@@ -1,19 +1,84 @@
+/* 🌙 BODY STYLE */
 body {
-  font-family: Arial;
-  text-align: center;
-  background: #0f172a;
+  background: #0b1320;
   color: white;
-}
-
-#tree {
-  margin-top: 20px;
-}
-
-.node {
-  display: inline-block;
+  font-family: Arial, sans-serif;
+  margin: 0;
   padding: 10px;
-  margin: 10px;
-  border: 1px solid #ccc;
-  background: #1e293b;
+}
+
+/* 🧾 HEADING */
+h1 {
+  margin-bottom: 10px;
+}
+
+h2, h3 {
+  margin: 10px 0;
+}
+
+/* 📊 DASHBOARD CARDS */
+.card {
+  border: 1px solid #ffffff33;
+  padding: 12px;
+  min-width: 130px;
+  background: #111827;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #00000055;
+}
+
+/* 🏆 TOP EARNERS */
+#topEarners {
+  margin-top: 10px;
+}
+
+#topEarners div {
+  padding: 6px;
+  border-bottom: 1px solid #ffffff22;
+}
+
+/* 🌳 TREE NODE */
+.node-box {
+  border: 1px solid #ffffff55;
+  padding: 10px;
+  display: inline-block;
   border-radius: 10px;
+  background: #1f2937;
+  box-shadow: 0 0 10px #00000066;
+}
+
+/* 🔘 BUTTON STYLE */
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin: 3px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+/* ❌ DELETE BUTTON SPECIAL */
+button:last-child {
+  background: #dc2626;
+}
+
+button:last-child:hover {
+  background: #b91c1c;
+}
+
+/* 📱 RESPONSIVE */
+@media (max-width: 600px) {
+  .card {
+    min-width: 100px;
+    font-size: 14px;
+  }
+
+  button {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
 }
