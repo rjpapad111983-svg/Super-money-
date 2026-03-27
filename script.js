@@ -6,12 +6,11 @@ let tree = {
   right: null
 };
 
-// 💾 SAVE DATA
+// 💾 SAVE / LOAD
 function saveData() {
   localStorage.setItem("mlmTree", JSON.stringify(tree));
 }
 
-// 📂 LOAD DATA
 function loadData() {
   let data = localStorage.getItem("mlmTree");
   if (data) {
@@ -30,28 +29,14 @@ function addMemberToNode(id, side) {
     if (node.id === id) {
       if (side === "left") {
         if (!node.left) {
-          node.left = {
-            id: Date.now(),
-            name,
-            left: null,
-            right: null
-          };
-        } else {
-          alert("Left full");
-        }
+          node.left = { id: Date.now(), name, left: null, right: null };
+        } else alert("Left full");
       }
 
       if (side === "right") {
         if (!node.right) {
-          node.right = {
-            id: Date.now(),
-            name,
-            left: null,
-            right: null
-          };
-        } else {
-          alert("Right full");
-        }
+          node.right = { id: Date.now(), name, left: null, right: null };
+        } else alert("Right full");
       }
     }
 
@@ -76,9 +61,7 @@ function editMember(id) {
   function update(node) {
     if (!node) return;
 
-    if (node.id === id) {
-      node.name = name;
-    }
+    if (node.id === id) node.name = name;
 
     update(node.left);
     update(node.right);
@@ -99,11 +82,9 @@ function deleteMember(id) {
   function remove(node) {
     if (!node) return;
 
-    if (node.left && node.left.id === id) {
-      node.left = null;
-    } else if (node.right && node.right.id === id) {
-      node.right = null;
-    } else {
+    if (node.left && node.left.id === id) node.left = null;
+    else if (node.right && node.right.id === id) node.right = null;
+    else {
       remove(node.left);
       remove(node.right);
     }
@@ -148,26 +129,18 @@ function getIncome() {
   let companyIncome = members * 10;
   let profit = companyIncome - memberIncome;
 
-  return {
-    pairs: data.pairs,
-    members,
-    memberIncome,
-    profit
-  };
-}
-
-// 🏆 GET MEMBERS
-function getAllMembers(node, arr = []) {
-  if (!node) return arr;
-
-  arr.push(node);
-  getAllMembers(node.left, arr);
-  getAllMembers(node.right, arr);
-
-  return arr;
+  return { pairs: data.pairs, members, memberIncome, profit };
 }
 
 // 📋 TABLE
+function getAllMembers(node, arr = []) {
+  if (!node) return arr;
+  arr.push(node);
+  getAllMembers(node.left, arr);
+  getAllMembers(node.right, arr);
+  return arr;
+}
+
 function renderMembersTable() {
   let members = getAllMembers(tree);
   let html = "";
@@ -233,6 +206,17 @@ function renderNode(node) {
 
     </div>
   `;
+}
+
+// 📱 PAGE SWITCH
+function showPage(page) {
+  document.getElementById("dashboardPage").style.display = "none";
+  document.getElementById("treePage").style.display = "none";
+  document.getElementById("membersPage").style.display = "none";
+
+  if (page === "dashboard") document.getElementById("dashboardPage").style.display = "block";
+  if (page === "tree") document.getElementById("treePage").style.display = "block";
+  if (page === "members") document.getElementById("membersPage").style.display = "block";
 }
 
 // 🚀 START
