@@ -1,4 +1,4 @@
-// 🌳 TREE DATA
+// 🌳 TREE
 let tree = {
   id: 1,
   name: "Rajesh",
@@ -6,7 +6,7 @@ let tree = {
   right: null
 };
 
-// 💾 SAVE / LOAD
+// 💾 STORAGE
 function saveData() {
   localStorage.setItem("mlmTree", JSON.stringify(tree));
 }
@@ -16,25 +16,21 @@ function loadData() {
   if (data) tree = JSON.parse(data);
 }
 
-// ➕ ADD MEMBER
+// ➕ ADD
 function addMemberToNode(id, side) {
-  let name = prompt("Enter member name:");
+  let name = prompt("Enter name");
   if (!name) return;
 
   function add(node) {
     if (!node) return;
 
     if (node.id === id) {
-      if (side === "left") {
-        if (!node.left) {
-          node.left = { id: Date.now(), name, left: null, right: null };
-        } else alert("Left full");
-      }
-
-      if (side === "right") {
-        if (!node.right) {
-          node.right = { id: Date.now(), name, left: null, right: null };
-        } else alert("Right full");
+      if (side === "left" && !node.left) {
+        node.left = { id: Date.now(), name, left: null, right: null };
+      } else if (side === "right" && !node.right) {
+        node.right = { id: Date.now(), name, left: null, right: null };
+      } else {
+        alert("Position full");
       }
     }
 
@@ -44,7 +40,7 @@ function addMemberToNode(id, side) {
 
   add(tree);
   saveData();
-  renderTree();
+  renderAll();
 }
 
 function addMember(side) {
@@ -53,28 +49,25 @@ function addMember(side) {
 
 // ✏️ EDIT
 function editMember(id) {
-  let name = prompt("Enter new name:");
+  let name = prompt("New name");
   if (!name) return;
 
-  function update(node) {
+  function edit(node) {
     if (!node) return;
     if (node.id === id) node.name = name;
 
-    update(node.left);
-    update(node.right);
+    edit(node.left);
+    edit(node.right);
   }
 
-  update(tree);
+  edit(tree);
   saveData();
-  renderTree();
+  renderAll();
 }
 
 // ❌ DELETE
 function deleteMember(id) {
-  if (id === 1) {
-    alert("Root delete nahi hoga");
-    return;
-  }
+  if (id === 1) return alert("Root delete not allowed");
 
   function remove(node) {
     if (!node) return;
@@ -89,7 +82,7 @@ function deleteMember(id) {
 
   remove(tree);
   saveData();
-  renderTree();
+  renderAll();
 }
 
 // 👥 COUNT
@@ -117,19 +110,18 @@ function calculatePairs(node) {
   };
 }
 
-// 💵 INCOME
-function getIncome() {
+// 📊 DASHBOARD
+function updateDashboard() {
   let data = calculatePairs(tree);
   let members = countMembers(tree);
 
-  let memberIncome = data.pairs * 3;
-  let companyIncome = members * 10;
-  let profit = companyIncome - memberIncome;
-
-  return { pairs: data.pairs, members, memberIncome, profit };
+  document.getElementById("members").innerText = members;
+  document.getElementById("pairs").innerText = data.pairs;
+  document.getElementById("commission").innerText = data.pairs * 3;
+  document.getElementById("profit").innerText = members * 10 - data.pairs * 3;
 }
 
-// 📋 ALL MEMBERS
+// 📋 MEMBERS
 function getAllMembers(node, arr = []) {
   if (!node) return arr;
 
@@ -140,7 +132,6 @@ function getAllMembers(node, arr = []) {
   return arr;
 }
 
-// 🔥 MEMBERS TABLE (FORCED VISIBLE BUTTONS)
 function renderMembersTable() {
   let members = getAllMembers(tree);
   let html = "";
@@ -150,7 +141,6 @@ function renderMembersTable() {
     let right = m.right ? 1 : 0;
 
     let pairs = calculatePairs(m).pairs;
-    let income = pairs * 3;
 
     html += `
       <tr>
@@ -158,19 +148,10 @@ function renderMembersTable() {
         <td>${m.id}</td>
         <td>${left}</td>
         <td>${right}</td>
-        <td>₹${income}</td>
+        <td>₹${pairs * 3}</td>
         <td>
-          <div style="display:flex;gap:5px;">
-            <div onclick="editMember(${m.id})"
-              style="background:#00ff88;color:black;padding:6px 10px;font-weight:bold;border-radius:4px;cursor:pointer;">
-              EDIT
-            </div>
-
-            <div onclick="deleteMember(${m.id})"
-              style="background:#ff4444;color:white;padding:6px 10px;font-weight:bold;border-radius:4px;cursor:pointer;">
-              DELETE
-            </div>
-          </div>
+          <button class="action-btn edit" onclick="editMember(${m.id})">Edit</button>
+          <button class="action-btn delete" onclick="deleteMember(${m.id})">Delete</button>
         </td>
       </tr>
     `;
@@ -179,49 +160,34 @@ function renderMembersTable() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// 🌳 TREE
-function renderTree() {
-  document.getElementById("tree").innerHTML = renderNode(tree);
-
-  let data = getIncome();
-
-  document.getElementById("members").innerText = data.members;
-  document.getElementById("pairs").innerText = data.pairs;
-  document.getElementById("commission").innerText = data.memberIncome;
-  document.getElementById("profit").innerText = data.profit;
-
-  renderMembersTable();
-}
-
-// 🌿 NODE UI
+// 🌳 TREE UI
 function renderNode(node) {
   if (!node) return "";
 
   return `
-    <div style="margin:20px; text-align:center;">
-      
-      <div style="border:1px solid white; padding:10px;">
-        ${node.name} (ID: ${node.id})
-        <br><br>
+    <div class="node">
+      ${node.name} (ID: ${node.id})<br><br>
 
-        <button onclick="addMemberToNode(${node.id}, 'left')">Left</button>
-        <button onclick="addMemberToNode(${node.id}, 'right')">Right</button>
-        <br><br>
+      <button onclick="addMemberToNode(${node.id}, 'left')">Left</button>
+      <button onclick="addMemberToNode(${node.id}, 'right')">Right</button>
+      <br><br>
 
-        <button onclick="editMember(${node.id})">Edit</button>
-        <button onclick="deleteMember(${node.id})">Delete</button>
-      </div>
+      <button onclick="editMember(${node.id})">Edit</button>
+      <button onclick="deleteMember(${node.id})">Delete</button>
 
-      <div style="display:flex; justify-content:space-around;">
+      <div style="display:flex;">
         <div>${renderNode(node.left)}</div>
         <div>${renderNode(node.right)}</div>
       </div>
-
     </div>
   `;
 }
 
-// 📱 PAGE SWITCH
+function renderTree() {
+  document.getElementById("tree").innerHTML = renderNode(tree);
+}
+
+// 🔄 PAGE
 function showPage(page) {
   document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("treePage").style.display = "none";
@@ -232,6 +198,12 @@ function showPage(page) {
   if (page === "members") document.getElementById("membersPage").style.display = "block";
 }
 
-// 🚀 START
+// 🚀 INIT
+function renderAll() {
+  renderTree();
+  renderMembersTable();
+  updateDashboard();
+}
+
 loadData();
-renderTree();
+renderAll();
