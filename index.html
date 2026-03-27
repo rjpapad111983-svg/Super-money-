@@ -1,42 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MLM Binary System</title>
+  <title>MLM Pro</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>Binary Tree System</h1>
+<div style="display:flex; font-family:sans-serif;">
 
-<button onclick="addMember('left')">Add Left</button>
-<button onclick="addMember('right')">Add Right</button>
+  <!-- SIDEBAR -->
+  <div style="width:220px; background:#0d1117; color:white; height:100vh; padding:15px;">
+    <h2>MLM Pro</h2>
 
-<h3>Total Members: <span id="members">0</span></h3>
-<h3>Total Pairs: <span id="pairs">0</span></h3>
-<h3>Total Commission: ₹<span id="commission">0</span></h3>
-<h3>Company Profit: ₹<span id="profit">0</span></h3>
+    <button onclick="showPage('dashboard')">Dashboard</button><br><br>
+    <button onclick="showPage('tree')">Binary Tree</button><br><br>
+    <button onclick="showPage('members')">Members</button>
+  </div>
 
-<hr>
+  <!-- CONTENT -->
+  <div style="flex:1; padding:20px; background:#020617; color:white; min-height:100vh;">
 
-<div id="tree"></div>
+    <!-- DASHBOARD -->
+    <div id="dashboardPage">
+      <h2>Dashboard</h2>
 
-<hr>
+      <p>Total Members: <span id="members"></span></p>
+      <p>Total Pairs: <span id="pairs"></span></p>
+      <p>Total Commission: ₹<span id="commission"></span></p>
+      <p>Company Profit: ₹<span id="profit"></span></p>
+    </div>
 
-<h2>Members Directory</h2>
+    <!-- TREE -->
+    <div id="treePage" style="display:none;">
+      <h2>Binary Tree</h2>
 
-<table border="1" width="100%">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>ID</th>
-      <th>Left</th>
-      <th>Right</th>
-      <th>Income</th>
-    </tr>
-  </thead>
-  <tbody id="membersTable"></tbody>
-</table>
+      <button onclick="addMember('left')">Add Left</button>
+      <button onclick="addMember('right')">Add Right</button>
+
+      <div id="tree"></div>
+    </div>
+
+    <!-- MEMBERS -->
+    <div id="membersPage" style="display:none;">
+      <h2>Members Directory</h2>
+
+      <table border="1" width="100%" style="color:white;">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>ID</th>
+            <th>Left</th>
+            <th>Right</th>
+            <th>Income</th>
+          </tr>
+        </thead>
+        <tbody id="membersTable"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
 
 <script src="script.js"></script>
 
