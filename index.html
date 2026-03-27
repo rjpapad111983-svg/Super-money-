@@ -7,33 +7,50 @@
 
 <body>
 
-<div style="display:flex; font-family:sans-serif;">
+<div class="app">
 
   <!-- SIDEBAR -->
-  <div style="width:220px; background:#0d1117; color:white; height:100vh; padding:15px;">
+  <div class="sidebar">
     <h2>MLM Pro</h2>
 
-    <button onclick="showPage('dashboard')">Dashboard</button><br><br>
-    <button onclick="showPage('tree')">Binary Tree</button><br><br>
+    <button onclick="showPage('dashboard')">Dashboard</button>
+    <button onclick="showPage('tree')">Binary Tree</button>
     <button onclick="showPage('members')">Members</button>
   </div>
 
-  <!-- CONTENT -->
-  <div style="flex:1; padding:20px; background:#020617; color:white; min-height:100vh;">
+  <!-- MAIN -->
+  <div class="main">
 
     <!-- DASHBOARD -->
     <div id="dashboardPage">
-      <h2>Dashboard</h2>
+      <h1>Dashboard</h1>
 
-      <p>Total Members: <span id="members"></span></p>
-      <p>Total Pairs: <span id="pairs"></span></p>
-      <p>Total Commission: ₹<span id="commission"></span></p>
-      <p>Company Profit: ₹<span id="profit"></span></p>
+      <div class="cards">
+        <div class="card">
+          <h3>Total Members</h3>
+          <p id="members">0</p>
+        </div>
+
+        <div class="card">
+          <h3>Total Pairs</h3>
+          <p id="pairs">0</p>
+        </div>
+
+        <div class="card">
+          <h3>Total Commission</h3>
+          <p>₹<span id="commission">0</span></p>
+        </div>
+
+        <div class="card">
+          <h3>Company Profit</h3>
+          <p>₹<span id="profit">0</span></p>
+        </div>
+      </div>
     </div>
 
     <!-- TREE -->
     <div id="treePage" style="display:none;">
-      <h2>Binary Tree</h2>
+      <h1>Binary Tree</h1>
 
       <button onclick="addMember('left')">Add Left</button>
       <button onclick="addMember('right')">Add Right</button>
@@ -43,9 +60,9 @@
 
     <!-- MEMBERS -->
     <div id="membersPage" style="display:none;">
-      <h2>Members Directory</h2>
+      <h1>Members Directory</h1>
 
-      <table border="1" width="100%" style="color:white;">
+      <table>
         <thead>
           <tr>
             <th>Name</th>
@@ -61,10 +78,8 @@
     </div>
 
   </div>
-
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
