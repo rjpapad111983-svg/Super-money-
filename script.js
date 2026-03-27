@@ -6,6 +6,19 @@ let tree = {
   right: null
 };
 
+// 💾 SAVE DATA
+function saveData() {
+  localStorage.setItem("mlmTree", JSON.stringify(tree));
+}
+
+// 📂 LOAD DATA
+function loadData() {
+  let data = localStorage.getItem("mlmTree");
+  if (data) {
+    tree = JSON.parse(data);
+  }
+}
+
 // ➕ ADD MEMBER
 function addMemberToNode(id, side) {
   let name = prompt("Enter member name:");
@@ -24,7 +37,7 @@ function addMemberToNode(id, side) {
             right: null
           };
         } else {
-          alert("Left already filled");
+          alert("Left full");
         }
       }
 
@@ -37,7 +50,7 @@ function addMemberToNode(id, side) {
             right: null
           };
         } else {
-          alert("Right already filled");
+          alert("Right full");
         }
       }
     }
@@ -47,24 +60,24 @@ function addMemberToNode(id, side) {
   }
 
   add(tree);
+  saveData();
   renderTree();
 }
 
-// ROOT BUTTON
 function addMember(side) {
   addMemberToNode(1, side);
 }
 
-// ✏️ EDIT MEMBER
+// ✏️ EDIT
 function editMember(id) {
-  let newName = prompt("Enter new name:");
-  if (!newName) return;
+  let name = prompt("New name:");
+  if (!name) return;
 
   function update(node) {
     if (!node) return;
 
     if (node.id === id) {
-      node.name = newName;
+      node.name = name;
     }
 
     update(node.left);
@@ -72,13 +85,14 @@ function editMember(id) {
   }
 
   update(tree);
+  saveData();
   renderTree();
 }
 
-// ❌ DELETE MEMBER
+// ❌ DELETE
 function deleteMember(id) {
   if (id === 1) {
-    alert("Root delete nahi kar sakte");
+    alert("Root delete nahi hoga");
     return;
   }
 
@@ -96,54 +110,53 @@ function deleteMember(id) {
   }
 
   remove(tree);
+  saveData();
   renderTree();
 }
 
-// 👥 COUNT MEMBERS
+// 👥 COUNT
 function countMembers(node) {
   if (!node) return 0;
   return 1 + countMembers(node.left) + countMembers(node.right);
 }
 
-// 💰 PAIR CALCULATION
+// 💰 PAIRS
 function calculatePairs(node) {
   if (!node) return { left: 0, right: 0, pairs: 0 };
 
-  let leftData = calculatePairs(node.left);
-  let rightData = calculatePairs(node.right);
+  let left = calculatePairs(node.left);
+  let right = calculatePairs(node.right);
 
-  let leftCount = node.left ? 1 + leftData.left + leftData.right : 0;
-  let rightCount = node.right ? 1 + rightData.left + rightData.right : 0;
+  let l = node.left ? 1 + left.left + left.right : 0;
+  let r = node.right ? 1 + right.left + right.right : 0;
 
-  let pair = Math.min(leftCount, rightCount);
-  let totalPairs = pair + leftData.pairs + rightData.pairs;
+  let pair = Math.min(l, r);
 
   return {
-    left: leftCount,
-    right: rightCount,
-    pairs: totalPairs
+    left: l,
+    right: r,
+    pairs: pair + left.pairs + right.pairs
   };
 }
 
-// 💵 INCOME SYSTEM
+// 💵 INCOME
 function getIncome() {
   let data = calculatePairs(tree);
-  let totalMembers = countMembers(tree);
+  let members = countMembers(tree);
 
   let memberIncome = data.pairs * 3;
-  let companyIncome = totalMembers * 10;
-  let companyProfit = companyIncome - memberIncome;
+  let companyIncome = members * 10;
+  let profit = companyIncome - memberIncome;
 
   return {
     pairs: data.pairs,
-    totalMembers: totalMembers,
-    memberIncome: memberIncome,
-    companyIncome: companyIncome,
-    companyProfit: companyProfit
+    members,
+    memberIncome,
+    profit
   };
 }
 
-// 🏆 GET ALL MEMBERS
+// 🏆 GET MEMBERS
 function getAllMembers(node, arr = []) {
   if (!node) return arr;
 
@@ -154,44 +167,44 @@ function getAllMembers(node, arr = []) {
   return arr;
 }
 
-// 🥇 TOP EARNERS
-function getTopEarners() {
+// 📋 TABLE
+function renderMembersTable() {
   let members = getAllMembers(tree);
-
-  return members
-    .map(m => {
-      let pairs = calculatePairs(m).pairs;
-      return {
-        name: m.name,
-        income: pairs * 3
-      };
-    })
-    .sort((a, b) => b.income - a.income);
-}
-
-// 📊 UPDATE DASHBOARD
-function updateDashboard() {
-  let data = getIncome();
-
-  document.getElementById("members").innerText = data.totalMembers;
-  document.getElementById("pairs").innerText = data.pairs;
-  document.getElementById("commission").innerText = data.memberIncome;
-  document.getElementById("profit").innerText = data.companyProfit;
-
-  let top = getTopEarners();
   let html = "";
 
-  top.forEach((m, i) => {
-    html += `<div>#${i + 1} ${m.name} - ₹${m.income}</div>`;
+  members.forEach(m => {
+    let left = m.left ? 1 : 0;
+    let right = m.right ? 1 : 0;
+
+    let pairs = calculatePairs(m).pairs;
+    let income = pairs * 3;
+
+    html += `
+      <tr>
+        <td>${m.name}</td>
+        <td>${m.id}</td>
+        <td>${left}</td>
+        <td>${right}</td>
+        <td>₹${income}</td>
+      </tr>
+    `;
   });
 
-  document.getElementById("topEarners").innerHTML = html;
+  document.getElementById("membersTable").innerHTML = html;
 }
 
 // 🌳 RENDER TREE
 function renderTree() {
   document.getElementById("tree").innerHTML = renderNode(tree);
-  updateDashboard();
+
+  let data = getIncome();
+
+  document.getElementById("members").innerText = data.members;
+  document.getElementById("pairs").innerText = data.pairs;
+  document.getElementById("commission").innerText = data.memberIncome;
+  document.getElementById("profit").innerText = data.profit;
+
+  renderMembersTable();
 }
 
 // 🌿 NODE UI
@@ -201,7 +214,7 @@ function renderNode(node) {
   return `
     <div style="margin:20px; text-align:center;">
       
-      <div class="node-box">
+      <div style="border:1px solid white; padding:10px;">
         ${node.name} (ID: ${node.id})
         <br><br>
 
@@ -223,4 +236,5 @@ function renderNode(node) {
 }
 
 // 🚀 START
+loadData();
 renderTree();
