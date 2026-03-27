@@ -5,109 +5,37 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body style="background:#0b1320; color:white; text-align:center;">
 
   <h1>Binary Tree System</h1>
 
-  <!-- 🔥 NEW BUTTONS ADD -->
+  <!-- 🔥 DASHBOARD ADD -->
+  <div id="dashboard" style="margin-bottom:20px;">
+    
+    <h2>Dashboard</h2>
+
+    <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;">
+
+      <div class="card">Members: <span id="members">0</span></div>
+      <div class="card">Pairs: <span id="pairs">0</span></div>
+      <div class="card">Commission: ₹<span id="commission">0</span></div>
+      <div class="card">Company Profit: ₹<span id="profit">0</span></div>
+
+    </div>
+
+    <h3 style="margin-top:20px;">Top Earners</h3>
+    <div id="topEarners"></div>
+
+  </div>
+
+  <!-- 🔥 EXISTING BUTTONS -->
   <button onclick="addMember('left')">Add Left</button>
   <button onclick="addMember('right')">Add Right</button>
 
+  <!-- TREE -->
   <div id="tree"></div>
 
   <script src="script.js"></script>
-
-  <script>
-    // ROOT MEMBER
-    let tree = {
-      id: 1,
-      name: "Rajesh",
-      left: null,
-      right: null
-    };
-
-    // ADD MEMBER LEFT / RIGHT
-    function addMember(side) {
-      let name = prompt("Enter member name:");
-      if (!name) return;
-
-      if (side === "left") {
-        if (tree.left === null) {
-          tree.left = {
-            id: Date.now(),
-            name: name,
-            left: null,
-            right: null
-          };
-        } else {
-          alert("Left already filled");
-        }
-      }
-
-      if (side === "right") {
-        if (tree.right === null) {
-          tree.right = {
-            id: Date.now(),
-            name: name,
-            left: null,
-            right: null
-          };
-        } else {
-          alert("Right already filled");
-        }
-      }
-
-      renderTree();
-    }
-
-    // EDIT MEMBER
-    function editMember(id) {
-      let newName = prompt("Enter new name:");
-      if (!newName) return;
-
-      function update(node) {
-        if (!node) return;
-
-        if (node.id === id) {
-          node.name = newName;
-        }
-
-        update(node.left);
-        update(node.right);
-      }
-
-      update(tree);
-      renderTree();
-    }
-
-    // RENDER TREE
-    function renderTree() {
-      let html = renderNode(tree);
-      document.getElementById("tree").innerHTML = html;
-    }
-
-    function renderNode(node) {
-      if (!node) return "";
-
-      return `
-        <div style="margin:20px; text-align:center;">
-          <div style="border:1px solid white; padding:10px; display:inline-block;">
-            ${node.name} (ID: ${node.id})
-            <br><br>
-            <button onclick="editMember(${node.id})">Edit</button>
-          </div>
-
-          <div style="display:flex; justify-content:space-around;">
-            <div>${renderNode(node.left)}</div>
-            <div>${renderNode(node.right)}</div>
-          </div>
-        </div>
-      `;
-    }
-
-    // INITIAL LOAD
-    renderTree();
-  </script>
 
 </body>
 </html>
