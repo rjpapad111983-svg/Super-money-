@@ -1,4 +1,4 @@
-// GLOBAL TREE DATA
+// 🌳 TREE DATA
 let tree = {
   id: 1,
   name: "Rajesh",
@@ -6,7 +6,7 @@ let tree = {
   right: null
 };
 
-// ADD MEMBER (ANY NODE LEFT/RIGHT)
+// ➕ ADD MEMBER ANYWHERE
 function addMemberToNode(id, side) {
   let name = prompt("Enter member name:");
   if (!name) return;
@@ -16,10 +16,10 @@ function addMemberToNode(id, side) {
 
     if (node.id === id) {
       if (side === "left") {
-        if (node.left === null) {
+        if (!node.left) {
           node.left = {
             id: Date.now(),
-            name: name,
+            name,
             left: null,
             right: null
           };
@@ -29,10 +29,10 @@ function addMemberToNode(id, side) {
       }
 
       if (side === "right") {
-        if (node.right === null) {
+        if (!node.right) {
           node.right = {
             id: Date.now(),
-            name: name,
+            name,
             left: null,
             right: null
           };
@@ -50,12 +50,12 @@ function addMemberToNode(id, side) {
   renderTree();
 }
 
-// ROOT BUTTON (OPTIONAL)
+// ROOT BUTTON
 function addMember(side) {
   addMemberToNode(1, side);
 }
 
-// EDIT MEMBER
+// ✏️ EDIT MEMBER
 function editMember(id) {
   let newName = prompt("Enter new name:");
   if (!newName) return;
@@ -75,12 +75,75 @@ function editMember(id) {
   renderTree();
 }
 
-// RENDER TREE
-function renderTree() {
-  document.getElementById("tree").innerHTML = renderNode(tree);
+// ❌ DELETE MEMBER
+function deleteMember(id) {
+  if (id === 1) {
+    alert("Root delete nahi kar sakte");
+    return;
+  }
+
+  function remove(node) {
+    if (!node) return null;
+
+    if (node.left && node.left.id === id) {
+      node.left = null;
+    } else if (node.right && node.right.id === id) {
+      node.right = null;
+    } else {
+      remove(node.left);
+      remove(node.right);
+    }
+
+    return node;
+  }
+
+  remove(tree);
+  renderTree();
 }
 
-// EACH NODE UI
+// 💰 PAIR CALCULATION
+function calculatePairs(node) {
+  if (!node) return { left: 0, right: 0, pairs: 0 };
+
+  let leftData = calculatePairs(node.left);
+  let rightData = calculatePairs(node.right);
+
+  let leftCount = node.left ? 1 + leftData.left + leftData.right : 0;
+  let rightCount = node.right ? 1 + rightData.left + rightData.right : 0;
+
+  let pair = Math.min(leftCount, rightCount);
+
+  let totalPairs = pair + leftData.pairs + rightData.pairs;
+
+  return {
+    left: leftCount,
+    right: rightCount,
+    pairs: totalPairs
+  };
+}
+
+// 💵 INCOME
+function getIncome() {
+  let data = calculatePairs(tree);
+  let income = data.pairs * 3;
+
+  return {
+    pairs: data.pairs,
+    income: income
+  };
+}
+
+// 🌳 RENDER TREE
+function renderTree() {
+  let result = getIncome();
+
+  document.getElementById("tree").innerHTML =
+    `<h3>Total Pairs: ${result.pairs}</h3>
+     <h3>Total Income: ₹${result.income}</h3>` +
+    renderNode(tree);
+}
+
+// 🌿 NODE UI
 function renderNode(node) {
   if (!node) return "";
 
@@ -91,11 +154,12 @@ function renderNode(node) {
         ${node.name} (ID: ${node.id})
         <br><br>
 
-        <!-- 🔥 NEW BUTTONS PER MEMBER -->
         <button onclick="addMemberToNode(${node.id}, 'left')">Left</button>
         <button onclick="addMemberToNode(${node.id}, 'right')">Right</button>
         <br><br>
+
         <button onclick="editMember(${node.id})">Edit</button>
+        <button onclick="deleteMember(${node.id})">Delete</button>
       </div>
 
       <div style="display:flex; justify-content:space-around;">
@@ -107,5 +171,5 @@ function renderNode(node) {
   `;
 }
 
-// INITIAL LOAD
+// 🔄 START
 renderTree();
