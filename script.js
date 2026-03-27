@@ -53,7 +53,7 @@ function addMember(side) {
   addMemberToNode(1, side);
 }
 
-// ✏️ EDIT
+// ✏️ EDIT MEMBER
 function editMember(id) {
   let name = prompt("Enter new name:");
   if (!name) return;
@@ -61,7 +61,9 @@ function editMember(id) {
   function update(node) {
     if (!node) return;
 
-    if (node.id === id) node.name = name;
+    if (node.id === id) {
+      node.name = name;
+    }
 
     update(node.left);
     update(node.right);
@@ -72,7 +74,7 @@ function editMember(id) {
   renderTree();
 }
 
-// ❌ DELETE
+// ❌ DELETE MEMBER
 function deleteMember(id) {
   if (id === 1) {
     alert("Root delete nahi hoga");
@@ -82,9 +84,11 @@ function deleteMember(id) {
   function remove(node) {
     if (!node) return;
 
-    if (node.left && node.left.id === id) node.left = null;
-    else if (node.right && node.right.id === id) node.right = null;
-    else {
+    if (node.left && node.left.id === id) {
+      node.left = null;
+    } else if (node.right && node.right.id === id) {
+      node.right = null;
+    } else {
       remove(node.left);
       remove(node.right);
     }
@@ -95,7 +99,7 @@ function deleteMember(id) {
   renderTree();
 }
 
-// 👥 COUNT
+// 👥 COUNT MEMBERS
 function countMembers(node) {
   if (!node) return 0;
   return 1 + countMembers(node.left) + countMembers(node.right);
@@ -132,15 +136,18 @@ function getIncome() {
   return { pairs: data.pairs, members, memberIncome, profit };
 }
 
-// 📋 TABLE
+// 📋 ALL MEMBERS
 function getAllMembers(node, arr = []) {
   if (!node) return arr;
+
   arr.push(node);
   getAllMembers(node.left, arr);
   getAllMembers(node.right, arr);
+
   return arr;
 }
 
+// 📋 MEMBERS TABLE (EDIT FIXED)
 function renderMembersTable() {
   let members = getAllMembers(tree);
   let html = "";
@@ -160,8 +167,11 @@ function renderMembersTable() {
         <td>${right}</td>
         <td>₹${income}</td>
         <td>
-          <button onclick="editMember(${m.id})">✏️</button>
-          <button onclick="deleteMember(${m.id})">🗑️</button>
+          <button style="background:#2563eb;color:white;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;"
+            onclick="editMember(${m.id})">Edit</button>
+
+          <button style="background:#dc2626;color:white;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;margin-left:5px;"
+            onclick="deleteMember(${m.id})">Delete</button>
         </td>
       </tr>
     `;
@@ -170,7 +180,7 @@ function renderMembersTable() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// 🌳 RENDER TREE
+// 🌳 TREE RENDER
 function renderTree() {
   document.getElementById("tree").innerHTML = renderNode(tree);
 
