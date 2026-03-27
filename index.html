@@ -1,17 +1,113 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MLM Tree</title>
+  <title>Binary Tree System</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<h1>Binary Tree System</h1>
+  <h1>Binary Tree System</h1>
 
-<button onclick="addMember()">Add Member</button>
+  <!-- 🔥 NEW BUTTONS ADD -->
+  <button onclick="addMember('left')">Add Left</button>
+  <button onclick="addMember('right')">Add Right</button>
 
-<div id="tree"></div>
+  <div id="tree"></div>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
+
+  <script>
+    // ROOT MEMBER
+    let tree = {
+      id: 1,
+      name: "Rajesh",
+      left: null,
+      right: null
+    };
+
+    // ADD MEMBER LEFT / RIGHT
+    function addMember(side) {
+      let name = prompt("Enter member name:");
+      if (!name) return;
+
+      if (side === "left") {
+        if (tree.left === null) {
+          tree.left = {
+            id: Date.now(),
+            name: name,
+            left: null,
+            right: null
+          };
+        } else {
+          alert("Left already filled");
+        }
+      }
+
+      if (side === "right") {
+        if (tree.right === null) {
+          tree.right = {
+            id: Date.now(),
+            name: name,
+            left: null,
+            right: null
+          };
+        } else {
+          alert("Right already filled");
+        }
+      }
+
+      renderTree();
+    }
+
+    // EDIT MEMBER
+    function editMember(id) {
+      let newName = prompt("Enter new name:");
+      if (!newName) return;
+
+      function update(node) {
+        if (!node) return;
+
+        if (node.id === id) {
+          node.name = newName;
+        }
+
+        update(node.left);
+        update(node.right);
+      }
+
+      update(tree);
+      renderTree();
+    }
+
+    // RENDER TREE
+    function renderTree() {
+      let html = renderNode(tree);
+      document.getElementById("tree").innerHTML = html;
+    }
+
+    function renderNode(node) {
+      if (!node) return "";
+
+      return `
+        <div style="margin:20px; text-align:center;">
+          <div style="border:1px solid white; padding:10px; display:inline-block;">
+            ${node.name} (ID: ${node.id})
+            <br><br>
+            <button onclick="editMember(${node.id})">Edit</button>
+          </div>
+
+          <div style="display:flex; justify-content:space-around;">
+            <div>${renderNode(node.left)}</div>
+            <div>${renderNode(node.right)}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // INITIAL LOAD
+    renderTree();
+  </script>
+
 </body>
 </html>
