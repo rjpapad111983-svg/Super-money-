@@ -6,7 +6,7 @@ let tree = {
   right: null
 };
 
-// ➕ ADD MEMBER ANYWHERE
+// ➕ ADD MEMBER
 function addMemberToNode(id, side) {
   let name = prompt("Enter member name:");
   if (!name) return;
@@ -83,7 +83,7 @@ function deleteMember(id) {
   }
 
   function remove(node) {
-    if (!node) return null;
+    if (!node) return;
 
     if (node.left && node.left.id === id) {
       node.left = null;
@@ -93,8 +93,6 @@ function deleteMember(id) {
       remove(node.left);
       remove(node.right);
     }
-
-    return node;
   }
 
   remove(tree);
@@ -112,7 +110,6 @@ function calculatePairs(node) {
   let rightCount = node.right ? 1 + rightData.left + rightData.right : 0;
 
   let pair = Math.min(leftCount, rightCount);
-
   let totalPairs = pair + leftData.pairs + rightData.pairs;
 
   return {
@@ -122,14 +119,27 @@ function calculatePairs(node) {
   };
 }
 
-// 💵 INCOME
+// 👥 TOTAL MEMBERS
+function countMembers(node) {
+  if (!node) return 0;
+  return 1 + countMembers(node.left) + countMembers(node.right);
+}
+
+// 💵 FULL INCOME SYSTEM
 function getIncome() {
   let data = calculatePairs(tree);
-  let income = data.pairs * 3;
+  let totalMembers = countMembers(tree);
+
+  let memberIncome = data.pairs * 3;
+  let companyIncome = totalMembers * 10;
+  let companyProfit = companyIncome - memberIncome;
 
   return {
     pairs: data.pairs,
-    income: income
+    totalMembers: totalMembers,
+    memberIncome: memberIncome,
+    companyIncome: companyIncome,
+    companyProfit: companyProfit
   };
 }
 
@@ -138,9 +148,14 @@ function renderTree() {
   let result = getIncome();
 
   document.getElementById("tree").innerHTML =
-    `<h3>Total Pairs: ${result.pairs}</h3>
-     <h3>Total Income: ₹${result.income}</h3>` +
-    renderNode(tree);
+    `
+    <h3>Total Members: ${result.totalMembers}</h3>
+    <h3>Total Pairs: ${result.pairs}</h3>
+    <h3>Member Income: ₹${result.memberIncome}</h3>
+    <h3>Company Income: ₹${result.companyIncome}</h3>
+    <h3>Company Profit: ₹${result.companyProfit}</h3>
+    `
+    + renderNode(tree);
 }
 
 // 🌿 NODE UI
