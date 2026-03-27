@@ -1,84 +1,111 @@
-/* 🌙 BODY STYLE */
 body {
-  background: #0b1320;
-  color: white;
-  font-family: Arial, sans-serif;
   margin: 0;
-  padding: 10px;
+  font-family: Arial;
+  background: #0b1220;
+  color: white;
 }
 
-/* 🧾 HEADING */
-h1 {
-  margin-bottom: 10px;
+.app {
+  display: flex;
 }
 
-h2, h3 {
-  margin: 10px 0;
-}
-
-/* 📊 DASHBOARD CARDS */
-.card {
-  border: 1px solid #ffffff33;
-  padding: 12px;
-  min-width: 130px;
+/* SIDEBAR */
+.sidebar {
+  width: 200px;
   background: #111827;
-  border-radius: 8px;
-  box-shadow: 0 0 10px #00000055;
+  height: 100vh;
+  padding: 20px;
 }
 
-/* 🏆 TOP EARNERS */
-#topEarners {
-  margin-top: 10px;
+.sidebar h2 {
+  margin-bottom: 20px;
 }
 
-#topEarners div {
-  padding: 6px;
-  border-bottom: 1px solid #ffffff22;
-}
-
-/* 🌳 TREE NODE */
-.node-box {
-  border: 1px solid #ffffff55;
+.sidebar button {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
   padding: 10px;
-  display: inline-block;
-  border-radius: 10px;
   background: #1f2937;
-  box-shadow: 0 0 10px #00000066;
-}
-
-/* 🔘 BUTTON STYLE */
-button {
-  background: #2563eb;
   color: white;
   border: none;
-  padding: 5px 10px;
-  margin: 3px;
-  border-radius: 5px;
   cursor: pointer;
+  border-radius: 5px;
 }
 
-button:hover {
-  background: #1d4ed8;
+.sidebar button:hover {
+  background: #2563eb;
 }
 
-/* ❌ DELETE BUTTON SPECIAL */
-button:last-child {
-  background: #dc2626;
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 20px;
 }
 
-button:last-child:hover {
-  background: #b91c1c;
+/* CARDS */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
 }
 
-/* 📱 RESPONSIVE */
-@media (max-width: 600px) {
-  .card {
-    min-width: 100px;
-    font-size: 14px;
-  }
+.card {
+  background: #1f2937;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
 
-  button {
-    padding: 4px 8px;
-    font-size: 12px;
-  }
+.card p {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #374151;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background: #1f2937;
+}
+
+/* BUTTONS */
+.action-btn {
+  padding: 6px 10px;
+  margin: 2px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.edit {
+  background: #22c55e;
+  color: black;
+}
+
+.delete {
+  background: #ef4444;
+  color: white;
+}
+
+/* TREE */
+#tree {
+  margin-top: 20px;
+}
+
+.node {
+  border: 1px solid white;
+  padding: 10px;
+  margin: 10px;
+  text-align: center;
 }
