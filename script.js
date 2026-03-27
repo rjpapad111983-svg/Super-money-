@@ -99,6 +99,12 @@ function deleteMember(id) {
   renderTree();
 }
 
+// 👥 COUNT MEMBERS
+function countMembers(node) {
+  if (!node) return 0;
+  return 1 + countMembers(node.left) + countMembers(node.right);
+}
+
 // 💰 PAIR CALCULATION
 function calculatePairs(node) {
   if (!node) return { left: 0, right: 0, pairs: 0 };
@@ -119,13 +125,7 @@ function calculatePairs(node) {
   };
 }
 
-// 👥 TOTAL MEMBERS
-function countMembers(node) {
-  if (!node) return 0;
-  return 1 + countMembers(node.left) + countMembers(node.right);
-}
-
-// 💵 FULL INCOME SYSTEM
+// 💵 INCOME SYSTEM
 function getIncome() {
   let data = calculatePairs(tree);
   let totalMembers = countMembers(tree);
@@ -143,19 +143,55 @@ function getIncome() {
   };
 }
 
+// 🏆 GET ALL MEMBERS
+function getAllMembers(node, arr = []) {
+  if (!node) return arr;
+
+  arr.push(node);
+  getAllMembers(node.left, arr);
+  getAllMembers(node.right, arr);
+
+  return arr;
+}
+
+// 🥇 TOP EARNERS
+function getTopEarners() {
+  let members = getAllMembers(tree);
+
+  return members
+    .map(m => {
+      let pairs = calculatePairs(m).pairs;
+      return {
+        name: m.name,
+        income: pairs * 3
+      };
+    })
+    .sort((a, b) => b.income - a.income);
+}
+
+// 📊 UPDATE DASHBOARD
+function updateDashboard() {
+  let data = getIncome();
+
+  document.getElementById("members").innerText = data.totalMembers;
+  document.getElementById("pairs").innerText = data.pairs;
+  document.getElementById("commission").innerText = data.memberIncome;
+  document.getElementById("profit").innerText = data.companyProfit;
+
+  let top = getTopEarners();
+  let html = "";
+
+  top.forEach((m, i) => {
+    html += `<div>#${i + 1} ${m.name} - ₹${m.income}</div>`;
+  });
+
+  document.getElementById("topEarners").innerHTML = html;
+}
+
 // 🌳 RENDER TREE
 function renderTree() {
-  let result = getIncome();
-
-  document.getElementById("tree").innerHTML =
-    `
-    <h3>Total Members: ${result.totalMembers}</h3>
-    <h3>Total Pairs: ${result.pairs}</h3>
-    <h3>Member Income: ₹${result.memberIncome}</h3>
-    <h3>Company Income: ₹${result.companyIncome}</h3>
-    <h3>Company Profit: ₹${result.companyProfit}</h3>
-    `
-    + renderNode(tree);
+  document.getElementById("tree").innerHTML = renderNode(tree);
+  updateDashboard();
 }
 
 // 🌿 NODE UI
@@ -165,7 +201,7 @@ function renderNode(node) {
   return `
     <div style="margin:20px; text-align:center;">
       
-      <div style="border:1px solid white; padding:10px; display:inline-block;">
+      <div class="node-box">
         ${node.name} (ID: ${node.id})
         <br><br>
 
@@ -186,5 +222,5 @@ function renderNode(node) {
   `;
 }
 
-// 🔄 START
+// 🚀 START
 renderTree();
