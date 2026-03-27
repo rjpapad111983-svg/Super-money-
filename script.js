@@ -55,7 +55,7 @@ function addMember(side) {
 
 // ✏️ EDIT
 function editMember(id) {
-  let name = prompt("New name:");
+  let name = prompt("Enter new name:");
   if (!name) return;
 
   function update(node) {
@@ -159,6 +159,10 @@ function renderMembersTable() {
         <td>${left}</td>
         <td>${right}</td>
         <td>₹${income}</td>
+        <td>
+          <button onclick="editMember(${m.id})">✏️</button>
+          <button onclick="deleteMember(${m.id})">🗑️</button>
+        </td>
       </tr>
     `;
   });
