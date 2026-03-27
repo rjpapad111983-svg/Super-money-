@@ -1,41 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Binary Tree System</title>
+  <title>MLM Binary System</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body style="background:#0b1320; color:white; text-align:center;">
+<body>
 
-  <h1>Binary Tree System</h1>
+<h1>Binary Tree System</h1>
 
-  <!-- 🔥 DASHBOARD ADD -->
-  <div id="dashboard" style="margin-bottom:20px;">
-    
-    <h2>Dashboard</h2>
+<button onclick="addMember('left')">Add Left</button>
+<button onclick="addMember('right')">Add Right</button>
 
-    <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;">
+<h3>Total Members: <span id="members">0</span></h3>
+<h3>Total Pairs: <span id="pairs">0</span></h3>
+<h3>Total Commission: ₹<span id="commission">0</span></h3>
+<h3>Company Profit: ₹<span id="profit">0</span></h3>
 
-      <div class="card">Members: <span id="members">0</span></div>
-      <div class="card">Pairs: <span id="pairs">0</span></div>
-      <div class="card">Commission: ₹<span id="commission">0</span></div>
-      <div class="card">Company Profit: ₹<span id="profit">0</span></div>
+<hr>
 
-    </div>
+<div id="tree"></div>
 
-    <h3 style="margin-top:20px;">Top Earners</h3>
-    <div id="topEarners"></div>
+<hr>
 
-  </div>
+<h2>Members Directory</h2>
 
-  <!-- 🔥 EXISTING BUTTONS -->
-  <button onclick="addMember('left')">Add Left</button>
-  <button onclick="addMember('right')">Add Right</button>
+<table border="1" width="100%">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>ID</th>
+      <th>Left</th>
+      <th>Right</th>
+      <th>Income</th>
+    </tr>
+  </thead>
+  <tbody id="membersTable"></tbody>
+</table>
 
-  <!-- TREE -->
-  <div id="tree"></div>
-
-  <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
