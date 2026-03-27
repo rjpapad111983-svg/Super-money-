@@ -13,9 +13,7 @@ function saveData() {
 
 function loadData() {
   let data = localStorage.getItem("mlmTree");
-  if (data) {
-    tree = JSON.parse(data);
-  }
+  if (data) tree = JSON.parse(data);
 }
 
 // ➕ ADD MEMBER
@@ -53,17 +51,14 @@ function addMember(side) {
   addMemberToNode(1, side);
 }
 
-// ✏️ EDIT MEMBER
+// ✏️ EDIT
 function editMember(id) {
   let name = prompt("Enter new name:");
   if (!name) return;
 
   function update(node) {
     if (!node) return;
-
-    if (node.id === id) {
-      node.name = name;
-    }
+    if (node.id === id) node.name = name;
 
     update(node.left);
     update(node.right);
@@ -74,7 +69,7 @@ function editMember(id) {
   renderTree();
 }
 
-// ❌ DELETE MEMBER
+// ❌ DELETE
 function deleteMember(id) {
   if (id === 1) {
     alert("Root delete nahi hoga");
@@ -84,11 +79,9 @@ function deleteMember(id) {
   function remove(node) {
     if (!node) return;
 
-    if (node.left && node.left.id === id) {
-      node.left = null;
-    } else if (node.right && node.right.id === id) {
-      node.right = null;
-    } else {
+    if (node.left && node.left.id === id) node.left = null;
+    else if (node.right && node.right.id === id) node.right = null;
+    else {
       remove(node.left);
       remove(node.right);
     }
@@ -99,7 +92,7 @@ function deleteMember(id) {
   renderTree();
 }
 
-// 👥 COUNT MEMBERS
+// 👥 COUNT
 function countMembers(node) {
   if (!node) return 0;
   return 1 + countMembers(node.left) + countMembers(node.right);
@@ -147,7 +140,7 @@ function getAllMembers(node, arr = []) {
   return arr;
 }
 
-// 📋 MEMBERS TABLE (EDIT FIXED)
+// 🔥 MEMBERS TABLE (FORCED VISIBLE BUTTONS)
 function renderMembersTable() {
   let members = getAllMembers(tree);
   let html = "";
@@ -167,11 +160,17 @@ function renderMembersTable() {
         <td>${right}</td>
         <td>₹${income}</td>
         <td>
-          <button style="background:#2563eb;color:white;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;"
-            onclick="editMember(${m.id})">Edit</button>
+          <div style="display:flex;gap:5px;">
+            <div onclick="editMember(${m.id})"
+              style="background:#00ff88;color:black;padding:6px 10px;font-weight:bold;border-radius:4px;cursor:pointer;">
+              EDIT
+            </div>
 
-          <button style="background:#dc2626;color:white;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;margin-left:5px;"
-            onclick="deleteMember(${m.id})">Delete</button>
+            <div onclick="deleteMember(${m.id})"
+              style="background:#ff4444;color:white;padding:6px 10px;font-weight:bold;border-radius:4px;cursor:pointer;">
+              DELETE
+            </div>
+          </div>
         </td>
       </tr>
     `;
@@ -180,7 +179,7 @@ function renderMembersTable() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// 🌳 TREE RENDER
+// 🌳 TREE
 function renderTree() {
   document.getElementById("tree").innerHTML = renderNode(tree);
 
