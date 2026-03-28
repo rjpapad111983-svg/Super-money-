@@ -1,4 +1,4 @@
-// 🌳 TREE DATA
+// 🌳 TREE
 let tree = {
   id: 1,
   name: "Rajesh",
@@ -6,7 +6,7 @@ let tree = {
   right: null
 };
 
-// 💾 SAVE / LOAD
+// 💾 STORAGE
 function saveData() {
   localStorage.setItem("mlmTree", JSON.stringify(tree));
 }
@@ -16,9 +16,9 @@ function loadData() {
   if (data) tree = JSON.parse(data);
 }
 
-// ➕ ADD MEMBER
+// ➕ ADD
 function addMemberToNode(id, side) {
-  let name = prompt("Enter member name");
+  let name = prompt("Enter name");
   if (!name) return;
 
   function add(node) {
@@ -30,7 +30,7 @@ function addMemberToNode(id, side) {
       } else if (side === "right" && !node.right) {
         node.right = { id: Date.now(), name, left: null, right: null };
       } else {
-        alert("Position already filled");
+        alert("Position full");
       }
     }
 
@@ -43,24 +43,20 @@ function addMemberToNode(id, side) {
   renderAll();
 }
 
-function addMember(side) {
-  addMemberToNode(1, side);
-}
-
 // ✏️ EDIT
 function editMember(id) {
   let name = prompt("Enter new name");
   if (!name) return;
 
-  function update(node) {
+  function edit(node) {
     if (!node) return;
     if (node.id === id) node.name = name;
 
-    update(node.left);
-    update(node.right);
+    edit(node.left);
+    edit(node.right);
   }
 
-  update(tree);
+  edit(tree);
   saveData();
   renderAll();
 }
@@ -85,7 +81,7 @@ function deleteMember(id) {
   renderAll();
 }
 
-// 👥 TOTAL MEMBERS
+// 👥 COUNT TOTAL MEMBERS
 function countMembers(node) {
   if (!node) return 0;
   return 1 + countMembers(node.left) + countMembers(node.right);
@@ -97,8 +93,8 @@ function getDownlineCount(node) {
   return 1 + getDownlineCount(node.left) + getDownlineCount(node.right);
 }
 
-// 🔥 PAIR
-function getPair(node) {
+// 🔥 MEMBER PAIR (CORRECT MLM)
+function getMemberPair(node) {
   if (!node) return 0;
 
   let left = node.left ? getDownlineCount(node.left) : 0;
@@ -107,7 +103,7 @@ function getPair(node) {
   return Math.min(left, right);
 }
 
-// 📊 DASHBOARD
+// 📊 DASHBOARD (ROOT BASED)
 function updateDashboard() {
   let members = countMembers(tree);
 
@@ -115,6 +111,7 @@ function updateDashboard() {
   let right = tree.right ? getDownlineCount(tree.right) : 0;
 
   let pairs = Math.min(left, right);
+
   let commission = pairs * 3;
   let profit = members * 10 - commission;
 
@@ -135,15 +132,18 @@ function getAllMembers(node, arr = []) {
   return arr;
 }
 
-// 📋 TABLE
+// 📋 MEMBERS TABLE (DOWNLINE BASED)
 function renderMembersTable() {
   let members = getAllMembers(tree);
   let html = "";
 
   members.forEach(m => {
+
     let left = m.left ? getDownlineCount(m.left) : 0;
     let right = m.right ? getDownlineCount(m.right) : 0;
-    let income = Math.min(left, right) * 3;
+
+    let pairs = getMemberPair(m);
+    let income = pairs * 3;
 
     html += `
       <tr>
@@ -163,29 +163,25 @@ function renderMembersTable() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// 🌳 TREE UI (FIXED SAFE)
+// 🌳 TREE UI
 function renderNode(node) {
   if (!node) return "";
 
   return `
-    <div style="text-align:center; margin-top:20px;">
-      
-      <div style="display:inline-block; padding:10px; border:1px solid #3b82f6; border-radius:10px;">
-        <b>${node.name}</b><br>
-        ID: ${node.id}<br>
+    <div class="node">
+      <b>${node.name}</b><br>
+      ID: ${node.id}<br>
 
-        <button onclick="addMemberToNode(${node.id}, 'left')">L</button>
-        <button onclick="addMemberToNode(${node.id}, 'right')">R</button><br>
+      <button onclick="addMemberToNode(${node.id}, 'left')">L</button>
+      <button onclick="addMemberToNode(${node.id}, 'right')">R</button><br>
 
-        <button onclick="editMember(${node.id})">✏️</button>
-        <button onclick="deleteMember(${node.id})">❌</button>
+      <button onclick="editMember(${node.id})">✏️</button>
+      <button onclick="deleteMember(${node.id})">❌</button>
+
+      <div class="children">
+        ${renderNode(node.left)}
+        ${renderNode(node.right)}
       </div>
-
-      <div style="display:flex; justify-content:center; gap:40px; margin-top:20px;">
-        <div>${renderNode(node.left)}</div>
-        <div>${renderNode(node.right)}</div>
-      </div>
-
     </div>
   `;
 }
@@ -194,7 +190,7 @@ function renderTree() {
   document.getElementById("tree").innerHTML = renderNode(tree);
 }
 
-// 📄 PAGE SWITCH
+// 🔄 PAGE
 function showPage(page) {
   document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("treePage").style.display = "none";
