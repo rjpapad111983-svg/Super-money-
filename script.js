@@ -6,7 +6,7 @@ let tree = {
   right: null
 };
 
-// 💾 STORAGE
+// 💾 SAVE / LOAD
 function saveData() {
   localStorage.setItem("mlmTree", JSON.stringify(tree));
 }
@@ -43,20 +43,24 @@ function addMemberToNode(id, side) {
   renderAll();
 }
 
+function addMember(side) {
+  addMemberToNode(1, side);
+}
+
 // ✏️ EDIT
 function editMember(id) {
   let name = prompt("Enter new name");
   if (!name) return;
 
-  function edit(node) {
+  function update(node) {
     if (!node) return;
     if (node.id === id) node.name = name;
 
-    edit(node.left);
-    edit(node.right);
+    update(node.left);
+    update(node.right);
   }
 
-  edit(tree);
+  update(tree);
   saveData();
   renderAll();
 }
@@ -81,13 +85,13 @@ function deleteMember(id) {
   renderAll();
 }
 
-// 👥 COUNT
+// 👥 TOTAL MEMBERS
 function countMembers(node) {
   if (!node) return 0;
   return 1 + countMembers(node.left) + countMembers(node.right);
 }
 
-// 🔥 DOWNLINE
+// 🔥 DOWNLINE COUNT
 function getDownlineCount(node) {
   if (!node) return 0;
   return 1 + getDownlineCount(node.left) + getDownlineCount(node.right);
@@ -96,8 +100,10 @@ function getDownlineCount(node) {
 // 🔥 PAIR
 function getPair(node) {
   if (!node) return 0;
+
   let left = node.left ? getDownlineCount(node.left) : 0;
   let right = node.right ? getDownlineCount(node.right) : 0;
+
   return Math.min(left, right);
 }
 
@@ -118,12 +124,14 @@ function updateDashboard() {
   document.getElementById("profit").innerText = profit;
 }
 
-// 📋 MEMBERS LIST
+// 📋 ALL MEMBERS
 function getAllMembers(node, arr = []) {
   if (!node) return arr;
+
   arr.push(node);
   getAllMembers(node.left, arr);
   getAllMembers(node.right, arr);
+
   return arr;
 }
 
@@ -155,14 +163,14 @@ function renderMembersTable() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// 🌳 TREE UI (FIXED)
+// 🌳 TREE UI (FIXED SAFE)
 function renderNode(node) {
   if (!node) return "";
 
   return `
-    <div class="node-wrapper">
+    <div style="text-align:center; margin-top:20px;">
       
-      <div class="node">
+      <div style="display:inline-block; padding:10px; border:1px solid #3b82f6; border-radius:10px;">
         <b>${node.name}</b><br>
         ID: ${node.id}<br>
 
@@ -173,7 +181,7 @@ function renderNode(node) {
         <button onclick="deleteMember(${node.id})">❌</button>
       </div>
 
-      <div class="children">
+      <div style="display:flex; justify-content:center; gap:40px; margin-top:20px;">
         <div>${renderNode(node.left)}</div>
         <div>${renderNode(node.right)}</div>
       </div>
