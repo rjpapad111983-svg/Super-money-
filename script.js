@@ -6,17 +6,16 @@ let tree = {
   right: null
 };
 
-// 💾 STORAGE
-function saveData() {
+// LOAD
+let data = localStorage.getItem("mlmTree");
+if (data) tree = JSON.parse(data);
+
+// SAVE
+function save() {
   localStorage.setItem("mlmTree", JSON.stringify(tree));
 }
 
-function loadData() {
-  let data = localStorage.getItem("mlmTree");
-  if (data) tree = JSON.parse(data);
-}
-
-// ➕ ADD
+// ADD
 function addMemberToNode(id, side) {
   let name = prompt("Enter name");
   if (!name) return;
@@ -30,7 +29,7 @@ function addMemberToNode(id, side) {
       } else if (side === "right" && !node.right) {
         node.right = { id: Date.now(), name, left: null, right: null };
       } else {
-        alert("Position full");
+        alert("Already filled");
       }
     }
 
@@ -39,13 +38,13 @@ function addMemberToNode(id, side) {
   }
 
   add(tree);
-  saveData();
-  renderAll();
+  save();
+  render();
 }
 
-// ✏️ EDIT
+// EDIT
 function editMember(id) {
-  let name = prompt("Enter new name");
+  let name = prompt("New name");
   if (!name) return;
 
   function edit(node) {
@@ -57,11 +56,11 @@ function editMember(id) {
   }
 
   edit(tree);
-  saveData();
-  renderAll();
+  save();
+  render();
 }
 
-// ❌ DELETE
+// DELETE
 function deleteMember(id) {
   if (id === 1) return alert("Root delete not allowed");
 
@@ -77,73 +76,56 @@ function deleteMember(id) {
   }
 
   remove(tree);
-  saveData();
-  renderAll();
+  save();
+  render();
 }
 
-// 👥 COUNT TOTAL MEMBERS
-function countMembers(node) {
+// COUNT
+function count(node) {
   if (!node) return 0;
-  return 1 + countMembers(node.left) + countMembers(node.right);
+  return 1 + count(node.left) + count(node.right);
 }
 
-// 🔥 DOWNLINE COUNT
-function getDownlineCount(node) {
+// DOWNLINE
+function downline(node) {
   if (!node) return 0;
-  return 1 + getDownlineCount(node.left) + getDownlineCount(node.right);
+  return 1 + downline(node.left) + downline(node.right);
 }
 
-// 🔥 MEMBER PAIR (CORRECT MLM)
-function getMemberPair(node) {
-  if (!node) return 0;
+// DASHBOARD
+function dashboard() {
+  let members = count(tree);
 
-  let left = node.left ? getDownlineCount(node.left) : 0;
-  let right = node.right ? getDownlineCount(node.right) : 0;
-
-  return Math.min(left, right);
-}
-
-// 📊 DASHBOARD (ROOT BASED)
-function updateDashboard() {
-  let members = countMembers(tree);
-
-  let left = tree.left ? getDownlineCount(tree.left) : 0;
-  let right = tree.right ? getDownlineCount(tree.right) : 0;
+  let left = tree.left ? downline(tree.left) : 0;
+  let right = tree.right ? downline(tree.right) : 0;
 
   let pairs = Math.min(left, right);
 
-  let commission = pairs * 3;
-  let profit = members * 10 - commission;
-
   document.getElementById("members").innerText = members;
   document.getElementById("pairs").innerText = pairs;
-  document.getElementById("commission").innerText = commission;
-  document.getElementById("profit").innerText = profit;
+  document.getElementById("commission").innerText = pairs * 3;
+  document.getElementById("profit").innerText = members * 10 - pairs * 3;
 }
 
-// 📋 ALL MEMBERS
-function getAllMembers(node, arr = []) {
-  if (!node) return arr;
+// MEMBERS TABLE
+function table() {
+  let arr = [];
 
-  arr.push(node);
-  getAllMembers(node.left, arr);
-  getAllMembers(node.right, arr);
+  function collect(node) {
+    if (!node) return;
+    arr.push(node);
+    collect(node.left);
+    collect(node.right);
+  }
 
-  return arr;
-}
+  collect(tree);
 
-// 📋 MEMBERS TABLE (DOWNLINE BASED)
-function renderMembersTable() {
-  let members = getAllMembers(tree);
   let html = "";
 
-  members.forEach(m => {
-
-    let left = m.left ? getDownlineCount(m.left) : 0;
-    let right = m.right ? getDownlineCount(m.right) : 0;
-
-    let pairs = getMemberPair(m);
-    let income = pairs * 3;
+  arr.forEach(m => {
+    let left = m.left ? downline(m.left) : 0;
+    let right = m.right ? downline(m.right) : 0;
+    let income = Math.min(left, right) * 3;
 
     html += `
       <tr>
@@ -153,8 +135,8 @@ function renderMembersTable() {
         <td>${right}</td>
         <td>₹${income}</td>
         <td>
-          <button class="action-btn edit" onclick="editMember(${m.id})">Edit</button>
-          <button class="action-btn delete" onclick="deleteMember(${m.id})">Delete</button>
+          <button onclick="editMember(${m.id})">Edit</button>
+          <button onclick="deleteMember(${m.id})">Delete</button>
         </td>
       </tr>
     `;
@@ -163,48 +145,44 @@ function renderMembersTable() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// 🌳 TREE UI
-function renderNode(node) {
+// TREE
+function nodeUI(node) {
   if (!node) return "";
 
   return `
     <div class="node">
-      <b>${node.name}</b><br>
-      ID: ${node.id}<br>
-
-      <button onclick="addMemberToNode(${node.id}, 'left')">L</button>
-      <button onclick="addMemberToNode(${node.id}, 'right')">R</button><br>
-
-      <button onclick="editMember(${node.id})">✏️</button>
-      <button onclick="deleteMember(${node.id})">❌</button>
+      ${node.name}<br>ID:${node.id}<br>
+      <button onclick="addMemberToNode(${node.id},'left')">L</button>
+      <button onclick="addMemberToNode(${node.id},'right')">R</button><br>
+      <button onclick="editMember(${node.id})">E</button>
+      <button onclick="deleteMember(${node.id})">D</button>
 
       <div class="children">
-        ${renderNode(node.left)}
-        ${renderNode(node.right)}
+        ${nodeUI(node.left)}
+        ${nodeUI(node.right)}
       </div>
     </div>
   `;
 }
 
 function renderTree() {
-  document.getElementById("tree").innerHTML = renderNode(tree);
+  document.getElementById("tree").innerHTML = nodeUI(tree);
 }
 
-// 🔄 PAGE
-function showPage(page) {
+// PAGE
+function showPage(p) {
   document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("treePage").style.display = "none";
   document.getElementById("membersPage").style.display = "none";
 
-  document.getElementById(page + "Page").style.display = "block";
+  document.getElementById(p + "Page").style.display = "block";
 }
 
-// 🚀 INIT
-function renderAll() {
+// MAIN
+function render() {
   renderTree();
-  renderMembersTable();
-  updateDashboard();
+  table();
+  dashboard();
 }
 
-loadData();
-renderAll();
+render();
