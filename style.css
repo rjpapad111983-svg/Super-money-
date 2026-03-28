@@ -1,20 +1,23 @@
+/* 🌍 GLOBAL */
 body {
   margin: 0;
-  font-family: Arial;
-  background: #0b1220;
+  font-family: Arial, sans-serif;
+  background: #020617;
   color: white;
 }
 
-.app {
+/* 📦 LAYOUT */
+.container {
   display: flex;
 }
 
-/* SIDEBAR */
+/* 📌 SIDEBAR */
 .sidebar {
   width: 200px;
-  background: #111827;
-  height: 100vh;
+  background: #020617;
   padding: 20px;
+  height: 100vh;
+  border-right: 1px solid #1e293b;
 }
 
 .sidebar h2 {
@@ -24,45 +27,103 @@ body {
 .sidebar button {
   display: block;
   width: 100%;
-  margin: 10px 0;
+  margin-bottom: 10px;
   padding: 10px;
-  background: #1f2937;
-  color: white;
   border: none;
+  background: #1e293b;
+  color: white;
+  border-radius: 6px;
   cursor: pointer;
-  border-radius: 5px;
 }
 
 .sidebar button:hover {
-  background: #2563eb;
+  background: #3b82f6;
 }
 
-/* MAIN */
+/* 📄 MAIN */
 .main {
   flex: 1;
   padding: 20px;
 }
 
-/* CARDS */
+/* 📊 DASHBOARD */
 .cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
+  gap: 20px;
 }
 
 .card {
-  background: #1f2937;
+  background: #0f172a;
   padding: 20px;
   border-radius: 10px;
   text-align: center;
+  border: 1px solid #1e293b;
 }
 
-.card p {
-  font-size: 22px;
-  font-weight: bold;
+.card h3 {
+  margin-bottom: 10px;
+  color: #94a3b8;
 }
 
-/* TABLE */
+/* 🌳 TREE */
+#tree {
+  text-align: center;
+  overflow-x: auto;
+  padding: 20px;
+}
+
+/* NODE BOX */
+.node {
+  display: inline-block;
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid #3b82f6;
+  border-radius: 10px;
+  background: #0f172a;
+  min-width: 120px;
+}
+
+/* CHILDREN */
+.children {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 20px;
+}
+
+/* TREE BUTTON */
+.node button {
+  margin: 2px;
+  padding: 4px 6px;
+  font-size: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.node button:hover {
+  opacity: 0.8;
+}
+
+/* ✏️ BUTTON COLORS */
+.node button:nth-child(1),
+.node button:nth-child(2) {
+  background: #3b82f6;
+  color: white;
+}
+
+.node button:nth-child(3) {
+  background: #22c55e;
+  color: white;
+}
+
+.node button:nth-child(4) {
+  background: #ef4444;
+  color: white;
+}
+
+/* 📋 TABLE */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -70,42 +131,48 @@ table {
 }
 
 th, td {
-  border: 1px solid #374151;
   padding: 10px;
+  border: 1px solid #1e293b;
   text-align: center;
 }
 
 th {
-  background: #1f2937;
+  background: #1e293b;
 }
 
-/* BUTTONS */
+/* 🎯 ACTION BUTTONS */
 .action-btn {
-  padding: 6px 10px;
-  margin: 2px;
+  padding: 5px 10px;
   border: none;
-  cursor: pointer;
   border-radius: 5px;
+  cursor: pointer;
+  color: white;
 }
 
 .edit {
   background: #22c55e;
-  color: black;
 }
 
 .delete {
   background: #ef4444;
-  color: white;
 }
 
-/* TREE */
-#tree {
-  margin-top: 20px;
-}
+/* 📱 MOBILE */
+@media (max-width: 768px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
 
-.node {
-  border: 1px solid white;
-  padding: 10px;
-  margin: 10px;
-  text-align: center;
+  .sidebar {
+    width: 150px;
+  }
+
+  .node {
+    min-width: 100px;
+    font-size: 12px;
+  }
+
+  .children {
+    gap: 15px;
+  }
 }
