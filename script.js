@@ -43,13 +43,9 @@ function addMemberToNode(id, side) {
   renderAll();
 }
 
-function addMember(side) {
-  addMemberToNode(1, side);
-}
-
 // ✏️ EDIT
 function editMember(id) {
-  let name = prompt("New name");
+  let name = prompt("Enter new name");
   if (!name) return;
 
   function edit(node) {
@@ -85,43 +81,47 @@ function deleteMember(id) {
   renderAll();
 }
 
-// 👥 COUNT
+// 👥 COUNT TOTAL MEMBERS
 function countMembers(node) {
   if (!node) return 0;
   return 1 + countMembers(node.left) + countMembers(node.right);
 }
 
-// 💰 PAIRS
-function calculatePairs(node) {
-  if (!node) return { left: 0, right: 0, pairs: 0 };
-
-  let left = calculatePairs(node.left);
-  let right = calculatePairs(node.right);
-
-  let l = node.left ? 1 + left.left + left.right : 0;
-  let r = node.right ? 1 + right.left + right.right : 0;
-
-  let pair = Math.min(l, r);
-
-  return {
-    left: l,
-    right: r,
-    pairs: pair + left.pairs + right.pairs
-  };
+// 🔥 DOWNLINE COUNT
+function getDownlineCount(node) {
+  if (!node) return 0;
+  return 1 + getDownlineCount(node.left) + getDownlineCount(node.right);
 }
 
-// 📊 DASHBOARD
+// 🔥 MEMBER PAIR (CORRECT MLM)
+function getMemberPair(node) {
+  if (!node) return 0;
+
+  let left = node.left ? getDownlineCount(node.left) : 0;
+  let right = node.right ? getDownlineCount(node.right) : 0;
+
+  return Math.min(left, right);
+}
+
+// 📊 DASHBOARD (ROOT BASED)
 function updateDashboard() {
-  let data = calculatePairs(tree);
   let members = countMembers(tree);
 
+  let left = tree.left ? getDownlineCount(tree.left) : 0;
+  let right = tree.right ? getDownlineCount(tree.right) : 0;
+
+  let pairs = Math.min(left, right);
+
+  let commission = pairs * 3;
+  let profit = members * 10 - commission;
+
   document.getElementById("members").innerText = members;
-  document.getElementById("pairs").innerText = data.pairs;
-  document.getElementById("commission").innerText = data.pairs * 3;
-  document.getElementById("profit").innerText = members * 10 - data.pairs * 3;
+  document.getElementById("pairs").innerText = pairs;
+  document.getElementById("commission").innerText = commission;
+  document.getElementById("profit").innerText = profit;
 }
 
-// 📋 MEMBERS
+// 📋 ALL MEMBERS
 function getAllMembers(node, arr = []) {
   if (!node) return arr;
 
@@ -132,15 +132,18 @@ function getAllMembers(node, arr = []) {
   return arr;
 }
 
+// 📋 MEMBERS TABLE (DOWNLINE BASED)
 function renderMembersTable() {
   let members = getAllMembers(tree);
   let html = "";
 
   members.forEach(m => {
-    let left = m.left ? 1 : 0;
-    let right = m.right ? 1 : 0;
 
-    let pairs = calculatePairs(m).pairs;
+    let left = m.left ? getDownlineCount(m.left) : 0;
+    let right = m.right ? getDownlineCount(m.right) : 0;
+
+    let pairs = getMemberPair(m);
+    let income = pairs * 3;
 
     html += `
       <tr>
@@ -148,7 +151,7 @@ function renderMembersTable() {
         <td>${m.id}</td>
         <td>${left}</td>
         <td>${right}</td>
-        <td>₹${pairs * 3}</td>
+        <td>₹${income}</td>
         <td>
           <button class="action-btn edit" onclick="editMember(${m.id})">Edit</button>
           <button class="action-btn delete" onclick="deleteMember(${m.id})">Delete</button>
@@ -166,18 +169,18 @@ function renderNode(node) {
 
   return `
     <div class="node">
-      ${node.name} (ID: ${node.id})<br><br>
+      <b>${node.name}</b><br>
+      ID: ${node.id}<br>
 
-      <button onclick="addMemberToNode(${node.id}, 'left')">Left</button>
-      <button onclick="addMemberToNode(${node.id}, 'right')">Right</button>
-      <br><br>
+      <button onclick="addMemberToNode(${node.id}, 'left')">L</button>
+      <button onclick="addMemberToNode(${node.id}, 'right')">R</button><br>
 
-      <button onclick="editMember(${node.id})">Edit</button>
-      <button onclick="deleteMember(${node.id})">Delete</button>
+      <button onclick="editMember(${node.id})">✏️</button>
+      <button onclick="deleteMember(${node.id})">❌</button>
 
-      <div style="display:flex;">
-        <div>${renderNode(node.left)}</div>
-        <div>${renderNode(node.right)}</div>
+      <div class="children">
+        ${renderNode(node.left)}
+        ${renderNode(node.right)}
       </div>
     </div>
   `;
@@ -193,9 +196,7 @@ function showPage(page) {
   document.getElementById("treePage").style.display = "none";
   document.getElementById("membersPage").style.display = "none";
 
-  if (page === "dashboard") document.getElementById("dashboardPage").style.display = "block";
-  if (page === "tree") document.getElementById("treePage").style.display = "block";
-  if (page === "members") document.getElementById("membersPage").style.display = "block";
+  document.getElementById(page + "Page").style.display = "block";
 }
 
 // 🚀 INIT
