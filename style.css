@@ -1,178 +1,64 @@
-/* 🌍 GLOBAL */
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #020617;
+  font-family: Arial;
+  background: #0f172a;
   color: white;
 }
 
-/* 📦 LAYOUT */
 .container {
   display: flex;
 }
 
-/* 📌 SIDEBAR */
+/* SIDEBAR */
 .sidebar {
   width: 200px;
   background: #020617;
   padding: 20px;
   height: 100vh;
-  border-right: 1px solid #1e293b;
-}
-
-.sidebar h2 {
-  margin-bottom: 20px;
 }
 
 .sidebar button {
-  display: block;
   width: 100%;
-  margin-bottom: 10px;
+  margin: 10px 0;
   padding: 10px;
-  border: none;
   background: #1e293b;
+  border: none;
   color: white;
-  border-radius: 6px;
   cursor: pointer;
 }
 
-.sidebar button:hover {
-  background: #3b82f6;
-}
-
-/* 📄 MAIN */
+/* MAIN */
 .main {
   flex: 1;
   padding: 20px;
 }
 
-/* 📊 DASHBOARD */
-.cards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.card {
-  background: #0f172a;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  border: 1px solid #1e293b;
-}
-
-.card h3 {
-  margin-bottom: 10px;
-  color: #94a3b8;
-}
-
-/* 🌳 TREE */
+/* TREE */
 #tree {
   text-align: center;
-  overflow-x: auto;
-  padding: 20px;
 }
 
-/* NODE BOX */
 .node {
   display: inline-block;
   padding: 10px;
-  margin: 10px;
   border: 1px solid #3b82f6;
   border-radius: 10px;
-  background: #0f172a;
-  min-width: 120px;
+  margin: 10px;
 }
 
-/* CHILDREN */
 .children {
   display: flex;
   justify-content: center;
   gap: 40px;
-  margin-top: 20px;
 }
 
-/* TREE BUTTON */
-.node button {
-  margin: 2px;
-  padding: 4px 6px;
-  font-size: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.node button:hover {
-  opacity: 0.8;
-}
-
-/* ✏️ BUTTON COLORS */
-.node button:nth-child(1),
-.node button:nth-child(2) {
-  background: #3b82f6;
-  color: white;
-}
-
-.node button:nth-child(3) {
-  background: #22c55e;
-  color: white;
-}
-
-.node button:nth-child(4) {
-  background: #ef4444;
-  color: white;
-}
-
-/* 📋 TABLE */
+/* TABLE */
 table {
   width: 100%;
-  border-collapse: collapse;
   margin-top: 20px;
 }
 
-th, td {
+td, th {
   padding: 10px;
-  border: 1px solid #1e293b;
   text-align: center;
-}
-
-th {
-  background: #1e293b;
-}
-
-/* 🎯 ACTION BUTTONS */
-.action-btn {
-  padding: 5px 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  color: white;
-}
-
-.edit {
-  background: #22c55e;
-}
-
-.delete {
-  background: #ef4444;
-}
-
-/* 📱 MOBILE */
-@media (max-width: 768px) {
-  .cards {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    width: 150px;
-  }
-
-  .node {
-    min-width: 100px;
-    font-size: 12px;
-  }
-
-  .children {
-    gap: 15px;
-  }
 }
