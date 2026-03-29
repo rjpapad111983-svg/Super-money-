@@ -1,4 +1,4 @@
-// 🌳 TREE
+// 🌳 TREE DATA
 let tree = {
   id: 1,
   name: "Rajesh",
@@ -6,16 +6,16 @@ let tree = {
   right: null
 };
 
-// LOAD
+// 🔄 LOAD
 let data = localStorage.getItem("mlmTree");
 if (data) tree = JSON.parse(data);
 
-// SAVE
+// 💾 SAVE
 function save() {
   localStorage.setItem("mlmTree", JSON.stringify(tree));
 }
 
-// ➕ ADD
+// ➕ ADD MEMBER
 function addMemberToNode(id, side) {
   let name = prompt("Enter name");
   if (!name) return;
@@ -29,7 +29,7 @@ function addMemberToNode(id, side) {
       } else if (side === "right" && !node.right) {
         node.right = { id: Date.now(), name, left: null, right: null };
       } else {
-        alert("Already filled");
+        alert("Position already filled");
       }
     }
 
@@ -44,7 +44,7 @@ function addMemberToNode(id, side) {
 
 // ✏️ EDIT
 function editMember(id) {
-  let name = prompt("New name");
+  let name = prompt("Enter new name");
   if (!name) return;
 
   function edit(node) {
@@ -80,7 +80,7 @@ function deleteMember(id) {
   render();
 }
 
-// 👥 COUNT
+// 👥 TOTAL MEMBERS
 function count(node) {
   if (!node) return 0;
   return 1 + count(node.left) + count(node.right);
@@ -107,7 +107,7 @@ function dashboard() {
   document.getElementById("profit").innerText = members * 10 - pairs * 3;
 }
 
-// 📋 TABLE
+// 📋 MEMBERS TABLE
 function table() {
   let arr = [];
 
@@ -145,7 +145,7 @@ function table() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// 🌳 TREE (NO DELETE BUTTON HERE)
+// 🌳 TREE UI (NO DELETE BUTTON)
 function nodeUI(node) {
   if (!node) return "";
 
@@ -170,6 +170,47 @@ function renderTree() {
   document.getElementById("tree").innerHTML = nodeUI(tree);
 }
 
+// 🔍 SEARCH FUNCTION
+function searchMember() {
+  let input = document.getElementById("searchBox").value.toLowerCase();
+  let rows = document.querySelectorAll("#membersTable tr");
+
+  let resultHTML = "";
+  let found = false;
+
+  rows.forEach(row => {
+    let name = row.children[0].innerText.toLowerCase();
+
+    if (name.includes(input)) {
+      row.style.display = "";
+
+      if (!found && input !== "") {
+        let left = row.children[2].innerText;
+        let right = row.children[3].innerText;
+        let income = row.children[4].innerText;
+
+        let pair = Math.min(parseInt(left), parseInt(right));
+
+        resultHTML = `
+          <div style="background:#111;padding:10px;margin-top:10px;">
+            <b>${row.children[0].innerText}</b><br>
+            Left: ${left} | Right: ${right}<br>
+            Pair: ${pair}<br>
+            Income: ${income}
+          </div>
+        `;
+
+        found = true;
+      }
+
+    } else {
+      row.style.display = "none";
+    }
+  });
+
+  document.getElementById("searchResult").innerHTML = resultHTML;
+}
+
 // 📄 PAGE SWITCH
 function showPage(p) {
   document.getElementById("dashboardPage").style.display = "none";
@@ -179,11 +220,12 @@ function showPage(p) {
   document.getElementById(p + "Page").style.display = "block";
 }
 
-// 🚀 MAIN
+// 🚀 MAIN RENDER
 function render() {
   renderTree();
   table();
   dashboard();
 }
 
+// START
 render();
