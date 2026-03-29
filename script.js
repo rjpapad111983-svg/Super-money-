@@ -15,7 +15,7 @@ function save() {
   localStorage.setItem("mlmTree", JSON.stringify(tree));
 }
 
-// ADD
+// ➕ ADD
 function addMemberToNode(id, side) {
   let name = prompt("Enter name");
   if (!name) return;
@@ -42,7 +42,7 @@ function addMemberToNode(id, side) {
   render();
 }
 
-// EDIT
+// ✏️ EDIT
 function editMember(id) {
   let name = prompt("New name");
   if (!name) return;
@@ -60,7 +60,7 @@ function editMember(id) {
   render();
 }
 
-// DELETE
+// ❌ DELETE (TABLE ONLY)
 function deleteMember(id) {
   if (id === 1) return alert("Root delete not allowed");
 
@@ -80,19 +80,19 @@ function deleteMember(id) {
   render();
 }
 
-// COUNT
+// 👥 COUNT
 function count(node) {
   if (!node) return 0;
   return 1 + count(node.left) + count(node.right);
 }
 
-// DOWNLINE
+// 🔥 DOWNLINE
 function downline(node) {
   if (!node) return 0;
   return 1 + downline(node.left) + downline(node.right);
 }
 
-// DASHBOARD
+// 📊 DASHBOARD
 function dashboard() {
   let members = count(tree);
 
@@ -107,7 +107,7 @@ function dashboard() {
   document.getElementById("profit").innerText = members * 10 - pairs * 3;
 }
 
-// MEMBERS TABLE
+// 📋 TABLE
 function table() {
   let arr = [];
 
@@ -145,17 +145,18 @@ function table() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// TREE
+// 🌳 TREE (NO DELETE BUTTON HERE)
 function nodeUI(node) {
   if (!node) return "";
 
   return `
     <div class="node">
       ${node.name}<br>ID:${node.id}<br>
+
       <button onclick="addMemberToNode(${node.id},'left')">L</button>
       <button onclick="addMemberToNode(${node.id},'right')">R</button><br>
-      <button onclick="editMember(${node.id})">E</button>
-      <button onclick="deleteMember(${node.id})">D</button>
+
+      <button onclick="editMember(${node.id})">Edit</button>
 
       <div class="children">
         ${nodeUI(node.left)}
@@ -169,7 +170,7 @@ function renderTree() {
   document.getElementById("tree").innerHTML = nodeUI(tree);
 }
 
-// PAGE
+// 📄 PAGE SWITCH
 function showPage(p) {
   document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("treePage").style.display = "none";
@@ -178,7 +179,7 @@ function showPage(p) {
   document.getElementById(p + "Page").style.display = "block";
 }
 
-// MAIN
+// 🚀 MAIN
 function render() {
   renderTree();
   table();
