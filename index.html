@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MLM System</title>
+  <title>MLM Panel</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -9,7 +9,7 @@
 
 <div class="container">
 
-  <!-- SIDEBAR -->
+  <!-- Sidebar -->
   <div class="sidebar">
     <h2>MLM Panel</h2>
 
@@ -18,22 +18,22 @@
     <button onclick="showPage('members')">Members</button>
   </div>
 
-  <!-- MAIN -->
+  <!-- Main -->
   <div class="main">
 
-    <!-- DASHBOARD -->
+    <!-- Dashboard -->
     <div id="dashboardPage">
-      <h1>Dashboard</h1>
+      <h2>Dashboard</h2>
 
-      <p>Total Members: <span id="members">0</span></p>
-      <p>Total Pairs: <span id="pairs">0</span></p>
-      <p>Commission: ₹<span id="commission">0</span></p>
-      <p>Company Profit: ₹<span id="profit">0</span></p>
+      <p>Total Members: <span id="members"></span></p>
+      <p>Total Pairs: <span id="pairs"></span></p>
+      <p>Commission: ₹<span id="commission"></span></p>
+      <p>Company Profit: ₹<span id="profit"></span></p>
     </div>
 
-    <!-- TREE -->
+    <!-- Tree -->
     <div id="treePage" style="display:none;">
-      <h1>Binary Tree</h1>
+      <h2>Binary Tree</h2>
 
       <button onclick="addMemberToNode(1,'left')">Add Left</button>
       <button onclick="addMemberToNode(1,'right')">Add Right</button>
@@ -41,11 +41,24 @@
       <div id="tree"></div>
     </div>
 
-    <!-- MEMBERS -->
+    <!-- Members -->
     <div id="membersPage" style="display:none;">
-      <h1>Members</h1>
+      <h2>Members</h2>
 
-      <table border="1">
+      <!-- 🔍 SEARCH -->
+      <input 
+        type="text" 
+        id="searchBox" 
+        placeholder="🔍 Search name..." 
+        onkeyup="searchMember()" 
+        style="padding:8px; margin-bottom:10px; width:220px;"
+      >
+
+      <!-- RESULT BOX -->
+      <div id="searchResult"></div>
+
+      <!-- TABLE -->
+      <table border="1" cellpadding="5">
         <thead>
           <tr>
             <th>Name</th>
@@ -56,12 +69,12 @@
             <th>Action</th>
           </tr>
         </thead>
+
         <tbody id="membersTable"></tbody>
       </table>
     </div>
 
   </div>
-
 </div>
 
 <script src="script.js"></script>
