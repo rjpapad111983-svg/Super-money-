@@ -1,4 +1,3 @@
-// 🌳 TREE
 let tree = {
   id: 1,
   name: "Rajesh",
@@ -7,26 +6,20 @@ let tree = {
   wallet: 0
 };
 
-// LOAD
 let data = localStorage.getItem("mlmTree");
 if (data) tree = JSON.parse(data);
 
-// SAVE
 function save() {
   localStorage.setItem("mlmTree", JSON.stringify(tree));
 }
 
-// FIX OLD DATA
 function fixWallet(node) {
   if (!node) return;
-
   if (node.wallet === undefined) node.wallet = 0;
-
   fixWallet(node.left);
   fixWallet(node.right);
 }
 
-// ➕ ADD MEMBER
 function addMemberToNode(id, side) {
   let name = prompt("Enter name");
   if (!name) return;
@@ -53,17 +46,13 @@ function addMemberToNode(id, side) {
   render();
 }
 
-// ✏️ EDIT (ONLY NAME)
 function editMember(id) {
-  let name = prompt("Enter new name");
+  let name = prompt("New name");
   if (!name) return;
 
   function edit(node) {
     if (!node) return;
-
-    if (node.id === id) {
-      node.name = name;
-    }
+    if (node.id === id) node.name = name;
 
     edit(node.left);
     edit(node.right);
@@ -74,25 +63,20 @@ function editMember(id) {
   render();
 }
 
-// COUNT
 function count(node) {
   if (!node) return 0;
   return 1 + count(node.left) + count(node.right);
 }
 
-// DOWNLINE
 function downline(node) {
   if (!node) return 0;
   return 1 + downline(node.left) + downline(node.right);
 }
 
-// DASHBOARD
 function dashboard() {
   let members = count(tree);
-
   let left = tree.left ? downline(tree.left) : 0;
   let right = tree.right ? downline(tree.right) : 0;
-
   let pairs = Math.min(left, right);
 
   document.getElementById("members").innerText = members;
@@ -101,7 +85,6 @@ function dashboard() {
   document.getElementById("profit").innerText = members * 10 - pairs * 3;
 }
 
-// 📊 MEMBERS TABLE
 function table() {
   let arr = [];
 
@@ -120,13 +103,10 @@ function table() {
     let left = m.left ? downline(m.left) : 0;
     let right = m.right ? downline(m.right) : 0;
 
-    let newIncome = Math.min(left, right) * 3;
+    let income = Math.min(left, right) * 3;
 
-    // ✅ Wallet logic (reset नहीं होगा)
     if (!m.wallet) m.wallet = 0;
-    if (newIncome > m.wallet) {
-      m.wallet = newIncome;
-    }
+    if (income > m.wallet) m.wallet = income;
 
     html += `
       <tr>
@@ -134,11 +114,11 @@ function table() {
         <td>${m.id}</td>
         <td>${left}</td>
         <td>${right}</td>
-        <td>₹${newIncome}</td>
+        <td>₹${income}</td>
         <td>₹${m.wallet}</td>
         <td>
           <button onclick="editMember(${m.id})">Edit</button>
-          <button onclick="withdraw(${m.id})">Withdraw</button>
+          <button onclick="openAction(${m.id})">Action</button>
         </td>
       </tr>
     `;
@@ -147,14 +127,26 @@ function table() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// 💰 WITHDRAW
-function withdraw(id) {
+let currentUserId = null;
+
+function openAction(id) {
+  currentUserId = id;
+  document.getElementById("actionBox").style.display = "block";
+}
+
+function submitWithdraw() {
+  let amount = parseInt(document.getElementById("w_amount").value);
+
   function update(node) {
     if (!node) return;
 
-    if (node.id === id) {
-      alert("Withdraw ₹" + node.wallet);
-      node.wallet = 0;
+    if (node.id === currentUserId) {
+      if (node.wallet >= amount) {
+        node.wallet -= amount;
+        alert("Withdraw request submitted");
+      } else {
+        alert("Insufficient balance");
+      }
     }
 
     update(node.left);
@@ -166,19 +158,46 @@ function withdraw(id) {
   render();
 }
 
-// 🌳 TREE UI
+function submitTransfer() {
+  let toName = document.getElementById("t_to").value.toLowerCase();
+  let amount = parseInt(document.getElementById("t_amount").value);
+
+  let sender = null;
+  let receiver = null;
+
+  function find(node) {
+    if (!node) return;
+
+    if (node.id === currentUserId) sender = node;
+    if (node.name.toLowerCase() === toName) receiver = node;
+
+    find(node.left);
+    find(node.right);
+  }
+
+  find(tree);
+
+  if (!receiver) return alert("Receiver not found");
+  if (sender.wallet < amount) return alert("Not enough balance");
+
+  sender.wallet -= amount;
+  receiver.wallet += amount;
+
+  alert("Transfer success");
+
+  save();
+  render();
+}
+
 function nodeUI(node) {
   if (!node) return "";
 
   return `
     <div class="node">
       ${node.name}<br>ID:${node.id}<br>
-
       <button onclick="addMemberToNode(${node.id},'left')">L</button>
       <button onclick="addMemberToNode(${node.id},'right')">R</button><br>
-
       <button onclick="editMember(${node.id})">Edit</button>
-
       <div class="children">
         ${nodeUI(node.left)}
         ${nodeUI(node.right)}
@@ -191,7 +210,6 @@ function renderTree() {
   document.getElementById("tree").innerHTML = nodeUI(tree);
 }
 
-// 🔍 SEARCH
 function searchMember() {
   let input = document.getElementById("searchBox").value.toLowerCase();
   let rows = document.querySelectorAll("#membersTable tr");
@@ -202,7 +220,6 @@ function searchMember() {
   });
 }
 
-// PAGE SWITCH
 function showPage(p) {
   document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("treePage").style.display = "none";
@@ -211,7 +228,6 @@ function showPage(p) {
   document.getElementById(p + "Page").style.display = "block";
 }
 
-// MAIN
 function render() {
   fixWallet(tree);
   renderTree();
