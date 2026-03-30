@@ -1,21 +1,32 @@
-// 🌳 TREE DATA
+// 🌳 TREE
 let tree = {
   id: 1,
   name: "Rajesh",
   left: null,
-  right: null
+  right: null,
+  wallet: 0
 };
 
-// 🔄 LOAD
+// LOAD
 let data = localStorage.getItem("mlmTree");
 if (data) tree = JSON.parse(data);
 
-// 💾 SAVE
+// SAVE
 function save() {
   localStorage.setItem("mlmTree", JSON.stringify(tree));
 }
 
-// ➕ ADD MEMBER
+// 🔧 FIX OLD DATA
+function fixWallet(node) {
+  if (!node) return;
+
+  if (node.wallet === undefined) node.wallet = 0;
+
+  fixWallet(node.left);
+  fixWallet(node.right);
+}
+
+// ➕ ADD
 function addMemberToNode(id, side) {
   let name = prompt("Enter name");
   if (!name) return;
@@ -25,11 +36,11 @@ function addMemberToNode(id, side) {
 
     if (node.id === id) {
       if (side === "left" && !node.left) {
-        node.left = { id: Date.now(), name, left: null, right: null };
+        node.left = { id: Date.now(), name, left: null, right: null, wallet: 0 };
       } else if (side === "right" && !node.right) {
-        node.right = { id: Date.now(), name, left: null, right: null };
+        node.right = { id: Date.now(), name, left: null, right: null, wallet: 0 };
       } else {
-        alert("Position already filled");
+        alert("Already filled");
       }
     }
 
@@ -42,9 +53,9 @@ function addMemberToNode(id, side) {
   render();
 }
 
-// ✏️ EDIT
+// EDIT
 function editMember(id) {
-  let name = prompt("Enter new name");
+  let name = prompt("New name");
   if (!name) return;
 
   function edit(node) {
@@ -60,7 +71,7 @@ function editMember(id) {
   render();
 }
 
-// ❌ DELETE (TABLE ONLY)
+// DELETE
 function deleteMember(id) {
   if (id === 1) return alert("Root delete not allowed");
 
@@ -80,19 +91,19 @@ function deleteMember(id) {
   render();
 }
 
-// 👥 TOTAL MEMBERS
+// COUNT
 function count(node) {
   if (!node) return 0;
   return 1 + count(node.left) + count(node.right);
 }
 
-// 🔥 DOWNLINE
+// DOWNLINE
 function downline(node) {
   if (!node) return 0;
   return 1 + downline(node.left) + downline(node.right);
 }
 
-// 📊 DASHBOARD
+// DASHBOARD
 function dashboard() {
   let members = count(tree);
 
@@ -107,7 +118,7 @@ function dashboard() {
   document.getElementById("profit").innerText = members * 10 - pairs * 3;
 }
 
-// 📋 MEMBERS TABLE
+// TABLE
 function table() {
   let arr = [];
 
@@ -127,6 +138,8 @@ function table() {
     let right = m.right ? downline(m.right) : 0;
     let income = Math.min(left, right) * 3;
 
+    m.wallet = income; // wallet auto update
+
     html += `
       <tr>
         <td>${m.name}</td>
@@ -134,9 +147,11 @@ function table() {
         <td>${left}</td>
         <td>${right}</td>
         <td>₹${income}</td>
+        <td>₹${m.wallet}</td>
         <td>
           <button onclick="editMember(${m.id})">Edit</button>
           <button onclick="deleteMember(${m.id})">Delete</button>
+          <button onclick="withdraw(${m.id})">Withdraw</button>
         </td>
       </tr>
     `;
@@ -145,7 +160,26 @@ function table() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// 🌳 TREE UI (NO DELETE BUTTON)
+// WITHDRAW
+function withdraw(id) {
+  function update(node) {
+    if (!node) return;
+
+    if (node.id === id) {
+      alert("Withdraw ₹" + node.wallet);
+      node.wallet = 0;
+    }
+
+    update(node.left);
+    update(node.right);
+  }
+
+  update(tree);
+  save();
+  render();
+}
+
+// TREE
 function nodeUI(node) {
   if (!node) return "";
 
@@ -170,48 +204,18 @@ function renderTree() {
   document.getElementById("tree").innerHTML = nodeUI(tree);
 }
 
-// 🔍 SEARCH FUNCTION
+// SEARCH
 function searchMember() {
   let input = document.getElementById("searchBox").value.toLowerCase();
   let rows = document.querySelectorAll("#membersTable tr");
 
-  let resultHTML = "";
-  let found = false;
-
   rows.forEach(row => {
     let name = row.children[0].innerText.toLowerCase();
-
-    if (name.includes(input)) {
-      row.style.display = "";
-
-      if (!found && input !== "") {
-        let left = row.children[2].innerText;
-        let right = row.children[3].innerText;
-        let income = row.children[4].innerText;
-
-        let pair = Math.min(parseInt(left), parseInt(right));
-
-        resultHTML = `
-          <div style="background:#111;padding:10px;margin-top:10px;">
-            <b>${row.children[0].innerText}</b><br>
-            Left: ${left} | Right: ${right}<br>
-            Pair: ${pair}<br>
-            Income: ${income}
-          </div>
-        `;
-
-        found = true;
-      }
-
-    } else {
-      row.style.display = "none";
-    }
+    row.style.display = name.includes(input) ? "" : "none";
   });
-
-  document.getElementById("searchResult").innerHTML = resultHTML;
 }
 
-// 📄 PAGE SWITCH
+// PAGE
 function showPage(p) {
   document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("treePage").style.display = "none";
@@ -220,12 +224,12 @@ function showPage(p) {
   document.getElementById(p + "Page").style.display = "block";
 }
 
-// 🚀 MAIN RENDER
+// MAIN
 function render() {
+  fixWallet(tree);
   renderTree();
   table();
   dashboard();
 }
 
-// START
 render();
