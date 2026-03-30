@@ -16,7 +16,7 @@ function save() {
   localStorage.setItem("mlmTree", JSON.stringify(tree));
 }
 
-// 🔧 FIX OLD DATA
+// FIX OLD DATA
 function fixWallet(node) {
   if (!node) return;
 
@@ -26,7 +26,7 @@ function fixWallet(node) {
   fixWallet(node.right);
 }
 
-// ➕ ADD
+// ➕ ADD MEMBER
 function addMemberToNode(id, side) {
   let name = prompt("Enter name");
   if (!name) return;
@@ -53,40 +53,23 @@ function addMemberToNode(id, side) {
   render();
 }
 
-// EDIT
+// ✏️ EDIT (ONLY NAME)
 function editMember(id) {
-  let name = prompt("New name");
+  let name = prompt("Enter new name");
   if (!name) return;
 
   function edit(node) {
     if (!node) return;
-    if (node.id === id) node.name = name;
+
+    if (node.id === id) {
+      node.name = name;
+    }
 
     edit(node.left);
     edit(node.right);
   }
 
   edit(tree);
-  save();
-  render();
-}
-
-// DELETE
-function deleteMember(id) {
-  if (id === 1) return alert("Root delete not allowed");
-
-  function remove(node) {
-    if (!node) return;
-
-    if (node.left && node.left.id === id) node.left = null;
-    else if (node.right && node.right.id === id) node.right = null;
-    else {
-      remove(node.left);
-      remove(node.right);
-    }
-  }
-
-  remove(tree);
   save();
   render();
 }
@@ -118,7 +101,7 @@ function dashboard() {
   document.getElementById("profit").innerText = members * 10 - pairs * 3;
 }
 
-// TABLE
+// 📊 MEMBERS TABLE
 function table() {
   let arr = [];
 
@@ -136,9 +119,14 @@ function table() {
   arr.forEach(m => {
     let left = m.left ? downline(m.left) : 0;
     let right = m.right ? downline(m.right) : 0;
-    let income = Math.min(left, right) * 3;
 
-    m.wallet = income; // wallet auto update
+    let newIncome = Math.min(left, right) * 3;
+
+    // ✅ Wallet logic (reset नहीं होगा)
+    if (!m.wallet) m.wallet = 0;
+    if (newIncome > m.wallet) {
+      m.wallet = newIncome;
+    }
 
     html += `
       <tr>
@@ -146,11 +134,10 @@ function table() {
         <td>${m.id}</td>
         <td>${left}</td>
         <td>${right}</td>
-        <td>₹${income}</td>
+        <td>₹${newIncome}</td>
         <td>₹${m.wallet}</td>
         <td>
           <button onclick="editMember(${m.id})">Edit</button>
-          <button onclick="deleteMember(${m.id})">Delete</button>
           <button onclick="withdraw(${m.id})">Withdraw</button>
         </td>
       </tr>
@@ -160,7 +147,7 @@ function table() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// WITHDRAW
+// 💰 WITHDRAW
 function withdraw(id) {
   function update(node) {
     if (!node) return;
@@ -179,7 +166,7 @@ function withdraw(id) {
   render();
 }
 
-// TREE
+// 🌳 TREE UI
 function nodeUI(node) {
   if (!node) return "";
 
@@ -204,7 +191,7 @@ function renderTree() {
   document.getElementById("tree").innerHTML = nodeUI(tree);
 }
 
-// SEARCH
+// 🔍 SEARCH
 function searchMember() {
   let input = document.getElementById("searchBox").value.toLowerCase();
   let rows = document.querySelectorAll("#membersTable tr");
@@ -215,7 +202,7 @@ function searchMember() {
   });
 }
 
-// PAGE
+// PAGE SWITCH
 function showPage(p) {
   document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("treePage").style.display = "none";
