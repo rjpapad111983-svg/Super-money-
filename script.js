@@ -127,15 +127,34 @@ function table() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
+// ✅ ACTION FIX
 let currentUserId = null;
 
 function openAction(id) {
   currentUserId = id;
-  document.getElementById("actionBox").style.display = "block";
+
+  let box = document.getElementById("actionBox");
+
+  if (!box) {
+    alert("Action box not found ❌");
+    return;
+  }
+
+  box.style.display = "block";
+
+  setTimeout(() => {
+    box.scrollIntoView({ behavior: "smooth" });
+  }, 200);
+}
+
+function closeAction() {
+  document.getElementById("actionBox").style.display = "none";
 }
 
 function submitWithdraw() {
   let amount = parseInt(document.getElementById("w_amount").value);
+
+  if (!amount || amount <= 0) return alert("Enter valid amount");
 
   function update(node) {
     if (!node) return;
@@ -178,6 +197,7 @@ function submitTransfer() {
   find(tree);
 
   if (!receiver) return alert("Receiver not found");
+  if (!amount || amount <= 0) return alert("Enter valid amount");
   if (sender.wallet < amount) return alert("Not enough balance");
 
   sender.wallet -= amount;
