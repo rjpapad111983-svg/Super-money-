@@ -1,3 +1,4 @@
+// 🌳 TREE
 let tree = {
   id: 1,
   name: "Rajesh",
@@ -6,13 +7,16 @@ let tree = {
   wallet: 0
 };
 
+// LOAD
 let data = localStorage.getItem("mlmTree");
 if (data) tree = JSON.parse(data);
 
+// SAVE
 function save() {
   localStorage.setItem("mlmTree", JSON.stringify(tree));
 }
 
+// FIX WALLET
 function fixWallet(node) {
   if (!node) return;
   if (node.wallet === undefined) node.wallet = 0;
@@ -20,6 +24,7 @@ function fixWallet(node) {
   fixWallet(node.right);
 }
 
+// ➕ ADD MEMBER
 function addMemberToNode(id, side) {
   let name = prompt("Enter name");
   if (!name) return;
@@ -46,6 +51,7 @@ function addMemberToNode(id, side) {
   render();
 }
 
+// ✏️ EDIT
 function editMember(id) {
   let name = prompt("New name");
   if (!name) return;
@@ -63,16 +69,19 @@ function editMember(id) {
   render();
 }
 
+// COUNT
 function count(node) {
   if (!node) return 0;
   return 1 + count(node.left) + count(node.right);
 }
 
+// DOWNLINE
 function downline(node) {
   if (!node) return 0;
   return 1 + downline(node.left) + downline(node.right);
 }
 
+// DASHBOARD
 function dashboard() {
   let members = count(tree);
   let left = tree.left ? downline(tree.left) : 0;
@@ -85,6 +94,7 @@ function dashboard() {
   document.getElementById("profit").innerText = members * 10 - pairs * 3;
 }
 
+// 📊 TABLE
 function table() {
   let arr = [];
 
@@ -118,7 +128,7 @@ function table() {
         <td>₹${m.wallet}</td>
         <td>
           <button onclick="editMember(${m.id})">Edit</button>
-          <button onclick="openAction(${m.id})">Action</button>
+          <button class="actionBtn" data-id="${m.id}">Action</button>
         </td>
       </tr>
     `;
@@ -127,8 +137,16 @@ function table() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// ✅ ACTION FIX
+// 🔥 ACTION SYSTEM
 let currentUserId = null;
+
+// FORCE CLICK FIX (IMPORTANT)
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("actionBtn")) {
+    let id = e.target.getAttribute("data-id");
+    openAction(parseInt(id));
+  }
+});
 
 function openAction(id) {
   currentUserId = id;
@@ -136,14 +154,17 @@ function openAction(id) {
   let box = document.getElementById("actionBox");
 
   if (!box) {
-    alert("Action box not found ❌");
+    alert("❌ actionBox missing");
     return;
   }
 
   box.style.display = "block";
 
   setTimeout(() => {
-    box.scrollIntoView({ behavior: "smooth" });
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth"
+    });
   }, 200);
 }
 
@@ -151,6 +172,7 @@ function closeAction() {
   document.getElementById("actionBox").style.display = "none";
 }
 
+// 💰 WITHDRAW
 function submitWithdraw() {
   let amount = parseInt(document.getElementById("w_amount").value);
 
@@ -177,6 +199,7 @@ function submitWithdraw() {
   render();
 }
 
+// 🔄 TRANSFER
 function submitTransfer() {
   let toName = document.getElementById("t_to").value.toLowerCase();
   let amount = parseInt(document.getElementById("t_amount").value);
@@ -209,6 +232,7 @@ function submitTransfer() {
   render();
 }
 
+// 🌳 TREE UI
 function nodeUI(node) {
   if (!node) return "";
 
@@ -230,6 +254,7 @@ function renderTree() {
   document.getElementById("tree").innerHTML = nodeUI(tree);
 }
 
+// 🔍 SEARCH
 function searchMember() {
   let input = document.getElementById("searchBox").value.toLowerCase();
   let rows = document.querySelectorAll("#membersTable tr");
@@ -240,6 +265,7 @@ function searchMember() {
   });
 }
 
+// PAGE
 function showPage(p) {
   document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("treePage").style.display = "none";
@@ -248,6 +274,7 @@ function showPage(p) {
   document.getElementById(p + "Page").style.display = "block";
 }
 
+// MAIN
 function render() {
   fixWallet(tree);
   renderTree();
