@@ -1,14 +1,15 @@
-// CURRENT COMPANY
+// =======================
+// COMPANY SYSTEM
+// =======================
+
 let currentCompany = localStorage.getItem("currentCompany") || "1";
 
-// LOAD COMPANY ON START
 window.onload = function () {
   document.getElementById("companySelect").value = currentCompany;
   loadCompanyNames();
   render();
 };
 
-// CHANGE COMPANY
 function changeCompany() {
   currentCompany = document.getElementById("companySelect").value;
   localStorage.setItem("currentCompany", currentCompany);
@@ -17,7 +18,7 @@ function changeCompany() {
 }
 
 // =======================
-// ✅ COMPANY RENAME SYSTEM
+// COMPANY RENAME
 // =======================
 
 function renameCompany() {
@@ -29,17 +30,13 @@ function renameCompany() {
   }
 
   let names = JSON.parse(localStorage.getItem("companyNames")) || {};
-
   names[currentCompany] = name;
-
   localStorage.setItem("companyNames", JSON.stringify(names));
 
   loadCompanyNames();
-
   alert("Company name updated ✅");
 }
 
-// LOAD COMPANY NAMES
 function loadCompanyNames() {
   let names = JSON.parse(localStorage.getItem("companyNames")) || {};
   let select = document.getElementById("companySelect");
@@ -56,10 +53,9 @@ function loadCompanyNames() {
 }
 
 // =======================
-// EXISTING SYSTEM (SAFE)
+// PAGE SYSTEM
 // =======================
 
-// SHOW PAGE
 function showPage(page) {
   document.getElementById("dashboard").style.display = "none";
   document.getElementById("tree").style.display = "none";
@@ -68,19 +64,8 @@ function showPage(page) {
   document.getElementById(page).style.display = "block";
 }
 
-// SEARCH MEMBER
-function searchMember() {
-  let input = document.getElementById("searchInput").value.toLowerCase();
-  let rows = document.querySelectorAll("#memberTable tr");
-
-  rows.forEach(row => {
-    let name = row.children[0].innerText.toLowerCase();
-    row.style.display = name.includes(input) ? "" : "none";
-  });
-}
-
 // =======================
-// DUMMY DATA LOAD (SAFE)
+// DATA SYSTEM
 // =======================
 
 function getData() {
@@ -92,13 +77,77 @@ function saveData(data) {
 }
 
 // =======================
+// ADD MEMBER (JOIN)
+// =======================
+
+function addMember() {
+  let name = document.getElementById("name").value;
+  let id = document.getElementById("memberId").value;
+  let position = document.getElementById("position").value;
+
+  if (!name || !id) {
+    alert("Enter name & ID");
+    return;
+  }
+
+  let data = getData();
+
+  // Duplicate ID check
+  let exists = data.find(m => m.id == id);
+  if (exists) {
+    alert("ID already exists");
+    return;
+  }
+
+  let newMember = {
+    name: name,
+    id: id,
+    left: 0,
+    right: 0,
+    wallet: 0
+  };
+
+  data.push(newMember);
+
+  // Simple binary count logic (top user)
+  if (data.length > 1) {
+    if (position === "left") {
+      data[0].left += 1;
+    } else {
+      data[0].right += 1;
+    }
+  }
+
+  saveData(data);
+  render();
+
+  alert("Member Added ✅");
+
+  document.getElementById("name").value = "";
+  document.getElementById("memberId").value = "";
+}
+
+// =======================
+// SEARCH
+// =======================
+
+function searchMember() {
+  let input = document.getElementById("searchInput").value.toLowerCase();
+  let rows = document.querySelectorAll("#memberTable tr");
+
+  rows.forEach(row => {
+    let name = row.children[0].innerText.toLowerCase();
+    row.style.display = name.includes(input) ? "" : "none";
+  });
+}
+
+// =======================
 // RENDER SYSTEM
 // =======================
 
 function render() {
   let data = getData();
 
-  // MEMBERS TABLE
   let table = document.getElementById("memberTable");
   table.innerHTML = "";
 
@@ -111,6 +160,11 @@ function render() {
     let pair = Math.min(member.left, member.right);
     let income = pair * 3;
 
+    // wallet auto update
+    if (!member.wallet) {
+      member.wallet = income;
+    }
+
     totalPairs += pair;
     totalCommission += income;
     companyProfit += (pair * 10 - income);
@@ -122,7 +176,7 @@ function render() {
         <td>${member.left}</td>
         <td>${member.right}</td>
         <td>₹${income}</td>
-        <td>₹${member.wallet || income}</td>
+        <td>₹${member.wallet}</td>
         <td>
           <button onclick="editMember('${member.id}')">Edit</button>
         </td>
@@ -132,7 +186,10 @@ function render() {
     table.innerHTML += row;
   });
 
-  // DASHBOARD UPDATE
+  // SAVE wallet updates
+  saveData(data);
+
+  // Dashboard
   document.getElementById("totalMembers").innerText = totalMembers;
   document.getElementById("totalPairs").innerText = totalPairs;
   document.getElementById("totalCommission").innerText = totalCommission;
@@ -140,9 +197,19 @@ function render() {
 }
 
 // =======================
-// EDIT MEMBER (SAFE)
+// EDIT MEMBER
 // =======================
 
 function editMember(id) {
-  alert("Edit system already available");
+  let data = getData();
+  let member = data.find(m => m.id == id);
+
+  let newName = prompt("Edit Name", member.name);
+
+  if (newName) {
+    member.name = newName;
+  }
+
+  saveData(data);
+  render();
 }
