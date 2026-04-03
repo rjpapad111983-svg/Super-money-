@@ -54,7 +54,6 @@ th, td {
   padding: 8px;
   text-align: center;
 }
-
 </style>
 </head>
 
@@ -69,7 +68,7 @@ th, td {
 
 <div class="main">
 
-  <!-- COMPANY SELECT -->
+  <!-- COMPANY -->
   <h3>Select Company</h3>
 
   <select id="companySelect" onchange="changeCompany()">
@@ -85,7 +84,7 @@ th, td {
     <option value="10">Company 10</option>
   </select>
 
-  <!-- ✅ NEW ADD (Rename System) -->
+  <!-- RENAME -->
   <br><br>
   <input type="text" id="companyNameInput" placeholder="Enter company name">
   <button onclick="renameCompany()">Rename Company</button>
@@ -111,8 +110,23 @@ th, td {
   <div id="members" style="display:none;">
     <h2>Members</h2>
 
+    <!-- 🔍 SEARCH -->
     <input type="text" id="searchInput" placeholder="Search name..." onkeyup="searchMember()">
 
+    <!-- ✅ ADD MEMBER -->
+    <h3>Add Member</h3>
+
+    <input type="text" id="name" placeholder="Name">
+    <input type="number" id="memberId" placeholder="ID">
+
+    <select id="position">
+      <option value="left">Left</option>
+      <option value="right">Right</option>
+    </select>
+
+    <button onclick="addMember()">Join Member</button>
+
+    <!-- TABLE -->
     <table>
       <thead>
         <tr>
@@ -127,6 +141,7 @@ th, td {
       </thead>
       <tbody id="memberTable"></tbody>
     </table>
+
   </div>
 
 </div>
