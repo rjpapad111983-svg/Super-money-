@@ -1,3 +1,39 @@
+// 🔐 ADMIN LOGIN
+let ADMIN_USER = "admin";
+let ADMIN_PASS = "1234";
+
+function adminLogin() {
+  let user = document.getElementById("adminUser").value;
+  let pass = document.getElementById("adminPass").value;
+
+  if (user === ADMIN_USER && pass === ADMIN_PASS) {
+    localStorage.setItem("adminLogin", "true");
+    location.reload();
+  } else {
+    alert("Wrong login");
+  }
+}
+
+function checkLogin() {
+  let status = localStorage.getItem("adminLogin");
+
+  if (status === "true") {
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("app").style.display = "block";
+  } else {
+    document.getElementById("loginPage").style.display = "block";
+    document.getElementById("app").style.display = "none";
+  }
+}
+
+function logout() {
+  localStorage.removeItem("adminLogin");
+  location.reload();
+}
+
+// 🔥 MAX PAYOUT LOCK
+const MAX_PAYOUT = 1000;
+
 // 🌳 TREE
 let tree = {
   id: 1,
@@ -7,16 +43,13 @@ let tree = {
   wallet: 0
 };
 
-// LOAD
 let data = localStorage.getItem("mlmTree");
 if (data) tree = JSON.parse(data);
 
-// SAVE
 function save() {
   localStorage.setItem("mlmTree", JSON.stringify(tree));
 }
 
-// FIX WALLET
 function fixWallet(node) {
   if (!node) return;
   if (node.wallet === undefined) node.wallet = 0;
@@ -94,7 +127,7 @@ function dashboard() {
   document.getElementById("profit").innerText = members * 10 - pairs * 3;
 }
 
-// 📊 TABLE
+// 📊 TABLE (UPDATED LOCK SYSTEM)
 function table() {
   let arr = [];
 
@@ -113,10 +146,25 @@ function table() {
     let left = m.left ? downline(m.left) : 0;
     let right = m.right ? downline(m.right) : 0;
 
-    let income = Math.min(left, right) * 3;
+    let totalIncome = Math.min(left, right) * 3;
 
     if (!m.wallet) m.wallet = 0;
-    if (income > m.wallet) m.wallet = income;
+
+    // 🔥 LOCK LOGIC
+    if (m.wallet < MAX_PAYOUT) {
+
+      let newIncome = totalIncome - m.wallet;
+
+      if (newIncome > 0) {
+        m.wallet += newIncome;
+      }
+
+      if (m.wallet > MAX_PAYOUT) {
+        m.wallet = MAX_PAYOUT;
+      }
+    }
+
+    let status = m.wallet >= MAX_PAYOUT ? "🔒 Locked" : "Active";
 
     html += `
       <tr>
@@ -124,11 +172,12 @@ function table() {
         <td>${m.id}</td>
         <td>${left}</td>
         <td>${right}</td>
-        <td>₹${income}</td>
+        <td>₹${totalIncome}</td>
         <td>₹${m.wallet}</td>
+        <td>${status}</td>
         <td>
           <button onclick="editMember(${m.id})">Edit</button>
-          <button class="actionBtn" data-id="${m.id}">Action</button>
+          <button onclick="openAction(${m.id})">Action</button>
         </td>
       </tr>
     `;
@@ -137,34 +186,16 @@ function table() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// 🔥 ACTION SYSTEM
+// ACTION
 let currentUserId = null;
-
-// FORCE CLICK FIX (IMPORTANT)
-document.addEventListener("click", function(e) {
-  if (e.target.classList.contains("actionBtn")) {
-    let id = e.target.getAttribute("data-id");
-    openAction(parseInt(id));
-  }
-});
 
 function openAction(id) {
   currentUserId = id;
-
   let box = document.getElementById("actionBox");
-
-  if (!box) {
-    alert("❌ actionBox missing");
-    return;
-  }
-
   box.style.display = "block";
 
   setTimeout(() => {
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: "smooth"
-    });
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
   }, 200);
 }
 
@@ -175,8 +206,6 @@ function closeAction() {
 // 💰 WITHDRAW
 function submitWithdraw() {
   let amount = parseInt(document.getElementById("w_amount").value);
-
-  if (!amount || amount <= 0) return alert("Enter valid amount");
 
   function update(node) {
     if (!node) return;
@@ -220,7 +249,6 @@ function submitTransfer() {
   find(tree);
 
   if (!receiver) return alert("Receiver not found");
-  if (!amount || amount <= 0) return alert("Enter valid amount");
   if (sender.wallet < amount) return alert("Not enough balance");
 
   sender.wallet -= amount;
@@ -276,6 +304,7 @@ function showPage(p) {
 
 // MAIN
 function render() {
+  checkLogin();
   fixWallet(tree);
   renderTree();
   table();
