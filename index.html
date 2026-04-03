@@ -1,20 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MLM Panel</title>
+  <title>MLM Multi Company Panel</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
+<!-- LOGIN -->
+<div id="loginPage" style="padding:20px;">
+  <h2>Admin Login</h2>
+  <input id="adminUser" placeholder="Username"><br><br>
+  <input id="adminPass" type="password" placeholder="Password"><br><br>
+  <button onclick="adminLogin()">Login</button>
+</div>
+
+<div id="app" style="display:none;">
 
 <div class="container">
 
   <!-- Sidebar -->
   <div class="sidebar">
     <h2>MLM Panel</h2>
+
+    <!-- COMPANY SELECT -->
+    <select id="companySelect" onchange="changeCompany()">
+      <option value="1">Company 1</option>
+      <option value="2">Company 2</option>
+      <option value="3">Company 3</option>
+      <option value="4">Company 4</option>
+      <option value="5">Company 5</option>
+      <option value="6">Company 6</option>
+      <option value="7">Company 7</option>
+      <option value="8">Company 8</option>
+      <option value="9">Company 9</option>
+      <option value="10">Company 10</option>
+    </select>
+
+    <br><br>
+
     <button onclick="showPage('dashboard')">Dashboard</button>
     <button onclick="showPage('tree')">Tree</button>
     <button onclick="showPage('members')">Members</button>
+    <button onclick="logout()">Logout</button>
   </div>
 
   <!-- Main -->
@@ -52,27 +80,23 @@
             <th>Right</th>
             <th>Income</th>
             <th>Wallet</th>
+            <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody id="membersTable"></tbody>
       </table>
 
-      <!-- ✅ ACTION BOX FIX -->
-      <div id="actionBox" style="display:none; background:#111; padding:15px; margin-top:15px; border:1px solid #444;">
+      <!-- Action -->
+      <div id="actionBox" style="display:none; background:#111; padding:15px; margin-top:15px;">
         <h3>Withdraw / Transfer</h3>
 
-        <!-- Withdraw -->
-        <h4>Bank Withdraw</h4>
-        <input id="w_name" placeholder="Name"><br>
-        <input id="w_account" placeholder="Account Number"><br>
-        <input id="w_ifsc" placeholder="IFSC"><br>
+        <h4>Withdraw</h4>
         <input id="w_amount" placeholder="Amount"><br>
-        <button onclick="submitWithdraw()">Submit Withdraw</button>
+        <button onclick="submitWithdraw()">Submit</button>
 
         <hr>
 
-        <!-- Transfer -->
         <h4>Transfer</h4>
         <input id="t_to" placeholder="Receiver Name"><br>
         <input id="t_amount" placeholder="Amount"><br>
@@ -85,6 +109,8 @@
     </div>
 
   </div>
+
+</div>
 
 </div>
 
