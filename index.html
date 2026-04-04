@@ -84,8 +84,8 @@ th, td {
     <option value="10">Company 10</option>
   </select>
 
-  <!-- RENAME -->
   <br><br>
+
   <input type="text" id="companyNameInput" placeholder="Enter company name">
   <button onclick="renameCompany()">Rename Company</button>
 
@@ -110,20 +110,21 @@ th, td {
   <div id="members" style="display:none;">
     <h2>Members</h2>
 
-    <!-- 🔍 SEARCH -->
+    <!-- SEARCH -->
     <input type="text" id="searchInput" placeholder="Search name..." onkeyup="searchMember()">
 
-    <!-- ✅ ADD MEMBER -->
+    <!-- ADD MEMBER -->
     <h3>Add Member</h3>
 
-    <input type="text" id="name" placeholder="Name">
-    <input type="number" id="memberId" placeholder="ID">
+    <input type="text" id="name" placeholder="Enter Name">
+    <input type="number" id="memberId" placeholder="Enter ID">
 
     <select id="position">
       <option value="left">Left</option>
       <option value="right">Right</option>
     </select>
 
+    <!-- ✅ FIXED BUTTON -->
     <button onclick="addMember()">Join Member</button>
 
     <!-- TABLE -->
@@ -146,6 +147,7 @@ th, td {
 
 </div>
 
+<!-- ✅ IMPORTANT -->
 <script src="script.js"></script>
 
 </body>
