@@ -1,4 +1,21 @@
 // =======================
+// COMPANY
+// =======================
+
+let currentCompany = localStorage.getItem("company") || "1";
+
+window.onload = function () {
+  document.getElementById("companySelect").value = currentCompany;
+  render();
+};
+
+function changeCompany() {
+  currentCompany = document.getElementById("companySelect").value;
+  localStorage.setItem("company", currentCompany);
+  render();
+}
+
+// =======================
 // DATA
 // =======================
 
@@ -11,7 +28,68 @@ function saveData(data) {
 }
 
 // =======================
-// DOWNLINE COUNT (MAIN)
+// TREE JOIN (MAIN)
+// =======================
+
+function addLeft(parentId) {
+  let childId = prompt("Enter NEW Member ID");
+  if (!childId) return;
+
+  let name = prompt("Enter Member Name");
+  if (!name) return;
+
+  let data = getData();
+
+  let parent = data.find(m => m.id == parentId);
+
+  if (parent.leftChild) return alert("Left already filled");
+
+  // create new member
+  let newMember = {
+    name: name,
+    id: childId,
+    leftChild: null,
+    rightChild: null
+  };
+
+  data.push(newMember);
+
+  parent.leftChild = childId;
+
+  saveData(data);
+  render();
+}
+
+function addRight(parentId) {
+  let childId = prompt("Enter NEW Member ID");
+  if (!childId) return;
+
+  let name = prompt("Enter Member Name");
+  if (!name) return;
+
+  let data = getData();
+
+  let parent = data.find(m => m.id == parentId);
+
+  if (parent.rightChild) return alert("Right already filled");
+
+  let newMember = {
+    name: name,
+    id: childId,
+    leftChild: null,
+    rightChild: null
+  };
+
+  data.push(newMember);
+
+  parent.rightChild = childId;
+
+  saveData(data);
+  render();
+}
+
+// =======================
+// DOWNLINE CALCULATION
 // =======================
 
 function countDownline(id, side) {
@@ -32,7 +110,7 @@ function countDownline(id, side) {
 }
 
 // =======================
-// CALCULATE ALL
+// CALCULATE
 // =======================
 
 function calculateAll() {
@@ -43,71 +121,12 @@ function calculateAll() {
     m.rightTotal = countDownline(m.id, "right");
 
     m.pair = Math.min(m.leftTotal, m.rightTotal);
-
     m.income = m.pair * 3;
 
-    // company profit (example logic)
     m.companyProfit = (m.leftTotal + m.rightTotal) * 10 - m.income;
   });
 
   saveData(data);
-}
-
-// =======================
-// ADD MEMBER
-// =======================
-
-function addMember() {
-  let name = document.getElementById("name").value.trim();
-  let id = document.getElementById("memberId").value.trim();
-
-  if (!name || !id) return alert("Enter Name & ID");
-
-  let data = getData();
-
-  if (data.find(m => m.id == id)) return alert("ID exists");
-
-  data.push({
-    name,
-    id,
-    leftChild: null,
-    rightChild: null
-  });
-
-  saveData(data);
-  render();
-}
-
-// =======================
-// LEFT RIGHT LINK
-// =======================
-
-function addLeft(parentId) {
-  let childId = prompt("Enter LEFT ID");
-
-  let data = getData();
-  let parent = data.find(m => m.id == parentId);
-
-  if (parent.leftChild) return alert("Already filled");
-
-  parent.leftChild = childId;
-
-  saveData(data);
-  render();
-}
-
-function addRight(parentId) {
-  let childId = prompt("Enter RIGHT ID");
-
-  let data = getData();
-  let parent = data.find(m => m.id == parentId);
-
-  if (parent.rightChild) return alert("Already filled");
-
-  parent.rightChild = childId;
-
-  saveData(data);
-  render();
 }
 
 // =======================
@@ -118,10 +137,10 @@ function editMember(id) {
   let data = getData();
   let m = data.find(x => x.id == id);
 
-  let name = prompt("New Name", m.name);
-  if (!name) return;
+  let newName = prompt("Edit Name", m.name);
+  if (!newName) return;
 
-  m.name = name;
+  m.name = newName;
 
   saveData(data);
   render();
@@ -135,7 +154,10 @@ function renderTree() {
   let data = getData();
   let container = document.getElementById("treeContainer");
 
-  if (data.length === 0) return;
+  if (data.length === 0) {
+    container.innerHTML = "<h3>Add first member from tree</h3>";
+    return;
+  }
 
   let root = data[0];
 
@@ -152,8 +174,10 @@ function renderTree() {
         Pair: ${m.pair || 0}<br>
         ₹${m.income || 0}
         <br><br>
-        <button onclick="addLeft('${m.id}')">L</button>
-        <button onclick="addRight('${m.id}')">R</button>
+
+        <button onclick="addLeft('${m.id}')">Left</button>
+        <button onclick="addRight('${m.id}')">Right</button>
+        <br><br>
         <button onclick="editMember('${m.id}')">Edit</button>
       </div>
 
@@ -169,7 +193,7 @@ function renderTree() {
 }
 
 // =======================
-// RENDER TABLE
+// MEMBERS TABLE
 // =======================
 
 function render() {
@@ -180,10 +204,10 @@ function render() {
 
   table.innerHTML = "";
 
-  let totalCompanyProfit = 0;
+  let totalProfit = 0;
 
   data.forEach(m => {
-    totalCompanyProfit += m.companyProfit;
+    totalProfit += m.companyProfit;
 
     table.innerHTML += `
     <tr>
@@ -199,7 +223,7 @@ function render() {
     `;
   });
 
-  document.getElementById("companyProfit").innerText = totalCompanyProfit;
+  document.getElementById("companyProfit").innerText = totalProfit;
 
   renderTree();
 }
