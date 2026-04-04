@@ -1,8 +1,12 @@
 // =======================
-// COMPANY SYSTEM
+// GLOBAL
 // =======================
 
 let currentCompany = localStorage.getItem("currentCompany") || "1";
+
+// =======================
+// INIT
+// =======================
 
 window.onload = function () {
   document.getElementById("companySelect").value = currentCompany;
@@ -10,16 +14,16 @@ window.onload = function () {
   render();
 };
 
+// =======================
+// COMPANY SYSTEM
+// =======================
+
 function changeCompany() {
   currentCompany = document.getElementById("companySelect").value;
   localStorage.setItem("currentCompany", currentCompany);
   loadCompanyNames();
   render();
 }
-
-// =======================
-// COMPANY RENAME
-// =======================
 
 function renameCompany() {
   let name = document.getElementById("companyNameInput").value;
@@ -31,10 +35,11 @@ function renameCompany() {
 
   let names = JSON.parse(localStorage.getItem("companyNames")) || {};
   names[currentCompany] = name;
-  localStorage.setItem("companyNames", JSON.stringify(names));
 
+  localStorage.setItem("companyNames", JSON.stringify(names));
   loadCompanyNames();
-  alert("Company name updated ✅");
+
+  alert("Company renamed ✅");
 }
 
 function loadCompanyNames() {
@@ -43,12 +48,7 @@ function loadCompanyNames() {
 
   for (let i = 0; i < select.options.length; i++) {
     let val = select.options[i].value;
-
-    if (names[val]) {
-      select.options[i].text = names[val];
-    } else {
-      select.options[i].text = "Company " + val;
-    }
+    select.options[i].text = names[val] || "Company " + val;
   }
 }
 
@@ -77,24 +77,23 @@ function saveData(data) {
 }
 
 // =======================
-// ADD MEMBER (JOIN)
+// ADD MEMBER (FIXED)
 // =======================
 
 function addMember() {
-  let name = document.getElementById("name").value;
-  let id = document.getElementById("memberId").value;
+  let name = document.getElementById("name").value.trim();
+  let id = document.getElementById("memberId").value.trim();
   let position = document.getElementById("position").value;
 
   if (!name || !id) {
-    alert("Enter name & ID");
+    alert("Enter Name & ID");
     return;
   }
 
   let data = getData();
 
-  // Duplicate ID check
-  let exists = data.find(m => m.id == id);
-  if (exists) {
+  // duplicate check
+  if (data.find(m => m.id == id)) {
     alert("ID already exists");
     return;
   }
@@ -109,20 +108,23 @@ function addMember() {
 
   data.push(newMember);
 
-  // Simple binary count logic (top user)
+  // first member root
   if (data.length > 1) {
     if (position === "left") {
-      data[0].left += 1;
+      data[0].left++;
     } else {
-      data[0].right += 1;
+      data[0].right++;
     }
   }
 
   saveData(data);
+
+  // 👉 IMPORTANT: render after save
   render();
 
   alert("Member Added ✅");
 
+  // clear input
   document.getElementById("name").value = "";
   document.getElementById("memberId").value = "";
 }
@@ -142,7 +144,7 @@ function searchMember() {
 }
 
 // =======================
-// RENDER SYSTEM
+// RENDER (FIXED)
 // =======================
 
 function render() {
@@ -160,36 +162,33 @@ function render() {
     let pair = Math.min(member.left, member.right);
     let income = pair * 3;
 
-    // wallet auto update
-    if (!member.wallet) {
-      member.wallet = income;
-    }
+    // wallet sync
+    member.wallet = income;
 
     totalPairs += pair;
     totalCommission += income;
     companyProfit += (pair * 10 - income);
 
-    let row = `
-      <tr>
-        <td>${member.name}</td>
-        <td>${member.id}</td>
-        <td>${member.left}</td>
-        <td>${member.right}</td>
-        <td>₹${income}</td>
-        <td>₹${member.wallet}</td>
-        <td>
-          <button onclick="editMember('${member.id}')">Edit</button>
-        </td>
-      </tr>
+    let row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${member.name}</td>
+      <td>${member.id}</td>
+      <td>${member.left}</td>
+      <td>${member.right}</td>
+      <td>₹${income}</td>
+      <td>₹${member.wallet}</td>
+      <td>
+        <button onclick="editMember('${member.id}')">Edit</button>
+      </td>
     `;
 
-    table.innerHTML += row;
+    table.appendChild(row);
   });
 
-  // SAVE wallet updates
   saveData(data);
 
-  // Dashboard
+  // dashboard update
   document.getElementById("totalMembers").innerText = totalMembers;
   document.getElementById("totalPairs").innerText = totalPairs;
   document.getElementById("totalCommission").innerText = totalCommission;
@@ -197,19 +196,18 @@ function render() {
 }
 
 // =======================
-// EDIT MEMBER
+// EDIT
 // =======================
 
 function editMember(id) {
   let data = getData();
   let member = data.find(m => m.id == id);
 
-  let newName = prompt("Edit Name", member.name);
+  let newName = prompt("Enter new name", member.name);
 
   if (newName) {
     member.name = newName;
+    saveData(data);
+    render();
   }
-
-  saveData(data);
-  render();
 }
