@@ -6,53 +6,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #0b1a2f;
-  color: white;
-}
+body { margin:0; font-family:Arial; background:#0b1a2f; color:white; }
 
 .sidebar {
-  width: 200px;
-  height: 100vh;
-  background: #081225;
-  position: fixed;
+  width:200px; height:100vh; background:#081225; position:fixed;
 }
-
-.sidebar h2 {
-  text-align: center;
-  padding: 20px;
-}
-
+.sidebar h2 { text-align:center; padding:20px; }
 .sidebar button {
-  width: 100%;
-  padding: 10px;
-  background: #12284a;
-  border: none;
-  color: white;
-  margin-bottom: 5px;
+  width:100%; padding:10px; background:#12284a; border:none; color:white; margin-bottom:5px;
 }
 
-.main {
-  margin-left: 200px;
-  padding: 20px;
-}
+.main { margin-left:200px; padding:20px; }
 
-input, button, select {
-  padding: 8px;
-  margin: 5px;
-}
+input, button, select { padding:8px; margin:5px; }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+table { width:100%; border-collapse:collapse; }
+th, td { border:1px solid #2a3f5f; padding:8px; text-align:center; }
 
-th, td {
-  border: 1px solid #2a3f5f;
-  padding: 8px;
-  text-align: center;
+.tree-box {
+  border:1px solid white;
+  padding:10px;
+  margin:10px;
+  display:inline-block;
 }
 </style>
 </head>
@@ -68,86 +43,63 @@ th, td {
 
 <div class="main">
 
-  <!-- COMPANY -->
-  <h3>Select Company</h3>
+<h3>Select Company</h3>
 
-  <select id="companySelect" onchange="changeCompany()">
-    <option value="1">Company 1</option>
-    <option value="2">Company 2</option>
-    <option value="3">Company 3</option>
-    <option value="4">Company 4</option>
-    <option value="5">Company 5</option>
-    <option value="6">Company 6</option>
-    <option value="7">Company 7</option>
-    <option value="8">Company 8</option>
-    <option value="9">Company 9</option>
-    <option value="10">Company 10</option>
-  </select>
+<select id="companySelect" onchange="changeCompany()">
+  <option value="1">Company 1</option>
+  <option value="2">Company 2</option>
+</select>
 
-  <br><br>
+<br><br>
 
-  <input type="text" id="companyNameInput" placeholder="Enter company name">
-  <button onclick="renameCompany()">Rename Company</button>
+<input type="text" id="companyNameInput" placeholder="Enter company name">
+<button onclick="renameCompany()">Rename Company</button>
 
-  <hr>
+<hr>
 
-  <!-- DASHBOARD -->
-  <div id="dashboard">
-    <h2>Dashboard</h2>
-    <p>Total Members: <span id="totalMembers">0</span></p>
-    <p>Total Pairs: <span id="totalPairs">0</span></p>
-    <p>Commission: ₹<span id="totalCommission">0</span></p>
-    <p>Company Profit: ₹<span id="companyProfit">0</span></p>
-  </div>
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <h2>Dashboard</h2>
+  <p>Total Members: <span id="totalMembers">0</span></p>
+  <p>Total Pairs: <span id="totalPairs">0</span></p>
+  <p>Commission: ₹<span id="totalCommission">0</span></p>
+</div>
 
-  <!-- TREE -->
-  <div id="tree" style="display:none;">
-    <h2>Binary Tree</h2>
-    <div id="treeContainer"></div>
-  </div>
+<!-- TREE -->
+<div id="tree" style="display:none;">
+  <h2>Binary Tree</h2>
+  <div id="treeContainer"></div>
+</div>
 
-  <!-- MEMBERS -->
-  <div id="members" style="display:none;">
-    <h2>Members</h2>
+<!-- MEMBERS -->
+<div id="members" style="display:none;">
+  <h2>Members</h2>
 
-    <!-- SEARCH -->
-    <input type="text" id="searchInput" placeholder="Search name..." onkeyup="searchMember()">
+  <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchMember()">
 
-    <!-- ADD MEMBER -->
-    <h3>Add Member</h3>
+  <h3>Add Member</h3>
 
-    <input type="text" id="name" placeholder="Enter Name">
-    <input type="number" id="memberId" placeholder="Enter ID">
+  <input type="text" id="name" placeholder="Name">
+  <input type="number" id="memberId" placeholder="ID">
 
-    <select id="position">
-      <option value="left">Left</option>
-      <option value="right">Right</option>
-    </select>
+  <button onclick="addMember()">Join</button>
 
-    <!-- ✅ FIXED BUTTON -->
-    <button onclick="addMember()">Join Member</button>
-
-    <!-- TABLE -->
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>ID</th>
-          <th>Left</th>
-          <th>Right</th>
-          <th>Income</th>
-          <th>Wallet</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="memberTable"></tbody>
-    </table>
-
-  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>ID</th>
+        <th>Left</th>
+        <th>Right</th>
+        <th>Income</th>
+      </tr>
+    </thead>
+    <tbody id="memberTable"></tbody>
+  </table>
+</div>
 
 </div>
 
-<!-- ✅ IMPORTANT -->
 <script src="script.js"></script>
 
 </body>
