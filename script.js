@@ -1,23 +1,10 @@
-// =======================
-// COMPANY
-// =======================
-
 let currentCompany = localStorage.getItem("company") || "1";
-
-window.onload = function () {
-  document.getElementById("companySelect").value = currentCompany;
-  render();
-};
 
 function changeCompany() {
   currentCompany = document.getElementById("companySelect").value;
   localStorage.setItem("company", currentCompany);
   render();
 }
-
-// =======================
-// DATA
-// =======================
 
 function getData() {
   return JSON.parse(localStorage.getItem("data_" + currentCompany)) || [];
@@ -27,216 +14,193 @@ function saveData(data) {
   localStorage.setItem("data_" + currentCompany, JSON.stringify(data));
 }
 
-// =======================
-// TREE JOIN (MAIN)
-// =======================
+// ================= TREE JOIN =================
 
 function addLeft(parentId) {
-  let childId = prompt("Enter NEW Member ID");
-  if (!childId) return;
+  let id = prompt("Enter ID");
+  let name = prompt("Enter Name");
 
-  let name = prompt("Enter Member Name");
-  if (!name) return;
+  if (!id || !name) return;
 
   let data = getData();
+  let parent = data.find(x => x.id == parentId);
 
-  let parent = data.find(m => m.id == parentId);
+  if (parent.leftChild) return alert("Left filled");
 
-  if (parent.leftChild) return alert("Left already filled");
-
-  // create new member
-  let newMember = {
-    name: name,
-    id: childId,
-    leftChild: null,
-    rightChild: null
-  };
-
+  let newMember = { id, name, leftChild:null, rightChild:null };
   data.push(newMember);
 
-  parent.leftChild = childId;
+  parent.leftChild = id;
 
   saveData(data);
   render();
 }
 
 function addRight(parentId) {
-  let childId = prompt("Enter NEW Member ID");
-  if (!childId) return;
+  let id = prompt("Enter ID");
+  let name = prompt("Enter Name");
 
-  let name = prompt("Enter Member Name");
-  if (!name) return;
+  if (!id || !name) return;
 
   let data = getData();
+  let parent = data.find(x => x.id == parentId);
 
-  let parent = data.find(m => m.id == parentId);
+  if (parent.rightChild) return alert("Right filled");
 
-  if (parent.rightChild) return alert("Right already filled");
-
-  let newMember = {
-    name: name,
-    id: childId,
-    leftChild: null,
-    rightChild: null
-  };
-
+  let newMember = { id, name, leftChild:null, rightChild:null };
   data.push(newMember);
 
-  parent.rightChild = childId;
+  parent.rightChild = id;
 
   saveData(data);
   render();
 }
 
-// =======================
-// DOWNLINE CALCULATION
-// =======================
+// ================= COUNT =================
 
-function countDownline(id, side) {
+function count(id, side) {
   let data = getData();
-  let member = data.find(m => m.id == id);
+  let m = data.find(x => x.id == id);
+  if (!m) return 0;
 
-  if (!member) return 0;
+  let child = side=="left" ? m.leftChild : m.rightChild;
+  if (!child) return 0;
 
-  let childId = side === "left" ? member.leftChild : member.rightChild;
-  if (!childId) return 0;
-
-  let count = 1;
-
-  count += countDownline(childId, "left");
-  count += countDownline(childId, "right");
-
-  return count;
+  return 1 + count(child,"left") + count(child,"right");
 }
 
-// =======================
-// CALCULATE
-// =======================
-
-function calculateAll() {
-  let data = getData();
-
-  data.forEach(m => {
-    m.leftTotal = countDownline(m.id, "left");
-    m.rightTotal = countDownline(m.id, "right");
-
-    m.pair = Math.min(m.leftTotal, m.rightTotal);
-    m.income = m.pair * 3;
-
-    m.companyProfit = (m.leftTotal + m.rightTotal) * 10 - m.income;
-  });
-
-  saveData(data);
-}
-
-// =======================
-// EDIT
-// =======================
+// ================= EDIT =================
 
 function editMember(id) {
   let data = getData();
-  let m = data.find(x => x.id == id);
+  let m = data.find(x=>x.id==id);
 
-  let newName = prompt("Edit Name", m.name);
-  if (!newName) return;
+  let n = prompt("New Name", m.name);
+  if (!n) return;
 
-  m.name = newName;
+  m.name = n;
 
   saveData(data);
   render();
 }
 
-// =======================
-// TREE
-// =======================
+// ================= TREE =================
 
 function renderTree() {
   let data = getData();
-  let container = document.getElementById("treeContainer");
+  let c = document.getElementById("treeContainer");
 
-  if (data.length === 0) {
-    container.innerHTML = "<h3>Add first member from tree</h3>";
+  if (data.length==0) {
+    c.innerHTML = "<button onclick='createRoot()'>Create Root</button>";
     return;
   }
 
   let root = data[0];
 
-  function build(m) {
-    if (!m) return "";
+  function build(m){
+    if(!m) return "";
 
-    let left = data.find(x => x.id == m.leftChild);
-    let right = data.find(x => x.id == m.rightChild);
+    let l = data.find(x=>x.id==m.leftChild);
+    let r = data.find(x=>x.id==m.rightChild);
 
     return `
-    <div style="text-align:center;margin:15px;">
+    <div style="text-align:center;margin:10px;">
       <div style="border:1px solid #fff;padding:10px;">
         ${m.name}<br>ID:${m.id}<br>
-        Pair: ${m.pair || 0}<br>
-        ₹${m.income || 0}
-        <br><br>
+        Pair:${m.pair||0}<br>
+        ₹${m.income||0}<br><br>
 
-        <button onclick="addLeft('${m.id}')">Left</button>
-        <button onclick="addRight('${m.id}')">Right</button>
-        <br><br>
+        <button onclick="addLeft('${m.id}')">L</button>
+        <button onclick="addRight('${m.id}')">R</button><br><br>
         <button onclick="editMember('${m.id}')">Edit</button>
       </div>
 
-      <div style="display:flex;gap:40px;justify-content:center;">
-        ${build(left)}
-        ${build(right)}
+      <div style="display:flex;gap:30px;justify-content:center;">
+        ${build(l)}
+        ${build(r)}
       </div>
-    </div>
-    `;
+    </div>`;
   }
 
-  container.innerHTML = build(root);
+  c.innerHTML = build(root);
 }
 
-// =======================
-// MEMBERS TABLE
-// =======================
+// ================= ROOT =================
 
-function render() {
-  calculateAll();
+function createRoot(){
+  let id = prompt("Root ID");
+  let name = prompt("Root Name");
 
+  let data = [{id,name,leftChild:null,rightChild:null}];
+  saveData(data);
+  render();
+}
+
+// ================= MAIN =================
+
+function render(){
   let data = getData();
   let table = document.getElementById("memberTable");
 
   table.innerHTML = "";
 
-  let totalProfit = 0;
+  let totalPair=0, totalIncome=0, totalProfit=0;
 
-  data.forEach(m => {
-    totalProfit += m.companyProfit;
+  data.forEach(m=>{
+    m.left = count(m.id,"left");
+    m.right = count(m.id,"right");
+
+    m.pair = Math.min(m.left,m.right);
+    m.income = m.pair*3;
+
+    m.profit = (m.left+m.right)*10 - m.income;
+
+    totalPair += m.pair;
+    totalIncome += m.income;
+    totalProfit += m.profit;
 
     table.innerHTML += `
     <tr>
       <td>${m.name}</td>
       <td>${m.id}</td>
-      <td>${m.leftTotal || 0}</td>
-      <td>${m.rightTotal || 0}</td>
-      <td>${m.pair || 0}</td>
-      <td>₹${m.income || 0}</td>
-      <td>₹${m.companyProfit || 0}</td>
+      <td>${m.left}</td>
+      <td>${m.right}</td>
+      <td>${m.pair}</td>
+      <td>₹${m.income}</td>
+      <td>₹${m.profit}</td>
       <td><button onclick="editMember('${m.id}')">Edit</button></td>
-    </tr>
-    `;
+    </tr>`;
   });
 
+  document.getElementById("totalMembers").innerText = data.length;
+  document.getElementById("totalPairs").innerText = totalPair;
+  document.getElementById("totalCommission").innerText = totalIncome;
   document.getElementById("companyProfit").innerText = totalProfit;
 
   renderTree();
 }
 
-// =======================
-// SEARCH
-// =======================
+// ================= SEARCH =================
 
-function searchMember() {
-  let val = document.getElementById("searchInput").value.toLowerCase();
+function searchMember(){
+  let v = document.getElementById("searchInput").value.toLowerCase();
   let rows = document.querySelectorAll("#memberTable tr");
 
-  rows.forEach(r => {
-    r.style.display = r.innerText.toLowerCase().includes(val) ? "" : "none";
+  rows.forEach(r=>{
+    r.style.display = r.innerText.toLowerCase().includes(v) ? "" : "none";
   });
 }
+
+// ================= NAV =================
+
+function showPage(p){
+  document.getElementById("dashboard").style.display="none";
+  document.getElementById("tree").style.display="none";
+  document.getElementById("members").style.display="none";
+
+  document.getElementById(p).style.display="block";
+}
+
+// ================= INIT =================
+
+render();
