@@ -1,9 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>MLM Panel</title>
-<link rel="stylesheet" href="style.css">
+  <title>MLM Panel</title>
+  <style>
+    body { margin:0; font-family:Arial; background:#0b1b2b; color:white; }
+    .sidebar { width:200px; height:100vh; background:#071423; float:left; padding:20px; }
+    .sidebar button { width:100%; margin:5px 0; padding:10px; }
+    .main { margin-left:220px; padding:20px; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { border:1px solid #555; padding:8px; text-align:center; }
+  </style>
 </head>
 
 <body>
@@ -17,7 +23,6 @@
 
 <div class="main">
 
-  <!-- COMPANY -->
   <h3>Select Company</h3>
 
   <select id="companySelect" onchange="changeCompany()">
@@ -32,11 +37,6 @@
     <option value="9">Company 9</option>
     <option value="10">Company 10</option>
   </select>
-
-  <br><br>
-
-  <input type="text" id="companyNameInput" placeholder="Enter company name">
-  <button onclick="renameCompany()">Rename Company</button>
 
   <hr>
 
@@ -59,11 +59,9 @@
   <div id="members" style="display:none;">
     <h2>Members</h2>
 
-    <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchMember()">
+    <input id="searchInput" placeholder="Search..." onkeyup="searchMember()">
 
-    <br><br>
-
-    <table border="1" width="100%">
+    <table>
       <thead>
         <tr>
           <th>Name</th>
@@ -72,13 +70,12 @@
           <th>Right</th>
           <th>Pair</th>
           <th>Income</th>
-          <th>Company Profit</th>
-          <th>Action</th>
+          <th>Profit</th>
+          <th>Edit</th>
         </tr>
       </thead>
       <tbody id="memberTable"></tbody>
     </table>
-
   </div>
 
 </div>
