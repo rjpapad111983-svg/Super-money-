@@ -1,10 +1,28 @@
 let currentCompany = localStorage.getItem("company") || "1";
 
+// ================= COMPANY NAME =================
+
+function updateCompanyName() {
+  let name = localStorage.getItem("companyName_" + currentCompany) || ("Company " + currentCompany);
+  document.getElementById("companyTitle").innerText = name;
+}
+
+function renameCompany() {
+  let name = document.getElementById("companyNameInput").value;
+  if (!name) return alert("Enter company name");
+
+  localStorage.setItem("companyName_" + currentCompany, name);
+  updateCompanyName();
+}
+
 function changeCompany() {
   currentCompany = document.getElementById("companySelect").value;
   localStorage.setItem("company", currentCompany);
+  updateCompanyName();
   render();
 }
+
+// ================= STORAGE =================
 
 function getData() {
   return JSON.parse(localStorage.getItem("data_" + currentCompany)) || [];
@@ -17,19 +35,17 @@ function saveData(data) {
 // ================= TREE JOIN =================
 
 function addLeft(parentId) {
-  let id = prompt("Enter ID");
   let name = prompt("Enter Name");
-
-  if (!id || !name) return;
+  if (!name) return;
 
   let data = getData();
   let parent = data.find(x => x.id == parentId);
 
-  if (parent.leftChild) return alert("Left filled");
+  if (parent.leftChild) return alert("Left already filled");
 
-  let newMember = { id, name, leftChild:null, rightChild:null };
-  data.push(newMember);
+  let id = Date.now().toString();
 
+  data.push({ id, name, leftChild:null, rightChild:null });
   parent.leftChild = id;
 
   saveData(data);
@@ -37,19 +53,17 @@ function addLeft(parentId) {
 }
 
 function addRight(parentId) {
-  let id = prompt("Enter ID");
   let name = prompt("Enter Name");
-
-  if (!id || !name) return;
+  if (!name) return;
 
   let data = getData();
   let parent = data.find(x => x.id == parentId);
 
-  if (parent.rightChild) return alert("Right filled");
+  if (parent.rightChild) return alert("Right already filled");
 
-  let newMember = { id, name, leftChild:null, rightChild:null };
-  data.push(newMember);
+  let id = Date.now().toString();
 
+  data.push({ id, name, leftChild:null, rightChild:null });
   parent.rightChild = id;
 
   saveData(data);
@@ -75,7 +89,7 @@ function editMember(id) {
   let data = getData();
   let m = data.find(x=>x.id==id);
 
-  let n = prompt("New Name", m.name);
+  let n = prompt("Edit Name", m.name);
   if (!n) return;
 
   m.name = n;
@@ -105,8 +119,8 @@ function renderTree() {
 
     return `
     <div style="text-align:center;margin:10px;">
-      <div style="border:1px solid #fff;padding:10px;">
-        ${m.name}<br>ID:${m.id}<br>
+      <div style="border:1px solid #fff;padding:10px;min-width:120px;">
+        ${m.name}<br>
         Pair:${m.pair||0}<br>
         ₹${m.income||0}<br><br>
 
@@ -128,8 +142,10 @@ function renderTree() {
 // ================= ROOT =================
 
 function createRoot(){
-  let id = prompt("Root ID");
-  let name = prompt("Root Name");
+  let name = prompt("Enter Root Name");
+  if (!name) return;
+
+  let id = "1"; // root fix
 
   let data = [{id,name,leftChild:null,rightChild:null}];
   saveData(data);
@@ -151,9 +167,9 @@ function render(){
     m.right = count(m.id,"right");
 
     m.pair = Math.min(m.left,m.right);
-    m.income = m.pair*3;
+    m.income = m.pair * 3;
 
-    m.profit = (m.left+m.right)*10 - m.income;
+    m.profit = (m.left + m.right) * 10 - m.income;
 
     totalPair += m.pair;
     totalIncome += m.income;
@@ -162,7 +178,6 @@ function render(){
     table.innerHTML += `
     <tr>
       <td>${m.name}</td>
-      <td>${m.id}</td>
       <td>${m.left}</td>
       <td>${m.right}</td>
       <td>${m.pair}</td>
@@ -203,4 +218,5 @@ function showPage(p){
 
 // ================= INIT =================
 
+updateCompanyName();
 render();
