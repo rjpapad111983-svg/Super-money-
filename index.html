@@ -2,18 +2,50 @@
 <html>
 <head>
   <title>MLM Panel</title>
+
   <style>
-    body { margin:0; font-family:Arial; background:#0b1b2b; color:white; }
-    .sidebar { width:200px; height:100vh; background:#071423; float:left; padding:20px; }
-    .sidebar button { width:100%; margin:5px 0; padding:10px; }
-    .main { margin-left:220px; padding:20px; }
-    table { width:100%; border-collapse:collapse; }
-    th, td { border:1px solid #555; padding:8px; text-align:center; }
+    body {
+      margin:0;
+      font-family:Arial;
+      background:#0b1b2b;
+      color:white;
+    }
+
+    .sidebar {
+      width:200px;
+      height:100vh;
+      background:#071423;
+      float:left;
+      padding:20px;
+    }
+
+    .sidebar button {
+      width:100%;
+      margin:5px 0;
+      padding:10px;
+    }
+
+    .main {
+      margin-left:220px;
+      padding:20px;
+    }
+
+    table {
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    th, td {
+      border:1px solid #555;
+      padding:8px;
+      text-align:center;
+    }
   </style>
 </head>
 
 <body>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
   <h2>MLM Panel</h2>
   <button onclick="showPage('dashboard')">Dashboard</button>
@@ -21,6 +53,7 @@
   <button onclick="showPage('members')">Members</button>
 </div>
 
+<!-- MAIN -->
 <div class="main">
 
   <h3>Select Company</h3>
@@ -37,6 +70,13 @@
     <option value="9">Company 9</option>
     <option value="10">Company 10</option>
   </select>
+
+  <!-- ✅ Company Name Display -->
+  <h2 id="companyTitle">Company 1</h2>
+
+  <!-- ✅ Rename -->
+  <input id="companyNameInput" placeholder="Enter company name">
+  <button onclick="renameCompany()">Rename Company</button>
 
   <hr>
 
@@ -65,7 +105,7 @@
       <thead>
         <tr>
           <th>Name</th>
-          <th>ID</th>
+          <!-- ID REMOVED -->
           <th>Left</th>
           <th>Right</th>
           <th>Pair</th>
@@ -74,6 +114,7 @@
           <th>Edit</th>
         </tr>
       </thead>
+
       <tbody id="memberTable"></tbody>
     </table>
   </div>
