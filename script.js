@@ -1,7 +1,6 @@
 let currentCompany = localStorage.getItem("company") || "1";
 
-// ================= COMPANY NAME =================
-
+// COMPANY NAME
 function updateCompanyName() {
   let name = localStorage.getItem("companyName_" + currentCompany) || ("Company " + currentCompany);
   document.getElementById("companyTitle").innerText = name;
@@ -10,7 +9,6 @@ function updateCompanyName() {
 function renameCompany() {
   let name = document.getElementById("companyNameInput").value;
   if (!name) return alert("Enter company name");
-
   localStorage.setItem("companyName_" + currentCompany, name);
   updateCompanyName();
 }
@@ -22,8 +20,7 @@ function changeCompany() {
   render();
 }
 
-// ================= STORAGE =================
-
+// STORAGE
 function getData() {
   return JSON.parse(localStorage.getItem("data_" + currentCompany)) || [];
 }
@@ -32,8 +29,7 @@ function saveData(data) {
   localStorage.setItem("data_" + currentCompany, JSON.stringify(data));
 }
 
-// ================= TREE JOIN =================
-
+// JOIN
 function addLeft(parentId) {
   let name = prompt("Enter Name");
   if (!name) return;
@@ -41,13 +37,12 @@ function addLeft(parentId) {
   let data = getData();
   let parent = data.find(x => x.id == parentId);
 
-  if (parent.leftChild) return alert("Left already filled");
+  if (parent.leftChild) return alert("Left full");
 
   let id = Date.now().toString();
-
   data.push({ id, name, leftChild:null, rightChild:null });
-  parent.leftChild = id;
 
+  parent.leftChild = id;
   saveData(data);
   render();
 }
@@ -59,19 +54,17 @@ function addRight(parentId) {
   let data = getData();
   let parent = data.find(x => x.id == parentId);
 
-  if (parent.rightChild) return alert("Right already filled");
+  if (parent.rightChild) return alert("Right full");
 
   let id = Date.now().toString();
-
   data.push({ id, name, leftChild:null, rightChild:null });
-  parent.rightChild = id;
 
+  parent.rightChild = id;
   saveData(data);
   render();
 }
 
-// ================= COUNT =================
-
+// COUNT
 function count(id, side) {
   let data = getData();
   let m = data.find(x => x.id == id);
@@ -83,8 +76,7 @@ function count(id, side) {
   return 1 + count(child,"left") + count(child,"right");
 }
 
-// ================= EDIT =================
-
+// EDIT
 function editMember(id) {
   let data = getData();
   let m = data.find(x=>x.id==id);
@@ -93,13 +85,11 @@ function editMember(id) {
   if (!n) return;
 
   m.name = n;
-
   saveData(data);
   render();
 }
 
-// ================= TREE =================
-
+// TREE
 function renderTree() {
   let data = getData();
   let c = document.getElementById("treeContainer");
@@ -114,7 +104,6 @@ function renderTree() {
   function build(m){
     if(!m) return "";
 
-    // ✅ FIXED CALCULATION
     m.left = count(m.id,"left");
     m.right = count(m.id,"right");
     m.pair = Math.min(m.left, m.right);
@@ -125,17 +114,23 @@ function renderTree() {
 
     return `
     <div style="text-align:center;margin:10px;">
-      <div style="border:1px solid #fff;padding:10px;min-width:120px;">
+      <div style="
+        border:1px solid #fff;
+        padding:8px;
+        min-width:90px;
+        font-size:12px;
+        border-radius:6px;
+      ">
         ${m.name}<br>
         Pair:${m.pair}<br>
         ₹${m.income}<br><br>
 
-        <button onclick="addLeft('${m.id}')">L</button>
-        <button onclick="addRight('${m.id}')">R</button><br><br>
-        <button onclick="editMember('${m.id}')">Edit</button>
+        <button style="padding:2px 5px;font-size:10px;" onclick="addLeft('${m.id}')">L</button>
+        <button style="padding:2px 5px;font-size:10px;" onclick="addRight('${m.id}')">R</button><br><br>
+        <button style="padding:2px 5px;font-size:10px;" onclick="editMember('${m.id}')">Edit</button>
       </div>
 
-      <div style="display:flex;gap:30px;justify-content:center;">
+      <div style="display:flex;gap:10px;justify-content:center;">
         ${build(l)}
         ${build(r)}
       </div>
@@ -145,21 +140,17 @@ function renderTree() {
   c.innerHTML = build(root);
 }
 
-// ================= ROOT =================
-
+// ROOT
 function createRoot(){
   let name = prompt("Enter Root Name");
   if (!name) return;
 
-  let id = "1";
-
-  let data = [{id,name,leftChild:null,rightChild:null}];
+  let data = [{id:"1",name,leftChild:null,rightChild:null}];
   saveData(data);
   render();
 }
 
-// ================= MAIN =================
-
+// MAIN
 function render(){
   let data = getData();
   let table = document.getElementById("memberTable");
@@ -171,11 +162,9 @@ function render(){
   data.forEach(m=>{
     m.left = count(m.id,"left");
     m.right = count(m.id,"right");
-
     m.pair = Math.min(m.left,m.right);
     m.income = m.pair * 3;
-
-    m.profit = (m.left + m.right) * 10 - m.income;
+    m.profit = (m.left + m.right)*10 - m.income;
 
     totalPair += m.pair;
     totalIncome += m.income;
@@ -201,8 +190,7 @@ function render(){
   renderTree();
 }
 
-// ================= SEARCH =================
-
+// SEARCH
 function searchMember(){
   let v = document.getElementById("searchInput").value.toLowerCase();
   let rows = document.querySelectorAll("#memberTable tr");
@@ -212,17 +200,14 @@ function searchMember(){
   });
 }
 
-// ================= NAV =================
-
+// NAV
 function showPage(p){
   document.getElementById("dashboard").style.display="none";
   document.getElementById("tree").style.display="none";
   document.getElementById("members").style.display="none";
-
   document.getElementById(p).style.display="block";
 }
 
-// ================= INIT =================
-
+// INIT
 updateCompanyName();
 render();
