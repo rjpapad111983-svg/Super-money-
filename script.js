@@ -114,6 +114,12 @@ function renderTree() {
   function build(m){
     if(!m) return "";
 
+    // ✅ FIXED CALCULATION
+    m.left = count(m.id,"left");
+    m.right = count(m.id,"right");
+    m.pair = Math.min(m.left, m.right);
+    m.income = m.pair * 3;
+
     let l = data.find(x=>x.id==m.leftChild);
     let r = data.find(x=>x.id==m.rightChild);
 
@@ -121,8 +127,8 @@ function renderTree() {
     <div style="text-align:center;margin:10px;">
       <div style="border:1px solid #fff;padding:10px;min-width:120px;">
         ${m.name}<br>
-        Pair:${m.pair||0}<br>
-        ₹${m.income||0}<br><br>
+        Pair:${m.pair}<br>
+        ₹${m.income}<br><br>
 
         <button onclick="addLeft('${m.id}')">L</button>
         <button onclick="addRight('${m.id}')">R</button><br><br>
@@ -145,7 +151,7 @@ function createRoot(){
   let name = prompt("Enter Root Name");
   if (!name) return;
 
-  let id = "1"; // root fix
+  let id = "1";
 
   let data = [{id,name,leftChild:null,rightChild:null}];
   saveData(data);
