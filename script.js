@@ -1,6 +1,6 @@
 let currentCompany = localStorage.getItem("company") || "1";
 
-// COMPANY NAME
+// ================= COMPANY NAME =================
 function updateCompanyName() {
   let name = localStorage.getItem("companyName_" + currentCompany) || ("Company " + currentCompany);
   document.getElementById("companyTitle").innerText = name;
@@ -20,7 +20,7 @@ function changeCompany() {
   render();
 }
 
-// STORAGE
+// ================= STORAGE =================
 function getData() {
   return JSON.parse(localStorage.getItem("data_" + currentCompany)) || [];
 }
@@ -29,7 +29,7 @@ function saveData(data) {
   localStorage.setItem("data_" + currentCompany, JSON.stringify(data));
 }
 
-// JOIN
+// ================= JOIN =================
 function addLeft(parentId) {
   let name = prompt("Enter Name");
   if (!name) return;
@@ -64,7 +64,7 @@ function addRight(parentId) {
   render();
 }
 
-// COUNT
+// ================= COUNT =================
 function count(id, side) {
   let data = getData();
   let m = data.find(x => x.id == id);
@@ -76,7 +76,7 @@ function count(id, side) {
   return 1 + count(child,"left") + count(child,"right");
 }
 
-// EDIT
+// ================= EDIT =================
 function editMember(id) {
   let data = getData();
   let m = data.find(x=>x.id==id);
@@ -89,7 +89,7 @@ function editMember(id) {
   render();
 }
 
-// TREE
+// ================= TREE =================
 function renderTree() {
   let data = getData();
   let c = document.getElementById("treeContainer");
@@ -104,6 +104,7 @@ function renderTree() {
   function build(m){
     if(!m) return "";
 
+    // CALCULATION
     m.left = count(m.id,"left");
     m.right = count(m.id,"right");
     m.pair = Math.min(m.left, m.right);
@@ -113,13 +114,17 @@ function renderTree() {
     let r = data.find(x=>x.id==m.rightChild);
 
     return `
-    <div style="text-align:center;margin:10px;">
+    <div style="display:inline-block;text-align:center;margin:10px;">
+      
+      <!-- NODE -->
       <div style="
         border:1px solid #fff;
-        padding:8px;
-        min-width:90px;
-        font-size:12px;
+        padding:6px;
+        min-width:110px;
+        max-width:130px;
+        font-size:11px;
         border-radius:6px;
+        white-space:nowrap;
       ">
         ${m.name}<br>
         Pair:${m.pair}<br>
@@ -130,17 +135,25 @@ function renderTree() {
         <button style="padding:2px 5px;font-size:10px;" onclick="editMember('${m.id}')">Edit</button>
       </div>
 
-      <div style="display:flex;gap:10px;justify-content:center;">
+      <!-- CHILDREN -->
+      <div style="
+        display:flex;
+        justify-content:center;
+        align-items:flex-start;
+        gap:20px;
+        margin-top:10px;
+      ">
         ${build(l)}
         ${build(r)}
       </div>
+
     </div>`;
   }
 
   c.innerHTML = build(root);
 }
 
-// ROOT
+// ================= ROOT =================
 function createRoot(){
   let name = prompt("Enter Root Name");
   if (!name) return;
@@ -150,7 +163,7 @@ function createRoot(){
   render();
 }
 
-// MAIN
+// ================= MAIN =================
 function render(){
   let data = getData();
   let table = document.getElementById("memberTable");
@@ -190,7 +203,7 @@ function render(){
   renderTree();
 }
 
-// SEARCH
+// ================= SEARCH =================
 function searchMember(){
   let v = document.getElementById("searchInput").value.toLowerCase();
   let rows = document.querySelectorAll("#memberTable tr");
@@ -200,7 +213,7 @@ function searchMember(){
   });
 }
 
-// NAV
+// ================= NAV =================
 function showPage(p){
   document.getElementById("dashboard").style.display="none";
   document.getElementById("tree").style.display="none";
@@ -208,6 +221,6 @@ function showPage(p){
   document.getElementById(p).style.display="block";
 }
 
-// INIT
+// ================= INIT =================
 updateCompanyName();
 render();
