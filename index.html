@@ -47,7 +47,7 @@
       margin:5px;
     }
 
-    /* ✅ Mobile */
+    /* MOBILE FIX */
     @media(max-width:768px){
       .sidebar{
         width:100%;
@@ -63,6 +63,7 @@
 
 <body>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
   <h3>MLM Panel</h3>
   <button onclick="showPage('dashboard')">Dashboard</button>
@@ -70,6 +71,7 @@
   <button onclick="showPage('members')">Members</button>
 </div>
 
+<!-- MAIN -->
 <div class="main">
 
   <h4>Select Company</h4>
@@ -87,6 +89,7 @@
     <option value="10">Company 10</option>
   </select>
 
+  <!-- COMPANY NAME -->
   <h2 id="companyTitle">Company 1</h2>
 
   <input id="companyNameInput" placeholder="Enter company name">
@@ -107,9 +110,18 @@
   <div id="tree" style="display:none;">
     <h3>Binary Tree</h3>
 
-    <!-- ✅ MOBILE SCROLL -->
-    <div style="overflow-x:auto;">
-      <div id="treeContainer" style="min-width:900px;"></div>
+    <!-- ✅ FINAL FIX (NO CUT) -->
+    <div style="
+      width:100%;
+      overflow-x:auto;
+      overflow-y:hidden;
+      border:1px solid #444;
+      padding:10px;
+    ">
+      <div id="treeContainer" style="
+        display:inline-block;
+        min-width:1200px;
+      "></div>
     </div>
   </div>
 
