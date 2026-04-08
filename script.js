@@ -1,6 +1,6 @@
 let currentCompany = localStorage.getItem("company") || "1";
 
-// ================= COMPANY =================
+// ===== COMPANY =====
 function updateCompanyName() {
   let name = localStorage.getItem("companyName_" + currentCompany) || ("Company " + currentCompany);
   document.getElementById("companyTitle").innerText = name;
@@ -20,7 +20,7 @@ function changeCompany() {
   render();
 }
 
-// ================= STORAGE =================
+// ===== STORAGE =====
 function getData() {
   return JSON.parse(localStorage.getItem("data_" + currentCompany)) || [];
 }
@@ -29,7 +29,7 @@ function saveData(data) {
   localStorage.setItem("data_" + currentCompany, JSON.stringify(data));
 }
 
-// ================= ROOT =================
+// ===== ROOT =====
 function createRoot() {
   let name = prompt("Enter Root Name");
   if (!name) return;
@@ -39,7 +39,7 @@ function createRoot() {
   render();
 }
 
-// ================= ADD =================
+// ===== ADD =====
 function addLeft(parentId) {
   let name = prompt("Enter Name");
   if (!name) return;
@@ -74,7 +74,7 @@ function addRight(parentId) {
   render();
 }
 
-// ================= EDIT =================
+// ===== EDIT =====
 function editMember(id) {
   let data = getData();
   let m = data.find(x => x.id == id);
@@ -87,7 +87,7 @@ function editMember(id) {
   render();
 }
 
-// ================= COUNT =================
+// ===== COUNT =====
 function count(id, side) {
   let data = getData();
   let m = data.find(x => x.id == id);
@@ -99,7 +99,7 @@ function count(id, side) {
   return 1 + count(child, "left") + count(child, "right");
 }
 
-// ================= TREE (PRO LEVEL) =================
+// ===== TREE (FINAL FIX) =====
 function renderTree() {
   let data = getData();
   let container = document.getElementById("treeContainer");
@@ -109,74 +109,48 @@ function renderTree() {
     return;
   }
 
+  let map = {};
+  data.forEach(m => map[m.id] = m);
+
   let root = data[0];
 
-  // ===== LEVEL BUILD =====
-  let levels = [];
+  function build(node) {
+    if (!node) return "";
 
-  function build(node, level = 0) {
-    if (!node) return;
+    node.left = count(node.id, "left");
+    node.right = count(node.id, "right");
+    node.pair = Math.min(node.left, node.right);
+    node.income = node.pair * 3;
 
-    if (!levels[level]) levels[level] = [];
-    levels[level].push(node);
+    let leftNode = map[node.leftChild];
+    let rightNode = map[node.rightChild];
 
-    let left = data.find(x => x.id == node.leftChild);
-    let right = data.find(x => x.id == node.rightChild);
+    return `
+    <ul>
+      <li>
+        <div class="node">
+          ${node.name}<br>
+          Pair:${node.pair}<br>
+          ₹${node.income}<br><br>
 
-    build(left, level + 1);
-    build(right, level + 1);
+          <button onclick="addLeft('${node.id}')">L</button>
+          <button onclick="addRight('${node.id}')">R</button><br><br>
+          <button onclick="editMember('${node.id}')">Edit</button>
+        </div>
+
+        ${(leftNode || rightNode) ? `
+        <ul>
+          <li>${leftNode ? build(leftNode) : ""}</li>
+          <li>${rightNode ? build(rightNode) : ""}</li>
+        </ul>` : ""}
+      </li>
+    </ul>`;
   }
 
-  build(root);
-
-  // ===== HTML =====
-  let html = "";
-
-  levels.forEach((levelNodes, levelIndex) => {
-
-    html += `<div style="
-      display:flex;
-      justify-content:center;
-      gap:${Math.max(20, 100 - levelIndex * 10)}px;
-      margin:25px 0;
-      flex-wrap:nowrap;
-    ">`;
-
-    levelNodes.forEach(m => {
-
-      m.left = count(m.id, "left");
-      m.right = count(m.id, "right");
-      m.pair = Math.min(m.left, m.right);
-      m.income = m.pair * 3;
-
-      html += `
-      <div style="
-        border:1px solid #fff;
-        padding:6px;
-        min-width:90px;
-        font-size:10px;
-        border-radius:6px;
-        text-align:center;
-      ">
-        ${m.name}<br>
-        Pair:${m.pair}<br>
-        ₹${m.income}<br><br>
-
-        <button onclick="addLeft('${m.id}')">L</button>
-        <button onclick="addRight('${m.id}')">R</button><br><br>
-
-        <button onclick="editMember('${m.id}')">Edit</button>
-      </div>
-      `;
-    });
-
-    html += `</div>`;
-  });
-
-  container.innerHTML = html;
+  container.innerHTML = build(root);
 }
 
-// ================= TABLE =================
+// ===== TABLE =====
 function render() {
   let data = getData();
   let table = document.getElementById("memberTable");
@@ -218,25 +192,6 @@ function render() {
   renderTree();
 }
 
-// ================= SEARCH =================
-function searchMember() {
-  let v = document.getElementById("searchInput").value.toLowerCase();
-  let rows = document.querySelectorAll("#memberTable tr");
-
-  rows.forEach(r => {
-    r.style.display = r.innerText.toLowerCase().includes(v) ? "" : "none";
-  });
-}
-
-// ================= NAV =================
-function showPage(p) {
-  document.getElementById("dashboard").style.display = "none";
-  document.getElementById("tree").style.display = "none";
-  document.getElementById("members").style.display = "none";
-
-  document.getElementById(p).style.display = "block";
-}
-
-// ================= INIT =================
+// ===== INIT =====
 updateCompanyName();
 render();
