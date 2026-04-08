@@ -30,40 +30,88 @@
       padding:15px;
     }
 
+    @media(max-width:768px){
+      .sidebar{width:100%;height:auto;}
+      .main{margin-left:0;}
+    }
+
     table {
       width:100%;
       border-collapse:collapse;
       font-size:12px;
     }
 
-    th, td {
+    th,td {
       border:1px solid #555;
       padding:6px;
       text-align:center;
     }
 
-    input, select {
+    input,select {
       padding:6px;
       margin:5px;
     }
 
-    /* MOBILE FIX */
-    @media(max-width:768px){
-      .sidebar{
-        width:100%;
-        height:auto;
-        float:none;
-      }
-      .main{
-        margin-left:0;
-      }
+    /* TREE */
+    #treeContainer {
+      overflow-x:auto;
+      padding:20px;
+    }
+
+    #treeContainer ul {
+      padding-top:20px;
+      position:relative;
+      display:table;
+      margin:auto;
+    }
+
+    #treeContainer li {
+      display:table-cell;
+      text-align:center;
+      vertical-align:top;
+      padding:20px 10px;
+      position:relative;
+    }
+
+    #treeContainer li::before,
+    #treeContainer li::after {
+      content:'';
+      position:absolute;
+      top:0;
+      right:50%;
+      border-top:1px solid #fff;
+      width:50%;
+      height:20px;
+    }
+
+    #treeContainer li::after {
+      right:auto;
+      left:50%;
+      border-left:1px solid #fff;
+    }
+
+    #treeContainer ul ul::before {
+      content:'';
+      position:absolute;
+      top:0;
+      left:50%;
+      border-left:1px solid #fff;
+      height:20px;
+    }
+
+    .node {
+      border:1px solid #fff;
+      padding:6px;
+      border-radius:6px;
+      font-size:11px;
+      min-width:90px;
+      display:inline-block;
     }
   </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
   <h3>MLM Panel</h3>
   <button onclick="showPage('dashboard')">Dashboard</button>
@@ -71,25 +119,13 @@
   <button onclick="showPage('members')">Members</button>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
   <h4>Select Company</h4>
-
-  <select id="companySelect" onchange="changeCompany()">
+  <select id="companySelect">
     <option value="1">Company 1</option>
-    <option value="2">Company 2</option>
-    <option value="3">Company 3</option>
-    <option value="4">Company 4</option>
-    <option value="5">Company 5</option>
-    <option value="6">Company 6</option>
-    <option value="7">Company 7</option>
-    <option value="8">Company 8</option>
-    <option value="9">Company 9</option>
-    <option value="10">Company 10</option>
   </select>
 
-  <!-- COMPANY NAME -->
   <h2 id="companyTitle">Company 1</h2>
 
   <input id="companyNameInput" placeholder="Enter company name">
@@ -109,27 +145,12 @@
   <!-- TREE -->
   <div id="tree" style="display:none;">
     <h3>Binary Tree</h3>
-
-    <!-- ✅ FINAL FIX (NO CUT) -->
-    <div style="
-      width:100%;
-      overflow-x:auto;
-      overflow-y:hidden;
-      border:1px solid #444;
-      padding:10px;
-    ">
-      <div id="treeContainer" style="
-        display:inline-block;
-        min-width:1200px;
-      "></div>
-    </div>
+    <div id="treeContainer"></div>
   </div>
 
   <!-- MEMBERS -->
   <div id="members" style="display:none;">
     <h3>Members</h3>
-
-    <input id="searchInput" placeholder="Search..." onkeyup="searchMember()">
 
     <table>
       <thead>
