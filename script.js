@@ -1,6 +1,6 @@
 let currentCompany = localStorage.getItem("company") || "1";
 
-// ================= COMPANY NAME =================
+// ================= COMPANY =================
 function updateCompanyName() {
   let name = localStorage.getItem("companyName_" + currentCompany) || ("Company " + currentCompany);
   document.getElementById("companyTitle").innerText = name;
@@ -8,7 +8,7 @@ function updateCompanyName() {
 
 function renameCompany() {
   let name = document.getElementById("companyNameInput").value;
-  if (!name) return alert("Enter company name");
+  if (!name) return alert("Enter name");
   localStorage.setItem("companyName_" + currentCompany, name);
   updateCompanyName();
 }
@@ -29,7 +29,17 @@ function saveData(data) {
   localStorage.setItem("data_" + currentCompany, JSON.stringify(data));
 }
 
-// ================= JOIN =================
+// ================= ROOT =================
+function createRoot() {
+  let name = prompt("Enter Root Name");
+  if (!name) return;
+
+  let data = [{ id: "1", name, leftChild: null, rightChild: null }];
+  saveData(data);
+  render();
+}
+
+// ================= ADD =================
 function addLeft(parentId) {
   let name = prompt("Enter Name");
   if (!name) return;
@@ -40,7 +50,7 @@ function addLeft(parentId) {
   if (parent.leftChild) return alert("Left full");
 
   let id = Date.now().toString();
-  data.push({ id, name, leftChild:null, rightChild:null });
+  data.push({ id, name, leftChild: null, rightChild: null });
 
   parent.leftChild = id;
   saveData(data);
@@ -57,9 +67,22 @@ function addRight(parentId) {
   if (parent.rightChild) return alert("Right full");
 
   let id = Date.now().toString();
-  data.push({ id, name, leftChild:null, rightChild:null });
+  data.push({ id, name, leftChild: null, rightChild: null });
 
   parent.rightChild = id;
+  saveData(data);
+  render();
+}
+
+// ================= EDIT =================
+function editMember(id) {
+  let data = getData();
+  let m = data.find(x => x.id == id);
+
+  let n = prompt("Edit Name", m.name);
+  if (!n) return;
+
+  m.name = n;
   saveData(data);
   render();
 }
@@ -70,114 +93,106 @@ function count(id, side) {
   let m = data.find(x => x.id == id);
   if (!m) return 0;
 
-  let child = side=="left" ? m.leftChild : m.rightChild;
+  let child = side === "left" ? m.leftChild : m.rightChild;
   if (!child) return 0;
 
-  return 1 + count(child,"left") + count(child,"right");
+  return 1 + count(child, "left") + count(child, "right");
 }
 
-// ================= EDIT =================
-function editMember(id) {
-  let data = getData();
-  let m = data.find(x=>x.id==id);
-
-  let n = prompt("Edit Name", m.name);
-  if (!n) return;
-
-  m.name = n;
-  saveData(data);
-  render();
-}
-
-// ================= TREE =================
+// ================= TREE (PRO LEVEL) =================
 function renderTree() {
   let data = getData();
-  let c = document.getElementById("treeContainer");
+  let container = document.getElementById("treeContainer");
 
-  if (data.length==0) {
-    c.innerHTML = "<button onclick='createRoot()'>Create Root</button>";
+  if (data.length === 0) {
+    container.innerHTML = "<button onclick='createRoot()'>Create Root</button>";
     return;
   }
 
   let root = data[0];
 
-  function build(m){
-    if(!m) return "";
+  // ===== LEVEL BUILD =====
+  let levels = [];
 
-    // CALCULATION
-    m.left = count(m.id,"left");
-    m.right = count(m.id,"right");
-    m.pair = Math.min(m.left, m.right);
-    m.income = m.pair * 3;
+  function build(node, level = 0) {
+    if (!node) return;
 
-    let l = data.find(x=>x.id==m.leftChild);
-    let r = data.find(x=>x.id==m.rightChild);
+    if (!levels[level]) levels[level] = [];
+    levels[level].push(node);
 
-    return `
-    <div style="display:inline-block;text-align:center;margin:10px;">
-      
-      <!-- NODE -->
+    let left = data.find(x => x.id == node.leftChild);
+    let right = data.find(x => x.id == node.rightChild);
+
+    build(left, level + 1);
+    build(right, level + 1);
+  }
+
+  build(root);
+
+  // ===== HTML =====
+  let html = "";
+
+  levels.forEach((levelNodes, levelIndex) => {
+
+    html += `<div style="
+      display:flex;
+      justify-content:center;
+      gap:${Math.max(20, 100 - levelIndex * 10)}px;
+      margin:25px 0;
+      flex-wrap:nowrap;
+    ">`;
+
+    levelNodes.forEach(m => {
+
+      m.left = count(m.id, "left");
+      m.right = count(m.id, "right");
+      m.pair = Math.min(m.left, m.right);
+      m.income = m.pair * 3;
+
+      html += `
       <div style="
         border:1px solid #fff;
         padding:6px;
-        min-width:110px;
-        max-width:130px;
-        font-size:11px;
+        min-width:90px;
+        font-size:10px;
         border-radius:6px;
-        white-space:nowrap;
+        text-align:center;
       ">
         ${m.name}<br>
         Pair:${m.pair}<br>
         ₹${m.income}<br><br>
 
-        <button style="padding:2px 5px;font-size:10px;" onclick="addLeft('${m.id}')">L</button>
-        <button style="padding:2px 5px;font-size:10px;" onclick="addRight('${m.id}')">R</button><br><br>
-        <button style="padding:2px 5px;font-size:10px;" onclick="editMember('${m.id}')">Edit</button>
+        <button onclick="addLeft('${m.id}')">L</button>
+        <button onclick="addRight('${m.id}')">R</button><br><br>
+
+        <button onclick="editMember('${m.id}')">Edit</button>
       </div>
+      `;
+    });
 
-      <!-- CHILDREN -->
-      <div style="
-        display:flex;
-        justify-content:center;
-        align-items:flex-start;
-        gap:20px;
-        margin-top:10px;
-      ">
-        ${build(l)}
-        ${build(r)}
-      </div>
+    html += `</div>`;
+  });
 
-    </div>`;
-  }
-
-  c.innerHTML = build(root);
+  container.innerHTML = html;
 }
 
-// ================= ROOT =================
-function createRoot(){
-  let name = prompt("Enter Root Name");
-  if (!name) return;
-
-  let data = [{id:"1",name,leftChild:null,rightChild:null}];
-  saveData(data);
-  render();
-}
-
-// ================= MAIN =================
-function render(){
+// ================= TABLE =================
+function render() {
   let data = getData();
   let table = document.getElementById("memberTable");
 
   table.innerHTML = "";
 
-  let totalPair=0, totalIncome=0, totalProfit=0;
+  let totalPair = 0;
+  let totalIncome = 0;
+  let totalProfit = 0;
 
-  data.forEach(m=>{
-    m.left = count(m.id,"left");
-    m.right = count(m.id,"right");
-    m.pair = Math.min(m.left,m.right);
+  data.forEach(m => {
+    m.left = count(m.id, "left");
+    m.right = count(m.id, "right");
+    m.pair = Math.min(m.left, m.right);
     m.income = m.pair * 3;
-    m.profit = (m.left + m.right)*10 - m.income;
+    m.profit = (m.left + m.right) * 10 - m.income;
 
     totalPair += m.pair;
     totalIncome += m.income;
@@ -204,21 +219,22 @@ function render(){
 }
 
 // ================= SEARCH =================
-function searchMember(){
+function searchMember() {
   let v = document.getElementById("searchInput").value.toLowerCase();
   let rows = document.querySelectorAll("#memberTable tr");
 
-  rows.forEach(r=>{
+  rows.forEach(r => {
     r.style.display = r.innerText.toLowerCase().includes(v) ? "" : "none";
   });
 }
 
 // ================= NAV =================
-function showPage(p){
-  document.getElementById("dashboard").style.display="none";
-  document.getElementById("tree").style.display="none";
-  document.getElementById("members").style.display="none";
-  document.getElementById(p).style.display="block";
+function showPage(p) {
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("tree").style.display = "none";
+  document.getElementById("members").style.display = "none";
+
+  document.getElementById(p).style.display = "block";
 }
 
 // ================= INIT =================
