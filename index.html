@@ -1,176 +1,257 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>MLM Panel</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLM Panel</title>
 
-  <style>
-    body {
-      margin:0;
-      font-family:Arial;
-      background:#0b1b2b;
-      color:white;
-    }
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0b1d2a;
+    color: white;
+}
 
-    .sidebar {
-      width:180px;
-      height:100vh;
-      background:#071423;
-      float:left;
-      padding:15px;
-    }
+.sidebar {
+    width: 200px;
+    height: 100vh;
+    background: #081622;
+    position: fixed;
+    padding: 20px;
+}
 
-    .sidebar button {
-      width:100%;
-      margin:5px 0;
-      padding:8px;
-    }
+.sidebar h2 {
+    margin-bottom: 20px;
+}
 
-    .main {
-      margin-left:200px;
-      padding:15px;
-    }
+.sidebar button {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: none;
+    background: #eee;
+    color: black;
+    cursor: pointer;
+}
 
-    @media(max-width:768px){
-      .sidebar{width:100%;height:auto;}
-      .main{margin-left:0;}
-    }
+.main {
+    margin-left: 220px;
+    padding: 20px;
+}
 
-    table {
-      width:100%;
-      border-collapse:collapse;
-      font-size:12px;
-    }
+input {
+    padding: 8px;
+}
 
-    th,td {
-      border:1px solid #555;
-      padding:6px;
-      text-align:center;
-    }
+button {
+    padding: 8px;
+    margin: 5px;
+}
 
-    input,select {
-      padding:6px;
-      margin:5px;
-    }
+/* TREE STYLE */
+#tree {
+    overflow-x: auto;
+    white-space: nowrap;
+}
 
-    /* TREE */
-    #treeContainer {
-      overflow-x:auto;
-      padding:20px;
-    }
+.node {
+    display: inline-block;
+    border: 1px solid #fff;
+    padding: 10px;
+    margin: 10px;
+    text-align: center;
+}
 
-    #treeContainer ul {
-      padding-top:20px;
-      position:relative;
-      display:table;
-      margin:auto;
-    }
-
-    #treeContainer li {
-      display:table-cell;
-      text-align:center;
-      vertical-align:top;
-      padding:20px 10px;
-      position:relative;
-    }
-
-    #treeContainer li::before,
-    #treeContainer li::after {
-      content:'';
-      position:absolute;
-      top:0;
-      right:50%;
-      border-top:1px solid #fff;
-      width:50%;
-      height:20px;
-    }
-
-    #treeContainer li::after {
-      right:auto;
-      left:50%;
-      border-left:1px solid #fff;
-    }
-
-    #treeContainer ul ul::before {
-      content:'';
-      position:absolute;
-      top:0;
-      left:50%;
-      border-left:1px solid #fff;
-      height:20px;
-    }
-
-    .node {
-      border:1px solid #fff;
-      padding:6px;
-      border-radius:6px;
-      font-size:11px;
-      min-width:90px;
-      display:inline-block;
-    }
-  </style>
+.children {
+    display: flex;
+    justify-content: center;
+}
+</style>
 </head>
 
 <body>
 
 <div class="sidebar">
-  <h3>MLM Panel</h3>
-  <button onclick="showPage('dashboard')">Dashboard</button>
-  <button onclick="showPage('tree')">Tree</button>
-  <button onclick="showPage('members')">Members</button>
+    <h2>MLM Panel</h2>
+    <button onclick="showPage('dashboard')">Dashboard</button>
+    <button onclick="showPage('treePage')">Tree</button>
+    <button onclick="showPage('membersPage')">Members</button>
 </div>
 
 <div class="main">
 
-  <h4>Select Company</h4>
-  <select id="companySelect">
-    <option value="1">Company 1</option>
-  </select>
+    <!-- DASHBOARD -->
+    <div id="dashboard">
+        <h2>Dashboard</h2>
+        <p>Total Members: <span id="totalMembers">0</span></p>
+        <p>Total Pairs: <span id="totalPairs">0</span></p>
+        <p>Total Income: <span id="totalIncome">₹0</span></p>
+        <p>Company Profit: <span id="companyProfit">₹0</span></p>
+    </div>
 
-  <h2 id="companyTitle">Company 1</h2>
+    <!-- TREE PAGE -->
+    <div id="treePage" style="display:none;">
+        <h2>Binary Tree</h2>
+        <div id="tree"></div>
+    </div>
 
-  <input id="companyNameInput" placeholder="Enter company name">
-  <button onclick="renameCompany()">Rename</button>
-
-  <hr>
-
-  <!-- DASHBOARD -->
-  <div id="dashboard">
-    <h3>Dashboard</h3>
-    <p>Total Members: <span id="totalMembers">0</span></p>
-    <p>Total Pairs: <span id="totalPairs">0</span></p>
-    <p>Total Income: ₹<span id="totalCommission">0</span></p>
-    <p>Company Profit: ₹<span id="companyProfit">0</span></p>
-  </div>
-
-  <!-- TREE -->
-  <div id="tree" style="display:none;">
-    <h3>Binary Tree</h3>
-    <div id="treeContainer"></div>
-  </div>
-
-  <!-- MEMBERS -->
-  <div id="members" style="display:none;">
-    <h3>Members</h3>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Left</th>
-          <th>Right</th>
-          <th>Pair</th>
-          <th>Income</th>
-          <th>Profit</th>
-          <th>Edit</th>
-        </tr>
-      </thead>
-      <tbody id="memberTable"></tbody>
-    </table>
-  </div>
+    <!-- MEMBERS PAGE -->
+    <div id="membersPage" style="display:none;">
+        <h2>Members</h2>
+        <p>Members list auto tree se manage hoga</p>
+    </div>
 
 </div>
 
-<script src="script.js"></script>
+<script>
+// PAGE SWITCH
+function showPage(page) {
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("treePage").style.display = "none";
+    document.getElementById("membersPage").style.display = "none";
+
+    document.getElementById(page).style.display = "block";
+}
+
+// ===================== MLM SCRIPT =====================
+
+let members = [];
+
+// ROOT MEMBER
+function initRoot() {
+    if (members.length === 0) {
+        members.push({
+            id: 1,
+            name: "Rajesh",
+            parentId: null,
+            left: null,
+            right: null
+        });
+    }
+}
+
+// ADD MEMBER
+function addMember(parentId, side) {
+    let parent = members.find(m => m.id == parentId);
+
+    if (!parent) return alert("Parent not found");
+    if (parent[side]) return alert("Already filled");
+
+    let id = members.length + 1;
+
+    let newMember = {
+        id,
+        name: "Member " + id,
+        parentId,
+        left: null,
+        right: null
+    };
+
+    members.push(newMember);
+    parent[side] = id;
+
+    updateAll();
+}
+
+// EDIT NAME
+function editMember(id) {
+    let m = members.find(x => x.id == id);
+    let name = prompt("Enter Name", m.name);
+    if (name) {
+        m.name = name;
+        updateAll();
+    }
+}
+
+// DOWNLINE COUNT
+function countDownline(id) {
+    let m = members.find(x => x.id == id);
+    if (!m) return 0;
+
+    let c = 0;
+    if (m.left) c += 1 + countDownline(m.left);
+    if (m.right) c += 1 + countDownline(m.right);
+
+    return c;
+}
+
+// PAIRS
+function countPairs(id) {
+    let m = members.find(x => x.id == id);
+    if (!m) return 0;
+
+    let l = m.left ? 1 + countDownline(m.left) : 0;
+    let r = m.right ? 1 + countDownline(m.right) : 0;
+
+    return Math.min(l, r);
+}
+
+// TOTAL
+function totalPairs() {
+    let t = 0;
+    members.forEach(m => t += countPairs(m.id));
+    return t;
+}
+
+function totalIncome() {
+    return totalPairs() * 3;
+}
+
+function companyProfit() {
+    return (members.length * 10) - totalIncome();
+}
+
+// TREE RENDER
+function renderTree() {
+    let container = document.getElementById("tree");
+    container.innerHTML = "";
+
+    function build(id) {
+        let m = members.find(x => x.id == id);
+        if (!m) return "";
+
+        let pairs = countPairs(id);
+        let income = pairs * 3;
+
+        return `
+        <div class="node">
+            <div>${m.name}</div>
+            <div>Pair: ${pairs}</div>
+            <div>₹${income}</div>
+            <button onclick="addMember(${id}, 'left')">L</button>
+            <button onclick="addMember(${id}, 'right')">R</button>
+            <button onclick="editMember(${id})">Edit</button>
+
+            <div class="children">
+                ${m.left ? build(m.left) : ""}
+                ${m.right ? build(m.right) : ""}
+            </div>
+        </div>
+        `;
+    }
+
+    container.innerHTML = build(1);
+}
+
+// DASHBOARD
+function updateDashboard() {
+    document.getElementById("totalMembers").innerText = members.length;
+    document.getElementById("totalPairs").innerText = totalPairs();
+    document.getElementById("totalIncome").innerText = "₹" + totalIncome();
+    document.getElementById("companyProfit").innerText = "₹" + companyProfit();
+}
+
+// UPDATE
+function updateAll() {
+    renderTree();
+    updateDashboard();
+}
+
+// INIT
+initRoot();
+updateAll();
+</script>
 
 </body>
 </html>
