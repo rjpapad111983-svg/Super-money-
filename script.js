@@ -4,7 +4,7 @@ let members = [
 
 let lastId = 1;
 
-// ➤ Page Switch
+// Page Switch
 function showPage(page) {
     document.getElementById("dashboardPage").style.display = "none";
     document.getElementById("treePage").style.display = "none";
@@ -17,7 +17,7 @@ function showPage(page) {
     renderAll();
 }
 
-// ➤ Add Member (Tree se hi join)
+// Add Member
 function addMember(name = "", parentId, side) {
     let parent = members.find(m => m.id === parentId);
 
@@ -29,6 +29,7 @@ function addMember(name = "", parentId, side) {
     }
 
     lastId++;
+
     let newMember = {
         id: lastId,
         name: name || "Member " + lastId,
@@ -42,16 +43,16 @@ function addMember(name = "", parentId, side) {
     renderAll();
 }
 
-// ➤ Edit Member
+// Edit Member
 function editMember(id) {
     let m = members.find(x => x.id === id);
-    let newName = prompt("Enter name:", m.name);
-    if (newName) m.name = newName;
+    let name = prompt("Enter name", m.name);
+    if (name) m.name = name;
 
     renderAll();
 }
 
-// ➤ Count Downline Left/Right
+// Count Left/Right
 function countSide(id, side) {
     let m = members.find(x => x.id === id);
     if (!m || !m[side]) return 0;
@@ -59,19 +60,19 @@ function countSide(id, side) {
     return 1 + countSide(m[side], "left") + countSide(m[side], "right");
 }
 
-// ➤ Pair Calculation
+// Pair
 function countPairs(id) {
     let left = countSide(id, "left");
     let right = countSide(id, "right");
     return Math.min(left, right);
 }
 
-// ➤ Member Income (1 pair = ₹3)
+// Income (₹3 per pair)
 function memberIncome(id) {
     return countPairs(id) * 3;
 }
 
-// ➤ Dashboard
+// Dashboard
 function renderDashboard() {
     let totalMembers = members.length;
 
@@ -84,7 +85,6 @@ function renderDashboard() {
         totalIncome += p * 3;
     });
 
-    // Company profit = ₹10 per member - total payout
     let companyProfit = (totalMembers * 10) - totalIncome;
 
     document.getElementById("totalMembers").innerText = totalMembers;
@@ -93,7 +93,7 @@ function renderDashboard() {
     document.getElementById("companyProfit").innerText = companyProfit;
 }
 
-// ➤ Tree Render
+// Tree
 function renderTree() {
     let container = document.getElementById("tree");
 
@@ -112,7 +112,7 @@ function renderTree() {
             <br>
             <button onclick="editMember(${id})">Edit</button>
 
-            <div style="display:flex;">
+            <div style="display:flex; justify-content:center;">
                 ${m.left ? build(m.left) : ""}
                 ${m.right ? build(m.right) : ""}
             </div>
@@ -123,7 +123,7 @@ function renderTree() {
     container.innerHTML = build(1);
 }
 
-// ➤ Members Table
+// Members Table
 function renderMembers() {
     let table = document.getElementById("membersTable");
     table.innerHTML = "";
@@ -143,12 +143,12 @@ function renderMembers() {
     });
 }
 
-// ➤ Render All
+// Render All
 function renderAll() {
     renderDashboard();
     renderTree();
     renderMembers();
 }
 
-// ➤ First Load
+// Load
 renderAll();
