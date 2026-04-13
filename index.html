@@ -1,71 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MLM Panel</title>
 
 <style>
 body {
-    margin: 0;
+    margin:0;
     font-family: Arial;
-    background: #0b1d2a;
-    color: white;
+    background:#0b1d2a;
+    color:white;
 }
-
 .sidebar {
-    width: 200px;
-    height: 100vh;
-    background: #081622;
-    position: fixed;
-    padding: 20px;
+    width:200px;
+    height:100vh;
+    background:#081622;
+    position:fixed;
+    padding:20px;
 }
-
-.sidebar h2 {
-    margin-bottom: 20px;
-}
-
 .sidebar button {
-    width: 100%;
-    margin-bottom: 10px;
-    padding: 10px;
-    border: none;
-    background: #eee;
-    color: black;
-    cursor: pointer;
+    width:100%;
+    margin:10px 0;
+    padding:10px;
+    background:#eee;
+    border:none;
 }
-
 .main {
-    margin-left: 220px;
-    padding: 20px;
+    margin-left:220px;
+    padding:20px;
 }
 
-input {
-    padding: 8px;
-}
-
-button {
-    padding: 8px;
-    margin: 5px;
-}
-
-/* TREE STYLE */
+/* TREE */
 #tree {
-    overflow-x: auto;
-    white-space: nowrap;
+    overflow-x:auto;
 }
-
 .node {
-    display: inline-block;
-    border: 1px solid #fff;
-    padding: 10px;
-    margin: 10px;
-    text-align: center;
+    border:1px solid white;
+    padding:10px;
+    margin:10px;
+    text-align:center;
 }
-
 .children {
-    display: flex;
-    justify-content: center;
+    display:flex;
+    justify-content:center;
 }
 </style>
 </head>
@@ -76,181 +53,147 @@ button {
     <h2>MLM Panel</h2>
     <button onclick="showPage('dashboard')">Dashboard</button>
     <button onclick="showPage('treePage')">Tree</button>
-    <button onclick="showPage('membersPage')">Members</button>
 </div>
 
 <div class="main">
 
-    <!-- DASHBOARD -->
-    <div id="dashboard">
-        <h2>Dashboard</h2>
-        <p>Total Members: <span id="totalMembers">0</span></p>
-        <p>Total Pairs: <span id="totalPairs">0</span></p>
-        <p>Total Income: <span id="totalIncome">₹0</span></p>
-        <p>Company Profit: <span id="companyProfit">₹0</span></p>
-    </div>
+<div id="dashboard">
+    <h2>Dashboard</h2>
+    <p>Total Members: <span id="totalMembers">0</span></p>
+    <p>Total Pairs: <span id="totalPairs">0</span></p>
+    <p>Total Income: <span id="totalIncome">₹0</span></p>
+    <p>Company Profit: <span id="companyProfit">₹0</span></p>
+</div>
 
-    <!-- TREE PAGE -->
-    <div id="treePage" style="display:none;">
-        <h2>Binary Tree</h2>
-        <div id="tree"></div>
-    </div>
-
-    <!-- MEMBERS PAGE -->
-    <div id="membersPage" style="display:none;">
-        <h2>Members</h2>
-        <p>Members list auto tree se manage hoga</p>
-    </div>
+<div id="treePage" style="display:none;">
+    <h2>Binary Tree</h2>
+    <div id="tree"></div>
+</div>
 
 </div>
 
 <script>
-// PAGE SWITCH
-function showPage(page) {
-    document.getElementById("dashboard").style.display = "none";
-    document.getElementById("treePage").style.display = "none";
-    document.getElementById("membersPage").style.display = "none";
 
-    document.getElementById(page).style.display = "block";
+// 👉 PAGE SWITCH
+function showPage(p){
+    document.getElementById("dashboard").style.display="none";
+    document.getElementById("treePage").style.display="none";
+    document.getElementById(p).style.display="block";
 }
 
-// ===================== MLM SCRIPT =====================
-
+// 👉 DATA
 let members = [];
 
-// ROOT MEMBER
-function initRoot() {
-    if (members.length === 0) {
-        members.push({
-            id: 1,
-            name: "Rajesh",
-            parentId: null,
-            left: null,
-            right: null
-        });
-    }
+// 👉 INIT ROOT
+function init(){
+    members = [{
+        id:1,
+        name:"Rajesh",
+        left:null,
+        right:null
+    }];
 }
 
-// ADD MEMBER
-function addMember(parentId, side) {
-    let parent = members.find(m => m.id == parentId);
+// 👉 ADD MEMBER
+function addMember(parentId, side){
+    let p = members.find(x=>x.id==parentId);
 
-    if (!parent) return alert("Parent not found");
-    if (parent[side]) return alert("Already filled");
+    if(p[side]) return alert("Already filled");
 
-    let id = members.length + 1;
+    let id = members.length+1;
 
-    let newMember = {
+    members.push({
         id,
-        name: "Member " + id,
-        parentId,
-        left: null,
-        right: null
-    };
+        name:"Member "+id,
+        left:null,
+        right:null
+    });
 
-    members.push(newMember);
-    parent[side] = id;
+    p[side] = id;
 
-    updateAll();
+    update();
 }
 
-// EDIT NAME
-function editMember(id) {
-    let m = members.find(x => x.id == id);
-    let name = prompt("Enter Name", m.name);
-    if (name) {
-        m.name = name;
-        updateAll();
-    }
-}
+// 👉 COUNT DOWNLINE
+function downline(id){
+    let m = members.find(x=>x.id==id);
+    if(!m) return 0;
 
-// DOWNLINE COUNT
-function countDownline(id) {
-    let m = members.find(x => x.id == id);
-    if (!m) return 0;
-
-    let c = 0;
-    if (m.left) c += 1 + countDownline(m.left);
-    if (m.right) c += 1 + countDownline(m.right);
+    let c=0;
+    if(m.left) c+=1+downline(m.left);
+    if(m.right) c+=1+downline(m.right);
 
     return c;
 }
 
-// PAIRS
-function countPairs(id) {
-    let m = members.find(x => x.id == id);
-    if (!m) return 0;
+// 👉 PAIRS
+function pairs(id){
+    let m = members.find(x=>x.id==id);
+    if(!m) return 0;
 
-    let l = m.left ? 1 + countDownline(m.left) : 0;
-    let r = m.right ? 1 + countDownline(m.right) : 0;
+    let l = m.left ? 1+downline(m.left):0;
+    let r = m.right ? 1+downline(m.right):0;
 
-    return Math.min(l, r);
+    return Math.min(l,r);
 }
 
-// TOTAL
-function totalPairs() {
-    let t = 0;
-    members.forEach(m => t += countPairs(m.id));
-    return t;
+// 👉 TOTAL
+function totalPairs(){
+    return members.reduce((t,m)=>t+pairs(m.id),0);
 }
 
-function totalIncome() {
-    return totalPairs() * 3;
+function totalIncome(){
+    return totalPairs()*3;
 }
 
-function companyProfit() {
-    return (members.length * 10) - totalIncome();
+function profit(){
+    return members.length*10 - totalIncome();
 }
 
-// TREE RENDER
-function renderTree() {
-    let container = document.getElementById("tree");
-    container.innerHTML = "";
+// 👉 TREE
+function draw(){
+    let box = document.getElementById("tree");
 
-    function build(id) {
-        let m = members.find(x => x.id == id);
-        if (!m) return "";
-
-        let pairs = countPairs(id);
-        let income = pairs * 3;
+    function make(id){
+        let m = members.find(x=>x.id==id);
+        if(!m) return "";
 
         return `
         <div class="node">
             <div>${m.name}</div>
-            <div>Pair: ${pairs}</div>
-            <div>₹${income}</div>
-            <button onclick="addMember(${id}, 'left')">L</button>
-            <button onclick="addMember(${id}, 'right')">R</button>
-            <button onclick="editMember(${id})">Edit</button>
+            <div>Pair:${pairs(id)}</div>
+            <div>₹${pairs(id)*3}</div>
+
+            <button onclick="addMember(${id},'left')">L</button>
+            <button onclick="addMember(${id},'right')">R</button>
 
             <div class="children">
-                ${m.left ? build(m.left) : ""}
-                ${m.right ? build(m.right) : ""}
+                ${m.left?make(m.left):""}
+                ${m.right?make(m.right):""}
             </div>
         </div>
         `;
     }
 
-    container.innerHTML = build(1);
+    box.innerHTML = make(1);
 }
 
-// DASHBOARD
-function updateDashboard() {
+// 👉 UPDATE
+function update(){
+    draw();
+
     document.getElementById("totalMembers").innerText = members.length;
     document.getElementById("totalPairs").innerText = totalPairs();
-    document.getElementById("totalIncome").innerText = "₹" + totalIncome();
-    document.getElementById("companyProfit").innerText = "₹" + companyProfit();
+    document.getElementById("totalIncome").innerText = "₹"+totalIncome();
+    document.getElementById("companyProfit").innerText = "₹"+profit();
 }
 
-// UPDATE
-function updateAll() {
-    renderTree();
-    updateDashboard();
+// 👉 RUN AFTER LOAD
+window.onload = function(){
+    init();
+    update();
 }
 
-// INIT
-initRoot();
-updateAll();
 </script>
 
 </body>
