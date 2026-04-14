@@ -1,106 +1,120 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MLM Panel</title>
+  <title>MLM Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #0b1e2d;
-    color: white;
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #0b1e2d;
+      color: white;
+    }
 
-.sidebar {
-    width: 200px;
-    position: fixed;
-    height: 100%;
-    background: #081421;
-    padding: 10px;
-}
+    .sidebar {
+      width: 200px;
+      height: 100vh;
+      position: fixed;
+      background: #061726;
+      padding: 10px;
+    }
 
-.sidebar button {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0;
-    background: #ccc;
-    border: none;
-    cursor: pointer;
-}
+    .sidebar h2 {
+      text-align: center;
+    }
 
-.main {
-    margin-left: 210px;
-    padding: 15px;
-}
+    .sidebar button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+    }
 
-#tree {
-    overflow: auto;
-    white-space: nowrap;
-}
+    .content {
+      margin-left: 210px;
+      padding: 15px;
+    }
 
-.node {
-    display: inline-block;
-    border: 1px solid white;
-    padding: 10px;
-    margin: 10px;
-    text-align: center;
-    min-width: 120px;
-}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
 
-button {
-    margin: 2px;
-}
-</style>
+    th, td {
+      border: 1px solid white;
+      padding: 5px;
+      text-align: center;
+    }
+
+    .node {
+      border: 1px solid white;
+      padding: 10px;
+      margin: 10px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .children {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    button {
+      margin: 2px;
+    }
+  </style>
 </head>
 
 <body>
 
 <div class="sidebar">
-    <h3>MLM Panel</h3>
-    <button onclick="showPage('dashboard')">Dashboard</button>
-    <button onclick="showPage('tree')">Tree</button>
-    <button onclick="showPage('members')">Members</button>
+  <h2>MLM Panel</h2>
+  <button onclick="showPage('dashboardPage')">Dashboard</button>
+  <button onclick="showPage('treePage')">Tree</button>
+  <button onclick="showPage('membersPage')">Members</button>
 </div>
 
-<div class="main">
+<div class="content">
 
-<!-- Dashboard -->
-<div id="dashboardPage">
+  <!-- DASHBOARD -->
+  <div id="dashboardPage">
     <h2>Dashboard</h2>
     <p>Total Members: <span id="totalMembers"></span></p>
     <p>Total Pairs: <span id="totalPairs"></span></p>
-    <p>Total Income: ₹<span id="totalIncome"></span></p>
-    <p>Company Profit: ₹<span id="companyProfit"></span></p>
-</div>
+    <p>Total Income: <span id="totalIncome"></span></p>
+    <p>Company Profit: <span id="companyProfit"></span></p>
+  </div>
 
-<!-- Tree -->
-<div id="treePage" style="display:none;">
+  <!-- TREE -->
+  <div id="treePage" style="display:none;">
     <h2>Binary Tree</h2>
-    <div id="tree"></div>
-</div>
+    <div id="treeContainer"></div>
+  </div>
 
-<!-- Members -->
-<div id="membersPage" style="display:none;">
+  <!-- MEMBERS -->
+  <div id="membersPage" style="display:none;">
     <h2>Members</h2>
 
-    <h3>Company Profit: ₹<span id="membersCompanyProfit"></span></h3>
+    <p><b id="companyProfitText"></b></p>
 
-    <table border="1" width="100%">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>ID</th>
-                <th>Left</th>
-                <th>Right</th>
-                <th>Pairs</th>
-                <th>Income</th>
-                <th>Edit</th>
-            </tr>
-        </thead>
-        <tbody id="membersTable"></tbody>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>ID</th>
+          <th>Left</th>
+          <th>Right</th>
+          <th>Pairs</th>
+          <th>Income</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="membersTable"></tbody>
     </table>
-</div>
+  </div>
 
 </div>
 
