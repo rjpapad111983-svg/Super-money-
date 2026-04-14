@@ -1,124 +1,91 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MLM Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>MLM Panel</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: #0b1e2d;
-      color: white;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0b1f2a;
+  color: white;
+}
 
-    .sidebar {
-      width: 200px;
-      height: 100vh;
-      position: fixed;
-      background: #061726;
-      padding: 10px;
-    }
+.sidebar {
+  width: 200px;
+  height: 100vh;
+  background: #061621;
+  position: fixed;
+  padding: 10px;
+}
 
-    .sidebar h2 {
-      text-align: center;
-    }
+.sidebar button {
+  width: 100%;
+  margin: 5px 0;
+  padding: 10px;
+  background: #ddd;
+  border: none;
+  cursor: pointer;
+}
 
-    .sidebar button {
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-      border: none;
-      cursor: pointer;
-    }
+.main {
+  margin-left: 220px;
+  padding: 20px;
+}
 
-    .content {
-      margin-left: 210px;
-      padding: 15px;
-    }
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+td, th {
+  border: 1px solid #555;
+  padding: 8px;
+  text-align: center;
+}
 
-    th, td {
-      border: 1px solid white;
-      padding: 5px;
-      text-align: center;
-    }
+.node {
+  border: 1px solid white;
+  padding: 10px;
+  display: inline-block;
+  margin: 10px;
+}
+</style>
 
-    .node {
-      border: 1px solid white;
-      padding: 10px;
-      margin: 10px;
-      display: inline-block;
-      text-align: center;
-    }
-
-    .children {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
-
-    button {
-      margin: 2px;
-    }
-  </style>
 </head>
 
 <body>
 
 <div class="sidebar">
-  <h2>MLM Panel</h2>
-  <button onclick="showPage('dashboardPage')">Dashboard</button>
-  <button onclick="showPage('treePage')">Tree</button>
-  <button onclick="showPage('membersPage')">Members</button>
+  <h3>MLM Panel</h3>
+  <button onclick="showPage('dashboard')">Dashboard</button>
+  <button onclick="showPage('tree')">Tree</button>
+  <button onclick="showPage('members')">Members</button>
 </div>
 
-<div class="content">
+<div class="main">
 
-  <!-- DASHBOARD -->
-  <div id="dashboardPage">
-    <h2>Dashboard</h2>
-    <p>Total Members: <span id="totalMembers"></span></p>
-    <p>Total Pairs: <span id="totalPairs"></span></p>
-    <p>Total Income: <span id="totalIncome"></span></p>
-    <p>Company Profit: <span id="companyProfit"></span></p>
-  </div>
+<div id="dashboardPage">
+  <h2>Dashboard</h2>
+  <p>Total Members: <span id="totalMembers"></span></p>
+  <p>Total Pairs: <span id="totalPairs"></span></p>
+  <p>Total Income: ₹<span id="totalIncome"></span></p>
+  <p>Company Profit: ₹<span id="companyProfit"></span></p>
+</div>
 
-  <!-- TREE -->
-  <div id="treePage" style="display:none;">
-    <h2>Binary Tree</h2>
-    <div id="treeContainer"></div>
-  </div>
+<div id="treePage" style="display:none;">
+  <h2>Binary Tree</h2>
+  <div id="tree"></div>
+</div>
 
-  <!-- MEMBERS -->
-  <div id="membersPage" style="display:none;">
-    <h2>Members</h2>
-
-    <p><b id="companyProfitText"></b></p>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>ID</th>
-          <th>Left</th>
-          <th>Right</th>
-          <th>Pairs</th>
-          <th>Income</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="membersTable"></tbody>
-    </table>
-  </div>
+<div id="membersPage" style="display:none;">
+  <h2>Members</h2>
+  <table id="membersTable"></table>
+</div>
 
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
