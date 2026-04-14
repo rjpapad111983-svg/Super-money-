@@ -14,7 +14,6 @@ function showPage(page) {
   document.getElementById("membersPage").style.display = "none";
 
   document.getElementById(page + "Page").style.display = "block";
-
   renderAll();
 }
 
@@ -55,22 +54,24 @@ function editMember(id) {
   renderAll();
 }
 
-function countPairs(id) {
-  let m = getMember(id);
-  if (!m) return 0;
-
-  let leftCount = countDownline(m.left);
-  let rightCount = countDownline(m.right);
-
-  return Math.min(leftCount, rightCount);
-}
-
+// ✅ Correct binary pair logic
 function countDownline(id) {
   if (id === 0) return 0;
   let m = getMember(id);
   return 1 + countDownline(m.left) + countDownline(m.right);
 }
 
+function countPairs(id) {
+  let m = getMember(id);
+  if (!m) return 0;
+
+  let left = countDownline(m.left);
+  let right = countDownline(m.right);
+
+  return Math.min(left, right);
+}
+
+// ✅ Members Table
 function renderMembers() {
   let html = `
   <tr>
@@ -108,6 +109,7 @@ function renderMembers() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
+// ✅ FIXED TREE (Proper left-right layout)
 function renderTreeNode(id) {
   if (id === 0) return "";
 
@@ -116,17 +118,22 @@ function renderTreeNode(id) {
   let income = pairs * 3;
 
   return `
-    <div class="node">
-      ${m.name}<br>
-      Pair: ${pairs}<br>
-      ₹${income}<br>
-      <button onclick="addMember(${id}, 'left')">L</button>
-      <button onclick="addMember(${id}, 'right')">R</button>
-      <button onclick="editMember(${id})">Edit</button>
-      <div>
-        ${renderTreeNode(m.left)}
-        ${renderTreeNode(m.right)}
+    <div style="text-align:center; margin:20px;">
+      
+      <div style="border:1px solid white; padding:10px; border-radius:8px; display:inline-block;">
+        ${m.name}<br>
+        Pair: ${pairs}<br>
+        ₹${income}<br>
+        <button onclick="addMember(${id}, 'left')">L</button>
+        <button onclick="addMember(${id}, 'right')">R</button>
+        <button onclick="editMember(${id})">Edit</button>
       </div>
+
+      <div style="display:flex; justify-content:center; gap:40px; margin-top:10px;">
+        <div>${renderTreeNode(m.left)}</div>
+        <div>${renderTreeNode(m.right)}</div>
+      </div>
+
     </div>
   `;
 }
@@ -135,6 +142,7 @@ function renderTree() {
   document.getElementById("tree").innerHTML = renderTreeNode(1);
 }
 
+// ✅ Dashboard
 function renderDashboard() {
   let totalMembers = members.length;
   let totalPairs = 0;
@@ -154,6 +162,7 @@ function renderDashboard() {
   document.getElementById("companyProfit").innerText = companyProfit;
 }
 
+// ✅ Main render
 function renderAll() {
   renderMembers();
   renderTree();
