@@ -1,10 +1,17 @@
-let members = [
+// ✅ Load Data (Refresh ke baad bhi rahega)
+let members = JSON.parse(localStorage.getItem("members")) || [
     { id: 1, name: "Rajesh", left: null, right: null }
 ];
 
-let lastId = 1;
+let lastId = parseInt(localStorage.getItem("lastId")) || 1;
 
-// Page Switch
+// ✅ Save Data
+function saveData() {
+    localStorage.setItem("members", JSON.stringify(members));
+    localStorage.setItem("lastId", lastId);
+}
+
+// ✅ Page Switch
 function showPage(page) {
     document.getElementById("dashboardPage").style.display = "none";
     document.getElementById("treePage").style.display = "none";
@@ -17,7 +24,7 @@ function showPage(page) {
     renderAll();
 }
 
-// Add Member
+// ✅ Add Member (Tree se join)
 function addMember(name = "", parentId, side) {
     let parent = members.find(m => m.id === parentId);
 
@@ -40,19 +47,21 @@ function addMember(name = "", parentId, side) {
     members.push(newMember);
     parent[side] = newMember.id;
 
+    saveData(); // ✅ Save
     renderAll();
 }
 
-// Edit Member
+// ✅ Edit Member
 function editMember(id) {
     let m = members.find(x => x.id === id);
     let name = prompt("Enter name", m.name);
     if (name) m.name = name;
 
+    saveData(); // ✅ Save
     renderAll();
 }
 
-// Count Side
+// ✅ Count Downline
 function countSide(id, side) {
     let m = members.find(x => x.id === id);
     if (!m || !m[side]) return 0;
@@ -60,19 +69,19 @@ function countSide(id, side) {
     return 1 + countSide(m[side], "left") + countSide(m[side], "right");
 }
 
-// Pair
+// ✅ Pair
 function countPairs(id) {
     let left = countSide(id, "left");
     let right = countSide(id, "right");
     return Math.min(left, right);
 }
 
-// Income (₹3 per pair)
+// ✅ Income (₹3 per pair)
 function memberIncome(id) {
     return countPairs(id) * 3;
 }
 
-// Dashboard
+// ✅ Dashboard
 function renderDashboard() {
     let totalMembers = members.length;
 
@@ -93,7 +102,7 @@ function renderDashboard() {
     document.getElementById("companyProfit").innerText = companyProfit;
 }
 
-// Tree
+// ✅ Tree Render
 function renderTree() {
     let container = document.getElementById("tree");
 
@@ -123,7 +132,7 @@ function renderTree() {
     container.innerHTML = build(1);
 }
 
-// Members Table + Profit
+// ✅ Members Table + Company Profit
 function renderMembers() {
     let table = document.getElementById("membersTable");
     table.innerHTML = "";
@@ -143,8 +152,8 @@ function renderMembers() {
     });
 
     let totalMembers = members.length;
-
     let totalIncome = 0;
+
     members.forEach(m => {
         totalIncome += countPairs(m.id) * 3;
     });
@@ -154,12 +163,12 @@ function renderMembers() {
     document.getElementById("membersCompanyProfit").innerText = companyProfit;
 }
 
-// Render All
+// ✅ Render All
 function renderAll() {
     renderDashboard();
     renderTree();
     renderMembers();
 }
 
-// Load
+// ✅ First Load
 renderAll();
