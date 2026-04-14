@@ -52,7 +52,7 @@ function editMember(id) {
     renderAll();
 }
 
-// Count Left/Right
+// Count Side
 function countSide(id, side) {
     let m = members.find(x => x.id === id);
     if (!m || !m[side]) return 0;
@@ -123,7 +123,7 @@ function renderTree() {
     container.innerHTML = build(1);
 }
 
-// Members Table
+// Members Table + Profit
 function renderMembers() {
     let table = document.getElementById("membersTable");
     table.innerHTML = "";
@@ -141,6 +141,17 @@ function renderMembers() {
         </tr>
         `;
     });
+
+    let totalMembers = members.length;
+
+    let totalIncome = 0;
+    members.forEach(m => {
+        totalIncome += countPairs(m.id) * 3;
+    });
+
+    let companyProfit = (totalMembers * 10) - totalIncome;
+
+    document.getElementById("membersCompanyProfit").innerText = companyProfit;
 }
 
 // Render All
