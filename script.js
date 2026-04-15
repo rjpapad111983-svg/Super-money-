@@ -3,6 +3,7 @@ let members = JSON.parse(localStorage.getItem("mlm")) || [
 ];
 
 let idCounter = members.length + 1;
+let zoomLevel = 1;
 
 function save() {
   localStorage.setItem("mlm", JSON.stringify(members));
@@ -23,7 +24,6 @@ function getMember(id) {
 
 function addMember(parentId, side) {
   let parent = getMember(parentId);
-  if (!parent) return;
 
   if (parent[side] !== 0) {
     alert("Already filled");
@@ -47,14 +47,13 @@ function addMember(parentId, side) {
 function editMember(id) {
   let m = getMember(id);
   let name = prompt("Enter name", m.name);
-  if (name) {
-    m.name = name;
-  }
+  if (name) m.name = name;
+
   save();
   renderAll();
 }
 
-// ✅ Correct binary pair logic
+/* correct pairing */
 function countDownline(id) {
   if (id === 0) return 0;
   let m = getMember(id);
@@ -63,15 +62,12 @@ function countDownline(id) {
 
 function countPairs(id) {
   let m = getMember(id);
-  if (!m) return 0;
-
   let left = countDownline(m.left);
   let right = countDownline(m.right);
-
   return Math.min(left, right);
 }
 
-// ✅ Members Table
+/* members table */
 function renderMembers() {
   let html = `
   <tr>
@@ -109,7 +105,7 @@ function renderMembers() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-// ✅ FIXED TREE (Proper left-right layout)
+/* tree layout */
 function renderTreeNode(id) {
   if (id === 0) return "";
 
@@ -118,23 +114,23 @@ function renderTreeNode(id) {
   let income = pairs * 3;
 
   return `
-    <div style="text-align:center; margin:20px;">
-      
-      <div style="border:1px solid white; padding:10px; border-radius:8px; display:inline-block;">
-        ${m.name}<br>
-        Pair: ${pairs}<br>
-        ₹${income}<br>
-        <button onclick="addMember(${id}, 'left')">L</button>
-        <button onclick="addMember(${id}, 'right')">R</button>
-        <button onclick="editMember(${id})">Edit</button>
-      </div>
-
-      <div style="display:flex; justify-content:center; gap:40px; margin-top:10px;">
-        <div>${renderTreeNode(m.left)}</div>
-        <div>${renderTreeNode(m.right)}</div>
-      </div>
-
+  <div style="text-align:center; margin:20px;">
+    
+    <div class="node">
+      ${m.name}<br>
+      Pair: ${pairs}<br>
+      ₹${income}<br>
+      <button onclick="addMember(${id}, 'left')">L</button>
+      <button onclick="addMember(${id}, 'right')">R</button>
+      <button onclick="editMember(${id})">Edit</button>
     </div>
+
+    <div style="display:flex; justify-content:center; gap:40px; margin-top:10px;">
+      <div>${renderTreeNode(m.left)}</div>
+      <div>${renderTreeNode(m.right)}</div>
+    </div>
+
+  </div>
   `;
 }
 
@@ -142,16 +138,16 @@ function renderTree() {
   document.getElementById("tree").innerHTML = renderTreeNode(1);
 }
 
-// ✅ Dashboard
+/* dashboard */
 function renderDashboard() {
   let totalMembers = members.length;
   let totalPairs = 0;
   let totalIncome = 0;
 
   members.forEach(m => {
-    let pairs = countPairs(m.id);
-    totalPairs += pairs;
-    totalIncome += pairs * 3;
+    let p = countPairs(m.id);
+    totalPairs += p;
+    totalIncome += p * 3;
   });
 
   let companyProfit = totalMembers * 10 - totalIncome;
@@ -162,7 +158,19 @@ function renderDashboard() {
   document.getElementById("companyProfit").innerText = companyProfit;
 }
 
-// ✅ Main render
+/* zoom */
+function zoomIn() {
+  zoomLevel += 0.2;
+  document.getElementById("tree").style.transform = `scale(${zoomLevel})`;
+}
+
+function zoomOut() {
+  zoomLevel -= 0.2;
+  if (zoomLevel < 0.3) zoomLevel = 0.3;
+  document.getElementById("tree").style.transform = `scale(${zoomLevel})`;
+}
+
+/* render */
 function renderAll() {
   renderMembers();
   renderTree();
