@@ -1,67 +1,132 @@
-#treeContainer {
-  overflow-x: auto;
+/* ===== GLOBAL ===== */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0b1f2a;
+  color: #fff;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 200px;
+  height: 100vh;
+  background: #061621;
+  position: fixed;
+  padding: 10px;
+}
+
+.sidebar h3 {
+  margin-bottom: 15px;
+}
+
+.sidebar button {
+  width: 100%;
+  margin: 5px 0;
+  padding: 10px;
+  background: #e0e0e0;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.sidebar button:hover {
+  background: #ffc107;
+}
+
+/* ===== MAIN ===== */
+.main {
+  margin-left: 220px;
   padding: 20px;
 }
 
-/* TREE STRUCTURE */
-#treeContainer ul {
-  padding-top: 20px;
-  position: relative;
-  display: table;
-  margin: auto;
+/* ===== TABLE ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
 }
 
-#treeContainer li {
-  display: table-cell;
+th {
+  background: #102c3c;
+}
+
+td, th {
+  border: 1px solid #444;
+  padding: 8px;
   text-align: center;
-  vertical-align: top;
-  position: relative;
-  padding: 20px 10px;
 }
 
-/* LINES */
-#treeContainer li::before,
-#treeContainer li::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 50%;
-  border-top: 1px solid #fff;
-  width: 50%;
-  height: 20px;
+/* ===== BUTTONS ===== */
+button {
+  border-radius: 5px;
+  border: none;
+  padding: 5px 8px;
+  cursor: pointer;
 }
 
-#treeContainer li::after {
-  right: auto;
-  left: 50%;
-  border-left: 1px solid #fff;
+button:hover {
+  opacity: 0.8;
 }
 
-#treeContainer li:only-child::before,
-#treeContainer li:only-child::after {
-  display: none;
+/* ===== TREE CONTAINER ===== */
+#treeContainer {
+  width: 100%;
+  height: 80vh;
+  overflow: auto;
+  border: 1px solid #333;
+  background: #071923;
+  border-radius: 10px;
 }
 
-#treeContainer li:only-child {
-  padding-top: 0;
+/* ===== TREE ===== */
+#tree {
+  transform-origin: 0 0;
+  transition: transform 0.2s;
+  display: inline-block;
+  padding: 50px;
 }
 
-#treeContainer ul ul::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  border-left: 1px solid #fff;
-  height: 20px;
-}
-
-/* NODE DESIGN */
+/* ===== NODE ===== */
 .node {
   border: 1px solid #fff;
-  padding: 6px;
-  display: inline-block;
-  border-radius: 6px;
-  font-size: 11px;
-  min-width: 90px;
-  background: #0b1b2b;
+  padding: 10px;
+  border-radius: 10px;
+  background: #0f2c3a;
+  min-width: 120px;
+  text-align: center;
+  box-shadow: 0 0 8px rgba(0,0,0,0.5);
+}
+
+/* ===== TREE CHILD ALIGN ===== */
+.node + div {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 10px;
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .main {
+    margin-left: 0;
+  }
+
+  #treeContainer {
+    height: 60vh;
+  }
+
+  .node {
+    min-width: 90px;
+    font-size: 12px;
+  }
+
 }
