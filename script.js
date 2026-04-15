@@ -50,7 +50,7 @@ function editMember(id) {
   }
 }
 
-// COUNT TEAM (FULL DOWNLINE)
+// COUNT DOWNLINE
 function countTeam(id) {
   if (id === 0) return 0;
 
@@ -58,13 +58,11 @@ function countTeam(id) {
   return 1 + countTeam(m.left) + countTeam(m.right);
 }
 
-// PAIR CALCULATION (CORRECT)
+// PAIR
 function getPairs(id) {
   let m = getMember(id);
-
   let left = countTeam(m.left);
   let right = countTeam(m.right);
-
   return Math.min(left, right);
 }
 
@@ -127,10 +125,43 @@ function searchMember() {
   });
 }
 
+// TREE NODE
+function renderTreeNode(id) {
+  if (id === 0) return "";
+
+  let m = getMember(id);
+  let pairs = getPairs(id);
+  let income = pairs * PAIR_INCOME;
+
+  return `
+    <div style="text-align:center;">
+      <div class="node">
+        ${m.name}<br>
+        Pair: ${pairs}<br>
+        ₹${income}<br>
+        <button onclick="addMember(${id}, 'left')">L</button>
+        <button onclick="addMember(${id}, 'right')">R</button>
+        <button onclick="editMember(${id})">Edit</button>
+      </div>
+
+      <div class="children">
+        <div>${renderTreeNode(m.left)}</div>
+        <div>${renderTreeNode(m.right)}</div>
+      </div>
+    </div>
+  `;
+}
+
+// TREE
+function renderTree() {
+  document.getElementById("tree").innerHTML = renderTreeNode(1);
+}
+
 // PAGE SWITCH
 function showPage(page) {
   document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("membersPage").style.display = "none";
+  document.getElementById("treePage").style.display = "none";
 
   document.getElementById(page + "Page").style.display = "block";
 }
@@ -139,6 +170,7 @@ function showPage(page) {
 function renderAll() {
   renderMembers();
   renderDashboard();
+  renderTree();
 }
 
 renderAll();
