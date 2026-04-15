@@ -1,27 +1,21 @@
-let members = JSON.parse(localStorage.getItem("mlm")) || [
+let members = JSON.parse(localStorage.getItem("members")) || [
   { id: 1, name: "Rajesh", left: 0, right: 0 }
 ];
 
-let idCounter = members.length + 1;
-let zoomLevel = 1;
+const PAIR_INCOME = 3;
+const MEMBER_FEE = 10;
 
+// SAVE
 function save() {
-  localStorage.setItem("mlm", JSON.stringify(members));
+  localStorage.setItem("members", JSON.stringify(members));
 }
 
-function showPage(page) {
-  document.getElementById("dashboardPage").style.display = "none";
-  document.getElementById("treePage").style.display = "none";
-  document.getElementById("membersPage").style.display = "none";
-
-  document.getElementById(page + "Page").style.display = "block";
-  renderAll();
-}
-
+// GET MEMBER
 function getMember(id) {
   return members.find(m => m.id === id);
 }
 
+// ADD MEMBER
 function addMember(parentId, side) {
   let parent = getMember(parentId);
 
@@ -30,145 +24,91 @@ function addMember(parentId, side) {
     return;
   }
 
-  let newMember = {
-    id: idCounter++,
-    name: "Member " + idCounter,
+  let newId = members.length + 1;
+
+  members.push({
+    id: newId,
+    name: "Member " + newId,
     left: 0,
     right: 0
-  };
+  });
 
-  members.push(newMember);
-  parent[side] = newMember.id;
+  parent[side] = newId;
 
   save();
   renderAll();
 }
 
+// EDIT
 function editMember(id) {
   let m = getMember(id);
   let name = prompt("Enter name", m.name);
-  if (name) m.name = name;
-
-  save();
-  renderAll();
+  if (name) {
+    m.name = name;
+    save();
+    renderAll();
+  }
 }
 
-/* ===== PAIR CALCULATION ===== */
-function countDownline(id) {
+// COUNT TEAM (FULL DOWNLINE)
+function countTeam(id) {
   if (id === 0) return 0;
+
   let m = getMember(id);
-  return 1 + countDownline(m.left) + countDownline(m.right);
+  return 1 + countTeam(m.left) + countTeam(m.right);
 }
 
-function countPairs(id) {
+// PAIR CALCULATION (CORRECT)
+function getPairs(id) {
   let m = getMember(id);
-  let left = countDownline(m.left);
-  let right = countDownline(m.right);
+
+  let left = countTeam(m.left);
+  let right = countTeam(m.right);
+
   return Math.min(left, right);
 }
 
-/* ===== MEMBERS TABLE ===== */
+// MEMBERS TABLE
 function renderMembers() {
-  let html = `
-  <tr>
-    <th>Name</th>
-    <th>ID</th>
-    <th>Left</th>
-    <th>Right</th>
-    <th>Pairs</th>
-    <th>Income</th>
-    <th>Action</th>
-  </tr>
-  `;
+  let html = "";
 
   members.forEach(m => {
-    let pairs = countPairs(m.id);
-    let income = pairs * 3;
+    let pairs = getPairs(m.id);
+    let income = pairs * PAIR_INCOME;
 
     html += `
-    <tr>
-      <td>${m.name}</td>
-      <td>${m.id}</td>
-      <td>${m.left}</td>
-      <td>${m.right}</td>
-      <td>${pairs}</td>
-      <td>₹${income}</td>
-      <td>
-        <button onclick="addMember(${m.id}, 'left')">L</button>
-        <button onclick="addMember(${m.id}, 'right')">R</button>
-        <button onclick="editMember(${m.id})">Edit</button>
-      </td>
-    </tr>
+      <tr>
+        <td>${m.name}</td>
+        <td>${m.id}</td>
+        <td>${m.left}</td>
+        <td>${m.right}</td>
+        <td>${pairs}</td>
+        <td>₹${income}</td>
+        <td>
+          <button onclick="addMember(${m.id}, 'left')">L</button>
+          <button onclick="addMember(${m.id}, 'right')">R</button>
+          <button onclick="editMember(${m.id})">Edit</button>
+        </td>
+      </tr>
     `;
   });
 
   document.getElementById("membersTable").innerHTML = html;
 }
 
-/* ===== SEARCH FUNCTION ===== */
-function searchMember() {
-  let input = document.getElementById("searchInput").value.toLowerCase();
-  let rows = document.querySelectorAll("#membersTable tr");
-
-  rows.forEach((row, index) => {
-    if (index === 0) return;
-
-    let text = row.innerText.toLowerCase();
-
-    if (text.includes(input)) {
-      row.style.display = "";
-    } else {
-      row.style.display = "none";
-    }
-  });
-}
-
-/* ===== TREE ===== */
-function renderTreeNode(id) {
-  if (id === 0) return "";
-
-  let m = getMember(id);
-  let pairs = countPairs(id);
-  let income = pairs * 3;
-
-  return `
-  <div style="text-align:center; margin:20px;">
-    
-    <div class="node">
-      ${m.name}<br>
-      Pair: ${pairs}<br>
-      ₹${income}<br>
-      <button onclick="addMember(${id}, 'left')">L</button>
-      <button onclick="addMember(${id}, 'right')">R</button>
-      <button onclick="editMember(${id})">Edit</button>
-    </div>
-
-    <div style="display:flex; justify-content:center; gap:40px; margin-top:10px;">
-      <div>${renderTreeNode(m.left)}</div>
-      <div>${renderTreeNode(m.right)}</div>
-    </div>
-
-  </div>
-  `;
-}
-
-function renderTree() {
-  document.getElementById("tree").innerHTML = renderTreeNode(1);
-}
-
-/* ===== DASHBOARD ===== */
+// DASHBOARD
 function renderDashboard() {
   let totalMembers = members.length;
   let totalPairs = 0;
   let totalIncome = 0;
 
   members.forEach(m => {
-    let p = countPairs(m.id);
+    let p = getPairs(m.id);
     totalPairs += p;
-    totalIncome += p * 3;
+    totalIncome += p * PAIR_INCOME;
   });
 
-  let companyProfit = totalMembers * 10 - totalIncome;
+  let companyProfit = totalMembers * MEMBER_FEE - totalIncome;
 
   document.getElementById("totalMembers").innerText = totalMembers;
   document.getElementById("totalPairs").innerText = totalPairs;
@@ -176,22 +116,28 @@ function renderDashboard() {
   document.getElementById("companyProfit").innerText = companyProfit;
 }
 
-/* ===== ZOOM ===== */
-function zoomIn() {
-  zoomLevel += 0.2;
-  document.getElementById("tree").style.transform = `scale(${zoomLevel})`;
+// SEARCH
+function searchMember() {
+  let input = document.getElementById("search").value.toLowerCase();
+  let rows = document.querySelectorAll("#membersTable tr");
+
+  rows.forEach(row => {
+    let text = row.innerText.toLowerCase();
+    row.style.display = text.includes(input) ? "" : "none";
+  });
 }
 
-function zoomOut() {
-  zoomLevel -= 0.2;
-  if (zoomLevel < 0.3) zoomLevel = 0.3;
-  document.getElementById("tree").style.transform = `scale(${zoomLevel})`;
+// PAGE SWITCH
+function showPage(page) {
+  document.getElementById("dashboardPage").style.display = "none";
+  document.getElementById("membersPage").style.display = "none";
+
+  document.getElementById(page + "Page").style.display = "block";
 }
 
-/* ===== MAIN ===== */
+// MAIN
 function renderAll() {
   renderMembers();
-  renderTree();
   renderDashboard();
 }
 
