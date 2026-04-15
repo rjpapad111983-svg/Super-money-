@@ -32,6 +32,7 @@
     .content {
       flex: 1;
       padding: 20px;
+      overflow: auto;
     }
 
     table {
@@ -50,6 +51,26 @@
       margin-bottom: 10px;
       width: 200px;
     }
+
+    /* TREE */
+    #tree {
+      overflow: auto;
+      white-space: nowrap;
+    }
+
+    .node {
+      border: 1px solid #fff;
+      padding: 8px;
+      display: inline-block;
+      margin: 10px;
+      min-width: 120px;
+    }
+
+    .children {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+    }
   </style>
 </head>
 
@@ -60,6 +81,7 @@
   <div class="sidebar">
     <h3>MLM Panel</h3>
     <button onclick="showPage('dashboard')">Dashboard</button>
+    <button onclick="showPage('tree')">Tree</button>
     <button onclick="showPage('members')">Members</button>
   </div>
 
@@ -72,6 +94,12 @@
       <p>Total Pairs: <span id="totalPairs"></span></p>
       <p>Total Income: ₹<span id="totalIncome"></span></p>
       <p>Company Profit: ₹<span id="companyProfit"></span></p>
+    </div>
+
+    <!-- TREE -->
+    <div id="treePage" style="display:none;">
+      <h2>Binary Tree</h2>
+      <div id="tree"></div>
     </div>
 
     <!-- MEMBERS -->
