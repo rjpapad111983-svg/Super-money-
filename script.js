@@ -53,7 +53,7 @@ function editMember(id) {
   renderAll();
 }
 
-/* correct pairing */
+/* ===== PAIR CALCULATION ===== */
 function countDownline(id) {
   if (id === 0) return 0;
   let m = getMember(id);
@@ -67,7 +67,7 @@ function countPairs(id) {
   return Math.min(left, right);
 }
 
-/* members table */
+/* ===== MEMBERS TABLE ===== */
 function renderMembers() {
   let html = `
   <tr>
@@ -105,7 +105,25 @@ function renderMembers() {
   document.getElementById("membersTable").innerHTML = html;
 }
 
-/* tree layout */
+/* ===== SEARCH FUNCTION ===== */
+function searchMember() {
+  let input = document.getElementById("searchInput").value.toLowerCase();
+  let rows = document.querySelectorAll("#membersTable tr");
+
+  rows.forEach((row, index) => {
+    if (index === 0) return;
+
+    let text = row.innerText.toLowerCase();
+
+    if (text.includes(input)) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
+}
+
+/* ===== TREE ===== */
 function renderTreeNode(id) {
   if (id === 0) return "";
 
@@ -138,7 +156,7 @@ function renderTree() {
   document.getElementById("tree").innerHTML = renderTreeNode(1);
 }
 
-/* dashboard */
+/* ===== DASHBOARD ===== */
 function renderDashboard() {
   let totalMembers = members.length;
   let totalPairs = 0;
@@ -158,7 +176,7 @@ function renderDashboard() {
   document.getElementById("companyProfit").innerText = companyProfit;
 }
 
-/* zoom */
+/* ===== ZOOM ===== */
 function zoomIn() {
   zoomLevel += 0.2;
   document.getElementById("tree").style.transform = `scale(${zoomLevel})`;
@@ -170,7 +188,7 @@ function zoomOut() {
   document.getElementById("tree").style.transform = `scale(${zoomLevel})`;
 }
 
-/* render */
+/* ===== MAIN ===== */
 function renderAll() {
   renderMembers();
   renderTree();
