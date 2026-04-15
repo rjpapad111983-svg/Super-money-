@@ -111,6 +111,13 @@ td, th {
 <!-- Members -->
 <div id="membersPage" style="display:none;">
   <h2>Members</h2>
+  <input 
+  type="text" 
+  id="searchInput" 
+  placeholder="Search name or ID..." 
+  onkeyup="searchMember()" 
+  style="padding:8px; width:250px; margin-bottom:10px; border-radius:6px;"
+>
   <table id="membersTable"></table>
 </div>
 
