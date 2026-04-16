@@ -2,113 +2,56 @@
 <html>
 <head>
   <title>MLM Panel</title>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: #0b1e2d;
-      color: white;
-    }
-
-    .container {
-      display: flex;
-    }
-
-    .sidebar {
-      width: 200px;
-      background: #071521;
-      padding: 20px;
-      height: 100vh;
-    }
-
-    .sidebar button {
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-      cursor: pointer;
-    }
-
-    .content {
-      flex: 1;
-      padding: 20px;
-      overflow: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      border: 1px solid #555;
-      padding: 8px;
-      text-align: center;
-    }
-
-    input {
-      padding: 8px;
-      margin-bottom: 10px;
-      width: 200px;
-    }
-
-    /* TREE */
-    #tree {
-      overflow: auto;
-      white-space: nowrap;
-    }
-
-    .node {
-      border: 1px solid #fff;
-      padding: 8px;
-      display: inline-block;
-      margin: 10px;
-      min-width: 120px;
-    }
-
-    .children {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="container">
+<div style="display:flex; height:100vh;">
 
-  <div class="sidebar">
-    <h3>MLM Panel</h3>
-    <button onclick="showPage('dashboard')">Dashboard</button>
-    <button onclick="showPage('tree')">Tree</button>
-    <button onclick="showPage('members')">Members</button>
+  <!-- LEFT MENU -->
+  <div style="width:200px; background:#0b1e2d; padding:10px;">
+    <h3 style="color:white;">MLM Panel</h3>
+
+    <button onclick="showPage('dashboard')" style="width:100%; margin-bottom:10px;">Dashboard</button>
+    <button onclick="showPage('tree')" style="width:100%; margin-bottom:10px;">Tree</button>
+    <button onclick="showPage('members')" style="width:100%;">Members</button>
   </div>
 
-  <div class="content">
+  <!-- RIGHT CONTENT -->
+  <div style="flex:1; padding:20px; color:white;">
 
     <!-- DASHBOARD -->
     <div id="dashboardPage">
       <h2>Dashboard</h2>
       <p>Total Members: <span id="totalMembers"></span></p>
       <p>Total Pairs: <span id="totalPairs"></span></p>
-      <p>Total Income: ₹<span id="totalIncome"></span></p>
-      <p>Company Profit: ₹<span id="companyProfit"></span></p>
+      <p>Total Income: <span id="totalIncome"></span></p>
+      <p>Company Profit: <span id="companyProfit"></span></p>
     </div>
 
     <!-- TREE -->
     <div id="treePage" style="display:none;">
       <h2>Binary Tree</h2>
-      <div id="tree"></div>
+
+      <!-- 🔥 ZOOM BUTTON -->
+      <button onclick="zoomIn()">➕ Zoom</button>
+      <button onclick="zoomOut()">➖ Zoom</button>
+
+      <!-- 🔥 TREE WRAPPER -->
+      <div id="treeWrapper">
+        <div id="tree"></div>
+      </div>
     </div>
 
     <!-- MEMBERS -->
     <div id="membersPage" style="display:none;">
       <h2>Members</h2>
 
-      <input type="text" id="search" placeholder="Search..." onkeyup="searchMember()">
+      <!-- SEARCH -->
+      <input type="text" id="searchInput" placeholder="Search name or ID..." onkeyup="searchMember()">
 
-      <table>
+      <table border="1" width="100%" style="margin-top:10px;">
         <thead>
           <tr>
             <th>Name</th>
@@ -120,6 +63,7 @@
             <th>Action</th>
           </tr>
         </thead>
+
         <tbody id="membersTable"></tbody>
       </table>
     </div>
@@ -128,5 +72,6 @@
 </div>
 
 <script src="script.js"></script>
+
 </body>
 </html>
