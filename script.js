@@ -1,7 +1,7 @@
 // ================= DATA LOAD =================
 let members = JSON.parse(localStorage.getItem("members")) || [];
 
-// Root fix (important)
+// ROOT FIX
 if (members.length === 0) {
   members = [{ id: 1, name: "Rajesh", left: 0, right: 0 }];
   saveData();
@@ -66,11 +66,7 @@ function countSide(id) {
   let m = getMember(id);
   if (!m) return 0;
 
-  return (
-    1 +
-    countSide(m.left) +
-    countSide(m.right)
-  );
+  return 1 + countSide(m.left) + countSide(m.right);
 }
 
 // ================= PAIR CALC =================
@@ -158,7 +154,7 @@ function renderTreeNode(id) {
         <button onclick="editMember(${id})">Edit</button>
       </div>
 
-      <div style="display:flex; justify-content:center; gap:20px;">
+      <div class="children">
         ${m.left ? renderTreeNode(m.left) : ""}
         ${m.right ? renderTreeNode(m.right) : ""}
       </div>
@@ -181,6 +177,20 @@ function searchMember() {
       row.style.display = "none";
     }
   });
+}
+
+// ================= ZOOM =================
+let scale = 1;
+
+function zoomIn() {
+  scale += 0.1;
+  document.getElementById("tree").style.transform = `scale(${scale})`;
+}
+
+function zoomOut() {
+  scale -= 0.1;
+  if (scale < 0.3) scale = 0.3;
+  document.getElementById("tree").style.transform = `scale(${scale})`;
 }
 
 // ================= PAGE SWITCH =================
