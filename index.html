@@ -9,17 +9,20 @@
 
 <div style="display:flex; height:100vh;">
 
-  <!-- LEFT MENU -->
-  <div style="width:200px; background:#0b1e2d; padding:10px;">
-    <h3 style="color:white;">MLM Panel</h3>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>MLM Panel</h3>
 
-    <button onclick="showPage('dashboard')" style="width:100%; margin-bottom:10px;">Dashboard</button>
-    <button onclick="showPage('tree')" style="width:100%; margin-bottom:10px;">Tree</button>
-    <button onclick="showPage('members')" style="width:100%;">Members</button>
+    <button onclick="showPage('dashboard')">Dashboard</button>
+    <button onclick="showPage('tree')">Tree</button>
+    <button onclick="showPage('members')">Members</button>
+
+    <!-- 🔥 NEW AUTO ADD -->
+    <button onclick="addMemberAuto()">+ Add Member</button>
   </div>
 
-  <!-- RIGHT CONTENT -->
-  <div style="flex:1; padding:20px; color:white;">
+  <!-- MAIN -->
+  <div class="main">
 
     <!-- DASHBOARD -->
     <div id="dashboardPage">
@@ -34,11 +37,9 @@
     <div id="treePage" style="display:none;">
       <h2>Binary Tree</h2>
 
-      <!-- 🔥 ZOOM BUTTON -->
       <button onclick="zoomIn()">➕ Zoom</button>
       <button onclick="zoomOut()">➖ Zoom</button>
 
-      <!-- 🔥 TREE WRAPPER -->
       <div id="treeWrapper">
         <div id="tree"></div>
       </div>
@@ -48,10 +49,9 @@
     <div id="membersPage" style="display:none;">
       <h2>Members</h2>
 
-      <!-- SEARCH -->
-      <input type="text" id="searchInput" placeholder="Search name or ID..." onkeyup="searchMember()">
+      <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchMember()">
 
-      <table border="1" width="100%" style="margin-top:10px;">
+      <table>
         <thead>
           <tr>
             <th>Name</th>
