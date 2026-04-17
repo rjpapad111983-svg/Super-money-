@@ -1,34 +1,23 @@
-// ================= DATA LOAD =================
+// ===== LOAD =====
 let members = JSON.parse(localStorage.getItem("members")) || [];
 
-// ROOT FIX
 if (members.length === 0) {
   members = [{ id: 1, name: "Rajesh", left: 0, right: 0 }];
   saveData();
 }
 
-// ================= SAVE =================
 function saveData() {
   localStorage.setItem("members", JSON.stringify(members));
 }
 
-// ================= GET MEMBER =================
 function getMember(id) {
   return members.find(m => m.id === id);
 }
 
-// ================= ADD MEMBER =================
-function addMember(parentId, side) {
+// ===== AUTO ADD =====
+function addMemberAuto() {
   let name = prompt("Enter member name:");
   if (!name) return;
-
-  let parent = getMember(parentId);
-  if (!parent) return;
-
-  if (parent[side] !== 0) {
-    alert("Already filled!");
-    return;
-  }
 
   let newId = members.length + 1;
 
@@ -39,67 +28,64 @@ function addMember(parentId, side) {
     right: 0
   });
 
-  parent[side] = newId;
+  // AUTO PLACE (BFS)
+  for (let i = 0; i < members.length; i++) {
+    if (members[i].left === 0) {
+      members[i].left = newId;
+      break;
+    } else if (members[i].right === 0) {
+      members[i].right = newId;
+      break;
+    }
+  }
 
   saveData();
   renderAll();
 }
 
-// ================= EDIT MEMBER =================
+// ===== EDIT =====
 function editMember(id) {
   let m = getMember(id);
-  if (!m) return;
-
   let name = prompt("Edit name:", m.name);
   if (!name) return;
 
   m.name = name;
-
   saveData();
   renderAll();
 }
 
-// ================= COUNT DOWNLINE =================
+// ===== COUNT =====
 function countSide(id) {
   if (!id) return 0;
-
   let m = getMember(id);
-  if (!m) return 0;
-
   return 1 + countSide(m.left) + countSide(m.right);
 }
 
-// ================= PAIR CALC =================
+// ===== PAIRS =====
 function getPairs(id) {
   let m = getMember(id);
-  if (!m) return 0;
-
-  let leftCount = countSide(m.left);
-  let rightCount = countSide(m.right);
-
-  return Math.min(leftCount, rightCount);
+  let left = countSide(m.left);
+  let right = countSide(m.right);
+  return Math.min(left, right);
 }
 
-// ================= DASHBOARD =================
+// ===== DASHBOARD =====
 function renderDashboard() {
   let totalMembers = members.length;
 
   let totalPairs = 0;
-  members.forEach(m => {
-    totalPairs += getPairs(m.id);
-  });
+  members.forEach(m => totalPairs += getPairs(m.id));
 
   let totalIncome = totalPairs * 3;
-
   let companyProfit = (members.length * 10) - totalIncome;
 
-  document.getElementById("totalMembers").innerText = totalMembers;
-  document.getElementById("totalPairs").innerText = totalPairs;
-  document.getElementById("totalIncome").innerText = "₹" + totalIncome;
-  document.getElementById("companyProfit").innerText = "₹" + companyProfit;
+  totalMembersEl.innerText = totalMembers;
+  totalPairsEl.innerText = totalPairs;
+  totalIncomeEl.innerText = "₹" + totalIncome;
+  companyProfitEl.innerText = "₹" + companyProfit;
 }
 
-// ================= MEMBERS TABLE =================
+// ===== MEMBERS =====
 function renderMembers() {
   let html = "";
 
@@ -115,28 +101,20 @@ function renderMembers() {
         <td>${countSide(m.right)}</td>
         <td>${pairs}</td>
         <td>₹${income}</td>
-        <td>
-          <button onclick="addMember(${m.id}, 'left')">L</button>
-          <button onclick="addMember(${m.id}, 'right')">R</button>
-          <button onclick="editMember(${m.id})">Edit</button>
-        </td>
+        <td><button onclick="editMember(${m.id})">Edit</button></td>
       </tr>
     `;
   });
 
-  document.getElementById("membersTable").innerHTML = html;
+  membersTable.innerHTML = html;
 }
 
-// ================= TREE =================
+// ===== TREE =====
 function renderTree() {
-  if (!members.length) return;
-
-  document.getElementById("tree").innerHTML = renderTreeNode(1);
+  tree.innerHTML = renderNode(1);
 }
 
-function renderTreeNode(id) {
-  if (!id) return "";
-
+function renderNode(id) {
   let m = getMember(id);
   if (!m) return "";
 
@@ -149,68 +127,67 @@ function renderTreeNode(id) {
         ${m.name}<br>
         Pair: ${pairs}<br>
         ₹${income}<br>
-        <button onclick="addMember(${id}, 'left')">L</button>
-        <button onclick="addMember(${id}, 'right')">R</button>
         <button onclick="editMember(${id})">Edit</button>
       </div>
 
       <div class="children">
-        ${m.left ? renderTreeNode(m.left) : ""}
-        ${m.right ? renderTreeNode(m.right) : ""}
+        ${m.left ? renderNode(m.left) : ""}
+        ${m.right ? renderNode(m.right) : ""}
       </div>
     </div>
   `;
 }
 
-// ================= SEARCH =================
+// ===== SEARCH =====
 function searchMember() {
-  let input = document.getElementById("searchInput").value.toLowerCase();
+  let val = searchInput.value.toLowerCase();
   let rows = document.querySelectorAll("#membersTable tr");
 
-  rows.forEach(row => {
-    let name = row.children[0].innerText.toLowerCase();
-    let id = row.children[1].innerText;
+  rows.forEach(r => {
+    let name = r.children[0].innerText.toLowerCase();
+    let id = r.children[1].innerText;
 
-    if (name.includes(input) || id.includes(input)) {
-      row.style.display = "";
-    } else {
-      row.style.display = "none";
-    }
+    r.style.display = (name.includes(val) || id.includes(val)) ? "" : "none";
   });
 }
 
-// ================= ZOOM =================
+// ===== ZOOM =====
 let scale = 1;
-
 function zoomIn() {
   scale += 0.1;
-  document.getElementById("tree").style.transform = `scale(${scale})`;
+  tree.style.transform = `scale(${scale})`;
 }
-
 function zoomOut() {
   scale -= 0.1;
   if (scale < 0.3) scale = 0.3;
-  document.getElementById("tree").style.transform = `scale(${scale})`;
+  tree.style.transform = `scale(${scale})`;
 }
 
-// ================= PAGE SWITCH =================
-function showPage(page) {
-  document.getElementById("dashboardPage").style.display = "none";
-  document.getElementById("membersPage").style.display = "none";
-  document.getElementById("treePage").style.display = "none";
+// ===== PAGE =====
+function showPage(p) {
+  dashboardPage.style.display = "none";
+  membersPage.style.display = "none";
+  treePage.style.display = "none";
 
-  document.getElementById(page + "Page").style.display = "block";
+  document.getElementById(p + "Page").style.display = "block";
 
-  if (page === "dashboard") renderDashboard();
-  if (page === "members") renderMembers();
-  if (page === "tree") renderTree();
+  if (p === "dashboard") renderDashboard();
+  if (p === "members") renderMembers();
+  if (p === "tree") renderTree();
 }
 
-// ================= INIT =================
+// ===== INIT =====
+const totalMembersEl = document.getElementById("totalMembers");
+const totalPairsEl = document.getElementById("totalPairs");
+const totalIncomeEl = document.getElementById("totalIncome");
+const companyProfitEl = document.getElementById("companyProfit");
+const membersTable = document.getElementById("membersTable");
+const tree = document.getElementById("tree");
+
+renderAll();
+
 function renderAll() {
   renderDashboard();
   renderMembers();
   renderTree();
 }
-
-renderAll();
