@@ -1,77 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>MLM Panel</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLM Panel</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div style="display:flex; height:100vh;">
+<div class="container">
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <h3>MLM Panel</h3>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>MLM Panel</h2>
 
-    <button onclick="showPage('dashboard')">Dashboard</button>
-    <button onclick="showPage('tree')">Tree</button>
-    <button onclick="showPage('members')">Members</button>
-
-    <!-- 🔥 NEW AUTO ADD -->
-    <button onclick="addMemberAuto()">+ Add Member</button>
-  </div>
-
-  <!-- MAIN -->
-  <div class="main">
-
-    <!-- DASHBOARD -->
-    <div id="dashboardPage">
-      <h2>Dashboard</h2>
-      <p>Total Members: <span id="totalMembers"></span></p>
-      <p>Total Pairs: <span id="totalPairs"></span></p>
-      <p>Total Income: <span id="totalIncome"></span></p>
-      <p>Company Profit: <span id="companyProfit"></span></p>
+        <button onclick="showPage('dashboard')">Dashboard</button>
+        <button onclick="showPage('tree')">Tree</button>
+        <button onclick="showPage('members')">Members</button>
+        <button onclick="addRootMember()">+ Add Member</button>
     </div>
 
-    <!-- TREE -->
-    <div id="treePage" style="display:none;">
-      <h2>Binary Tree</h2>
+    <!-- Main -->
+    <div class="main">
 
-      <button onclick="zoomIn()">➕ Zoom</button>
-      <button onclick="zoomOut()">➖ Zoom</button>
+        <!-- Dashboard -->
+        <div id="dashboard" class="page">
+            <h2>Dashboard</h2>
+            <p>Total Members: <span id="totalMembers">0</span></p>
+            <p>Total Pairs: <span id="totalPairs">0</span></p>
+            <p>Total Income: ₹<span id="totalIncome">0</span></p>
+            <p>Company Profit: ₹<span id="companyProfit">0</span></p>
+        </div>
 
-      <div id="treeWrapper">
-        <div id="tree"></div>
-      </div>
+        <!-- Tree -->
+        <div id="tree" class="page" style="display:none;">
+            <h2>Binary Tree</h2>
+            <div id="treeContainer" class="tree-container"></div>
+        </div>
+
+        <!-- Members -->
+        <div id="members" class="page" style="display:none;">
+            <h2>Members</h2>
+
+            <input type="text" id="search" placeholder="Search name or ID..." onkeyup="searchMember()">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>ID</th>
+                        <th>Left</th>
+                        <th>Right</th>
+                        <th>Pairs</th>
+                        <th>Income</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="membersTable"></tbody>
+            </table>
+        </div>
+
     </div>
 
-    <!-- MEMBERS -->
-    <div id="membersPage" style="display:none;">
-      <h2>Members</h2>
-
-      <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchMember()">
-
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>ID</th>
-            <th>Left</th>
-            <th>Right</th>
-            <th>Pairs</th>
-            <th>Income</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-
-        <tbody id="membersTable"></tbody>
-      </table>
-    </div>
-
-  </div>
 </div>
 
 <script src="script.js"></script>
+
+<script>
+// 👉 Page Switch
+function showPage(page) {
+    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+    document.getElementById(page).style.display = "block";
+}
+
+// 👉 Add Root Member
+function addRootMember() {
+    let name = prompt("Enter Member Name:");
+    if (!name) return;
+
+    addMember(name, 1, "left"); // auto attach
+}
+
+// 👉 Search
+function searchMember() {
+    let input = document.getElementById("search").value.toLowerCase();
+    let rows = document.querySelectorAll("#membersTable tr");
+
+    rows.forEach(row => {
+        let text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? "" : "none";
+    });
+}
+</script>
 
 </body>
 </html>
