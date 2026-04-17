@@ -1,166 +1,196 @@
-// ===== DATA LOAD =====
-let members = JSON.parse(localStorage.getItem("mlmData")) || [];
+let members = JSON.parse(localStorage.getItem("members")) || [];
 
-// ===== ROOT FIX =====
-if (!members.length) {
-  members = [{
-    id: 1,
-    name: "Rajesh",
-    left: 0,
-    right: 0
-  }];
-  saveData();
-}
-
-// ===== SAVE =====
+// 👉 Save data
 function saveData() {
-  localStorage.setItem("mlmData", JSON.stringify(members));
+    localStorage.setItem("members", JSON.stringify(members));
 }
 
-// ===== GET =====
-function getMember(id) {
-  return members.find(m => m.id == id);
+// 👉 Add root अगर empty है
+function ensureRoot() {
+    if (members.length === 0) {
+        members.push({
+            id: 1,
+            name: "Root",
+            left: null,
+            right: null,
+            parentId: null
+        });
+        saveData();
+    }
 }
 
-// ===== ADD LEFT =====
-function addLeft(parentId) {
-  let parent = getMember(parentId);
-  if (!parent) return alert("Parent missing");
+// 👉 Add Member
+function addMember(name, parentId, side) {
+    let id = members.length + 1;
 
-  if (parent.left) return alert("Left full");
+    let newMember = {
+        id,
+        name,
+        left: null,
+        right: null,
+        parentId
+    };
 
-  let name = prompt("Name");
-  if (!name) return;
+    members.push(newMember);
 
-  let id = Date.now();
+    let parent = members.find(m => m.id === parentId);
+    if (side === "left") parent.left = id;
+    if (side === "right") parent.right = id;
 
-  members.push({ id, name, left: 0, right: 0 });
-  parent.left = id;
-
-  saveData();
-  renderAll();
+    saveData();
+    renderAll();
 }
 
-// ===== ADD RIGHT =====
-function addRight(parentId) {
-  let parent = getMember(parentId);
-  if (!parent) return alert("Parent missing");
+// 👉 Left button
+function addLeft(id) {
+    let name = prompt("Enter Left Member Name:");
+    if (!name) return;
 
-  if (parent.right) return alert("Right full");
+    let parent = members.find(m => m.id === id);
 
-  let name = prompt("Name");
-  if (!name) return;
+    if (parent.left) {
+        alert("Left already filled!");
+        return;
+    }
 
-  let id = Date.now();
-
-  members.push({ id, name, left: 0, right: 0 });
-  parent.right = id;
-
-  saveData();
-  renderAll();
+    addMember(name, id, "left");
 }
 
-// ===== COUNT =====
-function countTree(id) {
-  if (!id) return 0;
+// 👉 Right button
+function addRight(id) {
+    let name = prompt("Enter Right Member Name:");
+    if (!name) return;
 
-  let m = getMember(id);
-  if (!m) return 0;
+    let parent = members.find(m => m.id === id);
 
-  return 1 + countTree(m.left) + countTree(m.right);
+    if (parent.right) {
+        alert("Right already filled!");
+        return;
+    }
+
+    addMember(name, id, "right");
 }
 
-// ===== PAIRS =====
-function getPairs(id) {
-  let m = getMember(id);
-  if (!m) return 0;
+// 👉 Count Downline (Recursive)
+function countDownline(id, side) {
+    let member = members.find(m => m.id === id);
+    if (!member) return 0;
 
-  let L = countTree(m.left);
-  let R = countTree(m.right);
+    let childId = member[side];
+    if (!childId) return 0;
 
-  return Math.min(L, R);
+    return 1 +
+        countDownline(childId, "left") +
+        countDownline(childId, "right");
 }
 
-// ===== TREE =====
-function renderNode(id) {
-  let m = getMember(id);
-  if (!m) return "";
-
-  let p = getPairs(id);
-
-  return `
-    <div style="text-align:center;">
-      <div class="node">
-        ${m.name}<br>
-        Pair: ${p}<br>
-        ₹${p * 3}<br>
-
-        <button onclick="addLeft(${id})">L</button>
-        <button onclick="addRight(${id})">R</button>
-      </div>
-
-      <div class="children">
-        ${m.left ? renderNode(m.left) : ""}
-        ${m.right ? renderNode(m.right) : ""}
-      </div>
-    </div>
-  `;
-}
-
-function renderTree() {
-  let el = document.getElementById("tree");
-  if (!el) return;
-
-  el.innerHTML = renderNode(1);
-}
-
-// ===== DASHBOARD =====
-function renderDashboard() {
-  let totalPairs = 0;
-
-  members.forEach(m => {
-    totalPairs += getPairs(m.id);
-  });
-
-  let totalIncome = totalPairs * 3;
-  let companyProfit = (members.length * 10) - totalIncome;
-
-  document.getElementById("totalMembers").innerText = members.length;
-  document.getElementById("totalPairs").innerText = totalPairs;
-  document.getElementById("totalIncome").innerText = "₹" + totalIncome;
-  document.getElementById("companyProfit").innerText = "₹" + companyProfit;
-}
-
-// ===== MEMBERS =====
+// 👉 Members Table
 function renderMembers() {
-  let table = document.getElementById("membersTable");
-  if (!table) return;
+    let table = document.getElementById("membersTable");
+    if (!table) return;
 
-  table.innerHTML = "";
+    table.innerHTML = "";
 
-  members.forEach(m => {
-    let L = countTree(m.left);
-    let R = countTree(m.right);
-    let P = Math.min(L, R);
+    members.forEach(m => {
+        let left = countDownline(m.id, "left");
+        let right = countDownline(m.id, "right");
 
-    table.innerHTML += `
-      <tr>
-        <td>${m.name}</td>
-        <td>${m.id}</td>
-        <td>${L}</td>
-        <td>${R}</td>
-        <td>${P}</td>
-        <td>₹${P * 3}</td>
-      </tr>
-    `;
-  });
+        let pairs = Math.min(left, right);
+        let income = pairs * 3;
+
+        table.innerHTML += `
+        <tr>
+            <td>${m.name}</td>
+            <td>${m.id}</td>
+            <td>${left}</td>
+            <td>${right}</td>
+            <td>${pairs}</td>
+            <td>₹${income}</td>
+            <td>
+                <button onclick="addLeft(${m.id})">L</button>
+                <button onclick="addRight(${m.id})">R</button>
+            </td>
+        </tr>`;
+    });
 }
 
-// ===== MAIN =====
+// 👉 Tree Render (FULL FIXED)
+function renderTree() {
+    let container = document.getElementById("treeContainer");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    if (members.length === 0) return;
+
+    let map = {};
+    members.forEach(m => map[m.id] = m);
+
+    function buildNode(member) {
+        let div = document.createElement("div");
+        div.className = "tree-node";
+
+        div.innerHTML = `
+            <div class="box">
+                ${member.name}<br>
+                ID: ${member.id}<br>
+                <button onclick="addLeft(${member.id})">L</button>
+                <button onclick="addRight(${member.id})">R</button>
+            </div>
+        `;
+
+        let children = document.createElement("div");
+        children.className = "tree-children";
+
+        if (member.left && map[member.left]) {
+            children.appendChild(buildNode(map[member.left]));
+        }
+
+        if (member.right && map[member.right]) {
+            children.appendChild(buildNode(map[member.right]));
+        }
+
+        div.appendChild(children);
+        return div;
+    }
+
+    container.appendChild(buildNode(members[0]));
+}
+
+// 👉 Dashboard
+function renderDashboard() {
+    let totalMembers = members.length;
+    let totalPairs = 0;
+    let totalIncome = 0;
+
+    members.forEach(m => {
+        let left = countDownline(m.id, "left");
+        let right = countDownline(m.id, "right");
+
+        let pair = Math.min(left, right);
+
+        totalPairs += pair;
+        totalIncome += pair * 3;
+    });
+
+    let m = document.getElementById("totalMembers");
+    let p = document.getElementById("totalPairs");
+    let i = document.getElementById("totalIncome");
+    let c = document.getElementById("companyProfit");
+
+    if (m) m.innerText = totalMembers;
+    if (p) p.innerText = totalPairs;
+    if (i) i.innerText = totalIncome;
+    if (c) c.innerText = totalMembers * 10;
+}
+
+// 👉 Main Render
 function renderAll() {
-  renderTree();
-  renderDashboard();
-  renderMembers();
+    renderMembers();
+    renderTree();
+    renderDashboard();
 }
 
+// 👉 INIT
+ensureRoot();
 renderAll();
