@@ -1,11 +1,11 @@
 let members = JSON.parse(localStorage.getItem("members")) || [];
 
-// 👉 Save data
+// 👉 Save
 function saveData() {
     localStorage.setItem("members", JSON.stringify(members));
 }
 
-// 👉 Add root अगर empty है
+// 👉 Root ensure
 function ensureRoot() {
     if (members.length === 0) {
         members.push({
@@ -41,7 +41,7 @@ function addMember(name, parentId, side) {
     renderAll();
 }
 
-// 👉 Left button
+// 👉 Add Left
 function addLeft(id) {
     let name = prompt("Enter Left Member Name:");
     if (!name) return;
@@ -56,7 +56,7 @@ function addLeft(id) {
     addMember(name, id, "left");
 }
 
-// 👉 Right button
+// 👉 Add Right
 function addRight(id) {
     let name = prompt("Enter Right Member Name:");
     if (!name) return;
@@ -71,7 +71,21 @@ function addRight(id) {
     addMember(name, id, "right");
 }
 
-// 👉 Count Downline (Recursive)
+// 👉 Edit Member (NEW)
+function editMember(id) {
+    let member = members.find(m => m.id === id);
+    if (!member) return;
+
+    let newName = prompt("Edit Name:", member.name);
+    if (newName) {
+        member.name = newName;
+    }
+
+    saveData();
+    renderAll();
+}
+
+// 👉 Count Downline
 function countDownline(id, side) {
     let member = members.find(m => m.id === id);
     if (!member) return 0;
@@ -109,12 +123,13 @@ function renderMembers() {
             <td>
                 <button onclick="addLeft(${m.id})">L</button>
                 <button onclick="addRight(${m.id})">R</button>
+                <button onclick="editMember(${m.id})">Edit</button>
             </td>
         </tr>`;
     });
 }
 
-// 👉 Tree Render (FULL FIXED)
+// 👉 Tree Render
 function renderTree() {
     let container = document.getElementById("treeContainer");
     if (!container) return;
@@ -136,6 +151,7 @@ function renderTree() {
                 ID: ${member.id}<br>
                 <button onclick="addLeft(${member.id})">L</button>
                 <button onclick="addRight(${member.id})">R</button>
+                <button onclick="editMember(${member.id})">Edit</button>
             </div>
         `;
 
@@ -184,7 +200,7 @@ function renderDashboard() {
     if (c) c.innerText = totalMembers * 10;
 }
 
-// 👉 Main Render
+// 👉 Render All
 function renderAll() {
     renderMembers();
     renderTree();
