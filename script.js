@@ -10,7 +10,7 @@ function ensureRoot() {
     if (members.length === 0) {
         members.push({
             id: 1,
-            name: "Root",
+            name: "Rajesh",
             left: null,
             right: null,
             parentId: null
@@ -71,31 +71,25 @@ function addRight(id) {
     addMember(name, id, "right");
 }
 
-// 👉 Edit Member (NEW)
+// 👉 Edit
 function editMember(id) {
-    let member = members.find(m => m.id === id);
-    if (!member) return;
-
-    let newName = prompt("Edit Name:", member.name);
-    if (newName) {
-        member.name = newName;
+    let m = members.find(x => x.id === id);
+    let name = prompt("Edit Name:", m.name);
+    if (name) {
+        m.name = name;
+        saveData();
+        renderAll();
     }
-
-    saveData();
-    renderAll();
 }
 
 // 👉 Count Downline
 function countDownline(id, side) {
-    let member = members.find(m => m.id === id);
-    if (!member) return 0;
-
-    let childId = member[side];
-    if (!childId) return 0;
+    let m = members.find(x => x.id === id);
+    if (!m || !m[side]) return 0;
 
     return 1 +
-        countDownline(childId, "left") +
-        countDownline(childId, "right");
+        countDownline(m[side], "left") +
+        countDownline(m[side], "right");
 }
 
 // 👉 Members Table
@@ -109,8 +103,8 @@ function renderMembers() {
         let left = countDownline(m.id, "left");
         let right = countDownline(m.id, "right");
 
-        let pairs = Math.min(left, right);
-        let income = pairs * 3;
+        let pair = Math.min(left, right);
+        let income = pair * 3;
 
         table.innerHTML += `
         <tr>
@@ -118,7 +112,7 @@ function renderMembers() {
             <td>${m.id}</td>
             <td>${left}</td>
             <td>${right}</td>
-            <td>${pairs}</td>
+            <td>${pair}</td>
             <td>₹${income}</td>
             <td>
                 <button onclick="addLeft(${m.id})">L</button>
@@ -129,7 +123,7 @@ function renderMembers() {
     });
 }
 
-// 👉 Tree Render
+// 👉 TREE (FINAL FIX)
 function renderTree() {
     let container = document.getElementById("treeContainer");
     if (!container) return;
@@ -141,11 +135,11 @@ function renderTree() {
     let map = {};
     members.forEach(m => map[m.id] = m);
 
-    function buildNode(member) {
-        let div = document.createElement("div");
-        div.className = "tree-node";
+    function build(member) {
+        let node = document.createElement("div");
+        node.className = "node";
 
-        div.innerHTML = `
+        node.innerHTML = `
             <div class="box">
                 ${member.name}<br>
                 ID: ${member.id}<br>
@@ -156,21 +150,24 @@ function renderTree() {
         `;
 
         let children = document.createElement("div");
-        children.className = "tree-children";
+        children.className = "children";
 
         if (member.left && map[member.left]) {
-            children.appendChild(buildNode(map[member.left]));
+            children.appendChild(build(map[member.left]));
         }
 
         if (member.right && map[member.right]) {
-            children.appendChild(buildNode(map[member.right]));
+            children.appendChild(build(map[member.right]));
         }
 
-        div.appendChild(children);
-        return div;
+        if (member.left || member.right) {
+            node.appendChild(children);
+        }
+
+        return node;
     }
 
-    container.appendChild(buildNode(members[0]));
+    container.appendChild(build(members[0]));
 }
 
 // 👉 Dashboard
@@ -180,27 +177,21 @@ function renderDashboard() {
     let totalIncome = 0;
 
     members.forEach(m => {
-        let left = countDownline(m.id, "left");
-        let right = countDownline(m.id, "right");
+        let l = countDownline(m.id, "left");
+        let r = countDownline(m.id, "right");
 
-        let pair = Math.min(left, right);
-
-        totalPairs += pair;
-        totalIncome += pair * 3;
+        let p = Math.min(l, r);
+        totalPairs += p;
+        totalIncome += p * 3;
     });
 
-    let m = document.getElementById("totalMembers");
-    let p = document.getElementById("totalPairs");
-    let i = document.getElementById("totalIncome");
-    let c = document.getElementById("companyProfit");
-
-    if (m) m.innerText = totalMembers;
-    if (p) p.innerText = totalPairs;
-    if (i) i.innerText = totalIncome;
-    if (c) c.innerText = totalMembers * 10;
+    document.getElementById("totalMembers").innerText = totalMembers;
+    document.getElementById("totalPairs").innerText = totalPairs;
+    document.getElementById("totalIncome").innerText = totalIncome;
+    document.getElementById("companyProfit").innerText = totalMembers * 10;
 }
 
-// 👉 Render All
+// 👉 All render
 function renderAll() {
     renderMembers();
     renderTree();
