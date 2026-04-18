@@ -1,221 +1,161 @@
-/* ===== RESET ===== */
-* {
-    box-sizing: border-box;
-}
-
 /* ===== BODY ===== */
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    display: flex;
-    background: #022c33;
-    color: #fff;
+    font-family: Arial;
+    background: #062f33;
+    color: white;
 }
 
 /* ===== SIDEBAR ===== */
 .sidebar {
-    width: 220px;
-    background: #011f24;
-    padding: 15px;
+    width: 200px;
     height: 100vh;
-    overflow-y: auto;
+    background: #022c2f;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 10px;
 }
 
 .sidebar h2 {
     text-align: center;
-    margin-bottom: 15px;
 }
 
 .sidebar button {
     width: 100%;
-    padding: 10px;
     margin: 5px 0;
-    background: #0a4c57;
+    padding: 10px;
     border: none;
+    background: #0a4a4f;
     color: white;
     border-radius: 6px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.sidebar button:hover {
-    background: #0f6c7a;
-}
-
-/* ===== COMPANY LIST ===== */
-#companyList button {
-    background: #033f47;
-    font-size: 12px;
 }
 
 /* ===== MAIN ===== */
 .main {
-    flex: 1;
-    padding: 15px;
-    overflow: hidden;
+    margin-left: 220px;
+    padding: 10px;
 }
 
 /* ===== PAGE ===== */
 .page {
     display: none;
 }
-
 .page.active {
     display: block;
-}
-
-/* ===== DASHBOARD ===== */
-#dashboard span {
-    font-weight: bold;
-}
-
-/* ===== TABLE ===== */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-th {
-    background: #0a4c57;
-}
-
-th, td {
-    border: 1px solid #0a4c57;
-    padding: 8px;
-    text-align: center;
 }
 
 /* ===== TREE WRAPPER ===== */
 #treeWrapper {
     width: 100%;
-    height: 80vh;
-    overflow: hidden;
-    border: 1px solid #0a4c57;
-    position: relative;
-    background: #022c33;
-}
-
-/* ===== TREE CONTAINER ===== */
-#treeContainer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform-origin: 0 0;
+    overflow: auto;
+    border: 1px solid #0a4a4f;
 }
 
 /* ===== TREE ===== */
 .tree {
     display: flex;
     justify-content: center;
+    padding: 40px;
 }
 
+/* ===== UL TREE STRUCTURE ===== */
 .tree ul {
     padding-top: 20px;
+    position: relative;
     display: flex;
     justify-content: center;
-    position: relative;
 }
 
 .tree li {
-    list-style: none;
+    list-style-type: none;
     text-align: center;
-    padding: 20px 10px 0;
     position: relative;
+    padding: 20px 10px 0 10px;
 }
 
-/* ===== TREE LINES ===== */
-.tree li::before,
+/* ===== LINES ===== */
+.tree li::before, 
 .tree li::after {
     content: '';
     position: absolute;
     top: 0;
+    right: 50%;
+    border-top: 2px solid #ccc;
     width: 50%;
     height: 20px;
-    border-top: 1px solid #ccc;
-}
-
-.tree li::before {
-    left: -50%;
-    border-right: 1px solid #ccc;
 }
 
 .tree li::after {
-    right: -50%;
-    border-left: 1px solid #ccc;
+    right: auto;
+    left: 50%;
+    border-left: 2px solid #ccc;
 }
 
-.tree li:only-child::before,
-.tree li:only-child::after {
+.tree li:only-child::after, 
+.tree li:only-child::before {
     display: none;
 }
 
-.tree li:first-child::before {
-    border: none;
+.tree li:only-child {
+    padding-top: 0;
 }
 
+.tree li:first-child::before, 
 .tree li:last-child::after {
-    border: none;
+    border: 0 none;
 }
 
-/* ===== NODE BOX ===== */
-.tree-box {
-    border: 1px solid #0a4c57;
-    background: #033f47;
+.tree li:last-child::before {
+    border-right: 2px solid #ccc;
+    border-radius: 0 5px 0 0;
+}
+
+.tree li:first-child::after {
+    border-radius: 5px 0 0 0;
+}
+
+/* ===== BOX ===== */
+.box {
+    border: 1px solid #0a4a4f;
     padding: 10px;
-    border-radius: 10px;
-    min-width: 120px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    display: inline-block;
+    border-radius: 8px;
+    background: #0c3f44;
+    min-width: 100px;
 }
 
-/* ===== BUTTON COLORS ===== */
-.tree-box button {
-    margin: 3px;
-    padding: 4px 7px;
+/* ===== BUTTON ===== */
+.box button {
+    margin: 2px;
+    padding: 3px 6px;
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    border-radius: 4px;
 }
 
-.tree-box button:nth-child(4) {
-    background: #3498db;
+/* ===== TABLE ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.tree-box button:nth-child(5) {
-    background: #2ecc71;
+table th, table td {
+    border: 1px solid #0a4a4f;
+    padding: 8px;
+    text-align: center;
 }
 
-.tree-box button:nth-child(6) {
-    background: #f1c40f;
-}
-
-/* ===== ZOOM CONTROLS ===== */
-.zoom-controls {
-    margin-bottom: 10px;
-}
-
-.zoom-controls button {
-    padding: 6px 10px;
-    margin-right: 5px;
-}
-
-/* ===== MOBILE ===== */
+/* ===== MOBILE FIX ===== */
 @media (max-width: 768px) {
-    body {
-        flex-direction: column;
+    .main {
+        margin-left: 0;
     }
 
     .sidebar {
-        width: 100%;
-        height: auto;
+        width: 180px;
     }
 
-    .main {
-        padding: 10px;
-    }
-
-    .tree-box {
-        min-width: 100px;
-        font-size: 12px;
+    #treeWrapper {
+        overflow-x: scroll;
     }
 }
