@@ -1,3 +1,8 @@
+/* ===== RESET ===== */
+* {
+    box-sizing: border-box;
+}
+
 /* ===== BODY ===== */
 body {
     margin: 0;
@@ -13,18 +18,18 @@ body {
     background: #011f24;
     padding: 15px;
     height: 100vh;
-    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .sidebar h2 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .sidebar button {
     width: 100%;
     padding: 10px;
-    margin: 6px 0;
+    margin: 5px 0;
     background: #0a4c57;
     border: none;
     color: white;
@@ -37,11 +42,17 @@ body {
     background: #0f6c7a;
 }
 
+/* ===== COMPANY LIST ===== */
+#companyList button {
+    background: #033f47;
+    font-size: 12px;
+}
+
 /* ===== MAIN ===== */
 .main {
     flex: 1;
-    padding: 20px;
-    overflow: auto;
+    padding: 15px;
+    overflow: hidden;
 }
 
 /* ===== PAGE ===== */
@@ -53,14 +64,47 @@ body {
     display: block;
 }
 
-/* ===== TREE CONTAINER ===== */
-#treeContainer {
-    width: 100%;
-    overflow-x: auto;
-    padding: 20px;
+/* ===== DASHBOARD ===== */
+#dashboard span {
+    font-weight: bold;
 }
 
-/* ===== TREE STRUCTURE ===== */
+/* ===== TABLE ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th {
+    background: #0a4c57;
+}
+
+th, td {
+    border: 1px solid #0a4c57;
+    padding: 8px;
+    text-align: center;
+}
+
+/* ===== TREE WRAPPER ===== */
+#treeWrapper {
+    width: 100%;
+    height: 80vh;
+    overflow: hidden;
+    border: 1px solid #0a4c57;
+    position: relative;
+    background: #022c33;
+}
+
+/* ===== TREE CONTAINER ===== */
+#treeContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+}
+
+/* ===== TREE ===== */
 .tree {
     display: flex;
     justify-content: center;
@@ -68,19 +112,19 @@ body {
 
 .tree ul {
     padding-top: 20px;
-    position: relative;
     display: flex;
     justify-content: center;
+    position: relative;
 }
 
 .tree li {
     list-style: none;
     text-align: center;
+    padding: 20px 10px 0;
     position: relative;
-    padding: 20px 10px 0 10px;
 }
 
-/* CONNECT LINES */
+/* ===== TREE LINES ===== */
 .tree li::before,
 .tree li::after {
     content: '';
@@ -101,13 +145,9 @@ body {
     border-left: 1px solid #ccc;
 }
 
-.tree li:only-child::after,
-.tree li:only-child::before {
+.tree li:only-child::before,
+.tree li:only-child::after {
     display: none;
-}
-
-.tree li:only-child {
-    padding-top: 0;
 }
 
 .tree li:first-child::before {
@@ -121,59 +161,42 @@ body {
 /* ===== NODE BOX ===== */
 .tree-box {
     border: 1px solid #0a4c57;
+    background: #033f47;
     padding: 10px;
     border-radius: 10px;
-    background: #033f47;
-    display: inline-block;
     min-width: 120px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    box-shadow: 0 0 8px rgba(0,0,0,0.5);
 }
 
-/* ===== BUTTONS ===== */
+/* ===== BUTTON COLORS ===== */
 .tree-box button {
     margin: 3px;
-    padding: 4px 8px;
+    padding: 4px 7px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
-.tree-box button:nth-child(3) {
-    background: #f0ad4e;
-}
-
 .tree-box button:nth-child(4) {
-    background: #5bc0de;
+    background: #3498db;
 }
 
 .tree-box button:nth-child(5) {
-    background: #5cb85c;
+    background: #2ecc71;
 }
 
-/* ===== TABLE ===== */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
+.tree-box button:nth-child(6) {
+    background: #f1c40f;
 }
 
-th {
-    background: #0a4c57;
+/* ===== ZOOM CONTROLS ===== */
+.zoom-controls {
+    margin-bottom: 10px;
 }
 
-th, td {
-    border: 1px solid #0a4c57;
-    padding: 10px;
-    text-align: center;
-}
-
-/* ===== COMPANY BUTTON ===== */
-#companyList button {
-    width: 100%;
-    margin-top: 5px;
-    padding: 6px;
-    font-size: 12px;
-    background: #033f47;
+.zoom-controls button {
+    padding: 6px 10px;
+    margin-right: 5px;
 }
 
 /* ===== MOBILE ===== */
