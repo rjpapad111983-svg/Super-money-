@@ -1,4 +1,3 @@
-/* ===== BODY ===== */
 body {
     margin: 0;
     font-family: Arial;
@@ -6,156 +5,53 @@ body {
     color: white;
 }
 
-/* ===== SIDEBAR ===== */
-.sidebar {
-    width: 200px;
-    height: 100vh;
-    background: #022c2f;
-    position: fixed;
-    left: 0;
-    top: 0;
-    padding: 10px;
+.container {
+    display: flex;
 }
 
-.sidebar h2 {
-    text-align: center;
+/* Sidebar */
+.sidebar {
+    width: 200px;
+    background: #041f22;
+    padding: 10px;
 }
 
 .sidebar button {
     width: 100%;
     margin: 5px 0;
     padding: 10px;
-    border: none;
-    background: #0a4a4f;
-    color: white;
-    border-radius: 6px;
-}
-
-/* ===== MAIN ===== */
-.main {
-    margin-left: 220px;
-    padding: 10px;
-}
-
-/* ===== PAGE ===== */
-.page {
-    display: none;
-}
-.page.active {
-    display: block;
-}
-
-/* ===== TREE WRAPPER ===== */
-#treeWrapper {
-    width: 100%;
-    overflow: auto;
-    border: 1px solid #0a4a4f;
-}
-
-/* ===== TREE ===== */
-.tree {
-    display: flex;
-    justify-content: center;
-    padding: 40px;
-}
-
-/* ===== UL TREE STRUCTURE ===== */
-.tree ul {
-    padding-top: 20px;
-    position: relative;
-    display: flex;
-    justify-content: center;
-}
-
-.tree li {
-    list-style-type: none;
-    text-align: center;
-    position: relative;
-    padding: 20px 10px 0 10px;
-}
-
-/* ===== LINES ===== */
-.tree li::before, 
-.tree li::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 50%;
-    border-top: 2px solid #ccc;
-    width: 50%;
-    height: 20px;
-}
-
-.tree li::after {
-    right: auto;
-    left: 50%;
-    border-left: 2px solid #ccc;
-}
-
-.tree li:only-child::after, 
-.tree li:only-child::before {
-    display: none;
-}
-
-.tree li:only-child {
-    padding-top: 0;
-}
-
-.tree li:first-child::before, 
-.tree li:last-child::after {
-    border: 0 none;
-}
-
-.tree li:last-child::before {
-    border-right: 2px solid #ccc;
-    border-radius: 0 5px 0 0;
-}
-
-.tree li:first-child::after {
-    border-radius: 5px 0 0 0;
-}
-
-/* ===== BOX ===== */
-.box {
-    border: 1px solid #0a4a4f;
-    padding: 10px;
-    display: inline-block;
-    border-radius: 8px;
     background: #0c3f44;
-    min-width: 100px;
-}
-
-/* ===== BUTTON ===== */
-.box button {
-    margin: 2px;
-    padding: 3px 6px;
     border: none;
-    border-radius: 4px;
+    color: white;
+    border-radius: 5px;
 }
 
-/* ===== TABLE ===== */
+/* Content */
+.content {
+    flex: 1;
+    padding: 20px;
+}
+
+/* Table */
 table {
     width: 100%;
     border-collapse: collapse;
 }
 
-table th, table td {
-    border: 1px solid #0a4a4f;
+th, td {
     padding: 8px;
-    text-align: center;
+    border: 1px solid #0c3f44;
 }
 
-/* ===== MOBILE FIX ===== */
-@media (max-width: 768px) {
-    .main {
-        margin-left: 0;
-    }
+/* Tree */
+#treeWrapper {
+    width: 100%;
+    height: 80vh;
+    overflow: auto;
+    border: 1px solid #0c3f44;
+}
 
-    .sidebar {
-        width: 180px;
-    }
-
-    #treeWrapper {
-        overflow-x: scroll;
-    }
+#treeSvg {
+    width: 3000px;
+    height: 3000px;
 }
