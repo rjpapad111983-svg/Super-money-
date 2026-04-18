@@ -4,93 +4,158 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MLM Panel</title>
-<link rel="stylesheet" href="style.css">
-</head>
 
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    display: flex;
+    background: #022c33;
+    color: white;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 200px;
+    background: #011f24;
+    padding: 10px;
+}
+
+.sidebar h2 {
+    text-align: center;
+}
+
+.sidebar button {
+    width: 100%;
+    margin: 5px 0;
+    padding: 10px;
+    background: #0a4c57;
+    border: none;
+    color: white;
+    border-radius: 5px;
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+    padding: 15px;
+}
+
+/* PAGE */
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+/* TREE */
+.tree ul {
+    padding-top: 20px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.tree li {
+    list-style: none;
+    text-align: center;
+    margin: 0 20px;
+}
+
+.tree-box {
+    border: 1px solid white;
+    padding: 10px;
+    border-radius: 8px;
+    background: #033f47;
+}
+
+.tree-box button {
+    margin: 3px;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #0a4c57;
+    padding: 8px;
+    text-align: center;
+}
+
+/* COMPANY BUTTONS */
+#companyList button {
+    margin: 3px;
+    padding: 5px;
+}
+</style>
+
+</head>
 <body>
 
-<div class="container">
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>MLM Panel</h2>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>MLM Panel</h2>
+    <button onclick="showPage('dashboard')">Dashboard</button>
+    <button onclick="showPage('tree')">Tree</button>
+    <button onclick="showPage('members')">Members</button>
+    <button onclick="updateCompanyName()">Rename Company</button>
 
-        <button onclick="showPage('dashboard')">Dashboard</button>
-        <button onclick="showPage('tree')">Tree</button>
-        <button onclick="showPage('members')">Members</button>
-        <button onclick="addRootMember()">+ Add Member</button>
+    <hr>
+
+    <div id="companyList"></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="page active">
+        <h2>Dashboard</h2>
+        Total Members: <span id="totalMembers"></span>
     </div>
 
-    <!-- Main -->
-    <div class="main">
+    <!-- TREE -->
+    <div id="tree" class="page">
+        <h2>Binary Tree</h2>
+        <div id="treeContainer"></div>
+    </div>
 
-        <!-- Dashboard -->
-        <div id="dashboard" class="page">
-            <h2>Dashboard</h2>
-            <p>Total Members: <span id="totalMembers">0</span></p>
-            <p>Total Pairs: <span id="totalPairs">0</span></p>
-            <p>Total Income: ₹<span id="totalIncome">0</span></p>
-            <p>Company Profit: ₹<span id="companyProfit">0</span></p>
-        </div>
+    <!-- MEMBERS -->
+    <div id="members" class="page">
+        <h2>Members</h2>
 
-        <!-- Tree -->
-        <div id="tree" class="page" style="display:none;">
-            <h2>Binary Tree</h2>
-            <div id="treeContainer" class="tree-container"></div>
-        </div>
-
-        <!-- Members -->
-        <div id="members" class="page" style="display:none;">
-            <h2>Members</h2>
-
-            <input type="text" id="search" placeholder="Search name or ID..." onkeyup="searchMember()">
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>ID</th>
-                        <th>Left</th>
-                        <th>Right</th>
-                        <th>Pairs</th>
-                        <th>Income</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="membersTable"></tbody>
-            </table>
-        </div>
-
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>ID</th>
+                    <th>Left</th>
+                    <th>Right</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="memberTable"></tbody>
+        </table>
     </div>
 
 </div>
 
+<!-- SCRIPT -->
 <script src="script.js"></script>
 
 <script>
-// 👉 Page Switch
-function showPage(page) {
-    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
-    document.getElementById(page).style.display = "block";
-}
-
-// 👉 Add Root Member
-function addRootMember() {
-    let name = prompt("Enter Member Name:");
-    if (!name) return;
-
-    addMember(name, 1, "left"); // auto attach
-}
-
-// 👉 Search
-function searchMember() {
-    let input = document.getElementById("search").value.toLowerCase();
-    let rows = document.querySelectorAll("#membersTable tr");
-
-    rows.forEach(row => {
-        let text = row.innerText.toLowerCase();
-        row.style.display = text.includes(input) ? "" : "none";
+// PAGE SWITCH
+function showPage(pageId) {
+    document.querySelectorAll(".page").forEach(p => {
+        p.classList.remove("active");
     });
+    document.getElementById(pageId).classList.add("active");
 }
 </script>
 
