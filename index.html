@@ -5,94 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MLM Panel</title>
 
-<style>
-body {
-    margin: 0;
-    font-family: Arial;
-    display: flex;
-    background: #022c33;
-    color: white;
-}
-
-/* SIDEBAR */
-.sidebar {
-    width: 200px;
-    background: #011f24;
-    padding: 10px;
-}
-
-.sidebar h2 {
-    text-align: center;
-}
-
-.sidebar button {
-    width: 100%;
-    margin: 5px 0;
-    padding: 10px;
-    background: #0a4c57;
-    border: none;
-    color: white;
-    border-radius: 5px;
-}
-
-/* MAIN */
-.main {
-    flex: 1;
-    padding: 15px;
-}
-
-/* PAGE */
-.page {
-    display: none;
-}
-
-.page.active {
-    display: block;
-}
-
-/* TREE */
-.tree ul {
-    padding-top: 20px;
-    position: relative;
-    display: flex;
-    justify-content: center;
-}
-
-.tree li {
-    list-style: none;
-    text-align: center;
-    margin: 0 20px;
-}
-
-.tree-box {
-    border: 1px solid white;
-    padding: 10px;
-    border-radius: 8px;
-    background: #033f47;
-}
-
-.tree-box button {
-    margin: 3px;
-}
-
-/* TABLE */
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    border: 1px solid #0a4c57;
-    padding: 8px;
-    text-align: center;
-}
-
-/* COMPANY BUTTONS */
-#companyList button {
-    margin: 3px;
-    padding: 5px;
-}
-</style>
+<link rel="stylesheet" href="style.css">
 
 </head>
 <body>
@@ -108,6 +21,7 @@ th, td {
 
     <hr>
 
+    <!-- COMPANY LIST -->
     <div id="companyList"></div>
 </div>
 
@@ -117,7 +31,11 @@ th, td {
     <!-- DASHBOARD -->
     <div id="dashboard" class="page active">
         <h2>Dashboard</h2>
-        Total Members: <span id="totalMembers"></span>
+
+        Total Members: <span id="totalMembers">0</span><br>
+        Total Pairs: <span id="totalPairs">0</span><br>
+        Total Income: <span id="totalIncome">₹0</span><br>
+        Company Profit: <span id="companyProfit">₹0</span>
     </div>
 
     <!-- TREE -->
@@ -137,10 +55,15 @@ th, td {
                     <th>ID</th>
                     <th>Left</th>
                     <th>Right</th>
+                    <th>Pairs</th>   <!-- ADD -->
+                    <th>Income</th>  <!-- ADD -->
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="memberTable"></tbody>
+
+            <tbody id="memberTable">
+                <!-- JS will fill -->
+            </tbody>
         </table>
     </div>
 
