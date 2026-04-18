@@ -1,147 +1,198 @@
-/* RESET */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
-
-/* BODY */
+/* ===== BODY ===== */
 body {
-    background: #062a33;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    background: #022c33;
     color: #fff;
 }
 
-/* LAYOUT */
-.container {
-    display: flex;
-    height: 100vh;
-}
-
-/* SIDEBAR */
+/* ===== SIDEBAR ===== */
 .sidebar {
-    width: 200px;
-    background: #041f25;
+    width: 220px;
+    background: #011f24;
     padding: 15px;
+    height: 100vh;
+    box-sizing: border-box;
 }
 
 .sidebar h2 {
+    text-align: center;
     margin-bottom: 20px;
 }
 
 .sidebar button {
     width: 100%;
     padding: 10px;
-    margin-bottom: 10px;
-    background: #0b3c46;
-    color: white;
+    margin: 6px 0;
+    background: #0a4c57;
     border: none;
+    color: white;
     border-radius: 6px;
     cursor: pointer;
+    transition: 0.3s;
 }
 
 .sidebar button:hover {
-    background: #145c69;
+    background: #0f6c7a;
 }
 
-/* MAIN */
+/* ===== MAIN ===== */
 .main {
     flex: 1;
     padding: 20px;
     overflow: auto;
 }
 
-/* TABLE */
-table {
+/* ===== PAGE ===== */
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+/* ===== TREE CONTAINER ===== */
+#treeContainer {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-th, td {
-    border: 1px solid #0f4b55;
-    padding: 8px;
-    text-align: center;
-}
-
-th {
-    background: #0b3c46;
-}
-
-td {
-    background: #062a33;
-}
-
-/* BUTTONS */
-button {
-    padding: 4px 8px;
-    margin: 2px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    opacity: 0.8;
-}
-
-/* SEARCH */
-#search {
-    width: 250px;
-    padding: 8px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border: none;
-}
-
-/* TREE */
-.tree-container {
     overflow-x: auto;
     padding: 20px;
 }
 
-/* NODE */
-.node {
-    text-align: center;
-    margin: 20px auto;
-}
-
-/* BOX */
-.box {
-    display: inline-block;
-    padding: 10px;
-    background: #0b3c46;
-    border: 1px solid #aaa;
-    border-radius: 8px;
-    color: #fff;
-    min-width: 100px;
-}
-
-/* CHILDREN */
-.children {
+/* ===== TREE STRUCTURE ===== */
+.tree {
     display: flex;
     justify-content: center;
-    gap: 50px;
-    margin-top: 20px;
 }
 
-/* MOBILE FIX */
-@media (max-width: 600px) {
+.tree ul {
+    padding-top: 20px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.tree li {
+    list-style: none;
+    text-align: center;
+    position: relative;
+    padding: 20px 10px 0 10px;
+}
+
+/* CONNECT LINES */
+.tree li::before,
+.tree li::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 20px;
+    border-top: 1px solid #ccc;
+}
+
+.tree li::before {
+    left: -50%;
+    border-right: 1px solid #ccc;
+}
+
+.tree li::after {
+    right: -50%;
+    border-left: 1px solid #ccc;
+}
+
+.tree li:only-child::after,
+.tree li:only-child::before {
+    display: none;
+}
+
+.tree li:only-child {
+    padding-top: 0;
+}
+
+.tree li:first-child::before {
+    border: none;
+}
+
+.tree li:last-child::after {
+    border: none;
+}
+
+/* ===== NODE BOX ===== */
+.tree-box {
+    border: 1px solid #0a4c57;
+    padding: 10px;
+    border-radius: 10px;
+    background: #033f47;
+    display: inline-block;
+    min-width: 120px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+/* ===== BUTTONS ===== */
+.tree-box button {
+    margin: 3px;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.tree-box button:nth-child(3) {
+    background: #f0ad4e;
+}
+
+.tree-box button:nth-child(4) {
+    background: #5bc0de;
+}
+
+.tree-box button:nth-child(5) {
+    background: #5cb85c;
+}
+
+/* ===== TABLE ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th {
+    background: #0a4c57;
+}
+
+th, td {
+    border: 1px solid #0a4c57;
+    padding: 10px;
+    text-align: center;
+}
+
+/* ===== COMPANY BUTTON ===== */
+#companyList button {
+    width: 100%;
+    margin-top: 5px;
+    padding: 6px;
+    font-size: 12px;
+    background: #033f47;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
     .sidebar {
-        width: 120px;
+        width: 100%;
+        height: auto;
     }
 
-    .sidebar button {
+    .main {
+        padding: 10px;
+    }
+
+    .tree-box {
+        min-width: 100px;
         font-size: 12px;
-        padding: 8px;
-    }
-
-    .box {
-        font-size: 12px;
-        padding: 8px;
-    }
-
-    .children {
-        gap: 20px;
     }
 }
