@@ -1,219 +1,249 @@
-// ===== STORAGE =====
-let companies = JSON.parse(localStorage.getItem("companies")) || [];
-let currentCompanyIndex = 0;
+// ===== DATA =====
+let members = JSON.parse(localStorage.getItem("members")) || [
+    { id: 1, name: "Root", left: null, right: null }
+];
 
-// ===== INIT =====
-if (companies.length === 0) {
-    companies.push({
-        name: "Company 1",
-        members: [
-            { id: 1, name: "Root", left: null, right: null }
-        ]
-    });
-    saveData();
-}
+let companies = JSON.parse(localStorage.getItem("companies")) || [
+    "Company 1","Company 2","Company 3","Company 4","Company 5",
+    "Company 6","Company 7","Company 8","Company 9","Company 10"
+];
 
+let zoom = 1;
+
+// ===== SAVE =====
 function saveData() {
+    localStorage.setItem("members", JSON.stringify(members));
     localStorage.setItem("companies", JSON.stringify(companies));
 }
 
-function getCompany() {
-    return companies[currentCompanyIndex];
+// ===== PAGE SWITCH =====
+function showPage(pageId) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(pageId).classList.add("active");
+
+    if (pageId === "members") renderMembers();
+    if (pageId === "treePage") renderTree();
+    if (pageId === "dashboard") updateDashboard();
 }
 
 // ===== ADD MEMBER =====
-function addMember(parentId, side) {
-    const name = prompt("Enter Member Name");
-    if (!name) return;
+function addMember(side) {
+    let name = document.getElementById("name").value;
+    let parentId = parseInt(document.getElementById("parentId").value);
 
-    const company = getCompany();
-    const parent = company.members.find(m => m.id === parentId);
+    if (!name || !parentId) return alert("Fill all fields");
 
-    if (side === "left" && parent.left) return alert("Left already filled");
-    if (side === "right" && parent.right) return alert("Right already filled");
+    let parent = members.find(m => m.id === parentId);
+    if (!parent) return alert("Parent not found");
 
-    const id = Date.now();
+    if (parent[side]) return alert(side + " already filled");
 
-    company.members.push({
-        id,
-        name,
+    let newId = Date.now();
+
+    parent[side] = newId;
+
+    members.push({
+        id: newId,
+        name: name,
         left: null,
         right: null
     });
 
-    if (side === "left") parent.left = id;
-    else parent.right = id;
+    saveData();
+    renderMembers();
+    renderTree();
+}
+
+// ===== EDIT MEMBER =====
+function editMember(id) {
+    let member = members.find(m => m.id === id);
+    let newName = prompt("Enter new name", member.name);
+    if (newName) {
+        member.name = newName;
+        saveData();
+        renderMembers();
+        renderTree();
+    }
+}
+
+// ===== ADD LEFT / RIGHT FROM TABLE =====
+function addChild(parentId, side) {
+    let name = prompt("Enter member name");
+    if (!name) return;
+
+    let parent = members.find(m => m.id === parentId);
+
+    if (parent[side]) return alert("Already filled");
+
+    let newId = Date.now();
+
+    parent[side] = newId;
+
+    members.push({
+        id: newId,
+        name: name,
+        left: null,
+        right: null
+    });
 
     saveData();
-    renderAll();
-}
-
-function addLeft(id) { addMember(id, "left"); }
-function addRight(id) { addMember(id, "right"); }
-
-// ===== EDIT =====
-function editMember(id) {
-    const company = getCompany();
-    const m = company.members.find(x => x.id === id);
-
-    const name = prompt("Edit Name", m.name);
-    if (name) {
-        m.name = name;
-        saveData();
-        renderAll();
-    }
-}
-
-// ===== COUNT TREE =====
-function countTree(id) {
-    const company = getCompany();
-
-    const map = {};
-    company.members.forEach(m => map[m.id] = m);
-
-    function count(nodeId) {
-        if (!nodeId) return 0;
-        const node = map[nodeId];
-        if (!node) return 0;
-        return 1 + count(node.left) + count(node.right);
-    }
-
-    return count(id);
+    renderMembers();
+    renderTree();
 }
 
 // ===== CALCULATE =====
-function calculate(member) {
-    const left = countTree(member.left);
-    const right = countTree(member.right);
+function getCounts(id) {
+    let node = members.find(m => m.id === id);
+    if (!node) return { left: 0, right: 0 };
 
-    const pairs = Math.min(left, right);
-    const income = pairs * 3;
+    let count = (childId) => {
+        if (!childId) return 0;
+        let child = members.find(m => m.id === childId);
+        return 1 + count(child.left) + count(child.right);
+    };
 
-    return { left, right, pairs, income };
+    return {
+        left: count(node.left),
+        right: count(node.right)
+    };
 }
 
 // ===== MEMBERS TABLE =====
 function renderMembers() {
-    const table = document.getElementById("memberTable");
-    if (!table) return;
-
-    const company = getCompany();
+    let table = document.getElementById("memberTable");
     table.innerHTML = "";
 
-    company.members.forEach(m => {
-        const calc = calculate(m);
+    members.forEach(m => {
+        let c = getCounts(m.id);
+        let pair = Math.min(c.left, c.right);
+        let income = pair * 3;
 
-        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
+        table.innerHTML += `
+        <tr>
             <td>${m.name}</td>
             <td>${m.id}</td>
-            <td>${calc.left}</td>
-            <td>${calc.right}</td>
-            <td>${calc.pairs}</td>
-            <td>₹${calc.income}</td>
+            <td>${c.left}</td>
+            <td>${c.right}</td>
+            <td>${pair}</td>
+            <td>₹${income}</td>
             <td>
-                <button onclick="addLeft(${m.id})">L</button>
-                <button onclick="addRight(${m.id})">R</button>
+                <button onclick="addChild(${m.id},'left')">L</button>
+                <button onclick="addChild(${m.id},'right')">R</button>
                 <button onclick="editMember(${m.id})">Edit</button>
             </td>
+        </tr>
         `;
-
-        table.appendChild(tr);
     });
-}
-
-// ===== DASHBOARD =====
-function renderDashboard() {
-    const company = getCompany();
-
-    let totalPairs = 0;
-
-    company.members.forEach(m => {
-        const calc = calculate(m);
-        totalPairs += calc.pairs;
-    });
-
-    const totalMembers = company.members.length;
-    const totalIncome = totalPairs * 3;
-    const profit = (totalMembers * 10) - totalIncome;
-
-    document.getElementById("totalMembers").innerText = totalMembers;
-    document.getElementById("totalPairs").innerText = totalPairs;
-    document.getElementById("totalIncome").innerText = "₹" + totalIncome;
-    document.getElementById("companyProfit").innerText = "₹" + profit;
 }
 
 // ===== TREE =====
 function renderTree() {
-    const container = document.getElementById("treeContainer");
-    if (!container) return;
+    let tree = document.getElementById("tree");
+    tree.innerHTML = "";
 
-    const company = getCompany();
-    container.innerHTML = "";
+    let root = members.find(m => m.id === 1);
+    if (!root) return;
 
-    const map = {};
-    company.members.forEach(m => map[m.id] = m);
+    function build(node) {
+        if (!node) return "";
 
-    function createNode(member) {
-        const li = document.createElement("li");
-        const calc = calculate(member);
+        let c = getCounts(node.id);
+        let pair = Math.min(c.left, c.right);
+        let income = pair * 3;
 
-        const box = document.createElement("div");
-        box.className = "tree-box";
-
-        box.innerHTML = `
-            ${member.name}<br>
-            Pair: ${calc.pairs}<br>
-            ₹${calc.income}<br>
-            <button onclick="addLeft(${member.id})">L</button>
-            <button onclick="addRight(${member.id})">R</button>
-            <button onclick="editMember(${member.id})">Edit</button>
+        return `
+        <div class="node">
+            <div class="box">
+                ${node.name}<br>
+                Pair: ${pair}<br>
+                ₹${income}<br>
+                <button onclick="addChild(${node.id},'left')">L</button>
+                <button onclick="addChild(${node.id},'right')">R</button>
+                <button onclick="editMember(${node.id})">Edit</button>
+            </div>
+            <div class="children">
+                ${node.left ? build(members.find(m => m.id === node.left)) : ""}
+                ${node.right ? build(members.find(m => m.id === node.right)) : ""}
+            </div>
+        </div>
         `;
-
-        li.appendChild(box);
-
-        if (member.left || member.right) {
-            const ul = document.createElement("ul");
-
-            if (member.left && map[member.left]) {
-                ul.appendChild(createNode(map[member.left]));
-            }
-
-            if (member.right && map[member.right]) {
-                ul.appendChild(createNode(map[member.right]));
-            }
-
-            li.appendChild(ul);
-        }
-
-        return li;
     }
 
-    const ul = document.createElement("ul");
-    ul.className = "tree";
-
-    ul.appendChild(createNode(company.members[0]));
-    container.appendChild(ul);
+    tree.innerHTML = build(root);
 }
 
-// ===== COMPANY NAME =====
-function updateCompanyName() {
-    const name = prompt("Enter Company Name");
-    if (!name) return;
+// ===== DASHBOARD =====
+function updateDashboard() {
+    let totalMembers = members.length;
 
-    companies[currentCompanyIndex].name = name;
+    let totalPairs = 0;
+
+    members.forEach(m => {
+        let c = getCounts(m.id);
+        totalPairs += Math.min(c.left, c.right);
+    });
+
+    let totalIncome = totalPairs * 3;
+    let companyProfit = totalMembers * 10 - totalIncome;
+
+    document.getElementById("totalMembers").innerText = totalMembers;
+    document.getElementById("totalPairs").innerText = totalPairs;
+    document.getElementById("totalIncome").innerText = totalIncome;
+    document.getElementById("companyProfit").innerText = companyProfit;
+}
+
+// ===== SEARCH =====
+function searchMember() {
+    let value = document.getElementById("search").value.toLowerCase();
+
+    document.querySelectorAll("#memberTable tr").forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
+    });
+}
+
+// ===== COMPANY LIST =====
+function renderCompanies() {
+    let list = document.getElementById("companyList");
+    list.innerHTML = "";
+
+    companies.forEach((c, i) => {
+        list.innerHTML += `
+        <button onclick="selectCompany(${i})">${c}</button>
+        `;
+    });
+}
+
+// ===== SELECT COMPANY =====
+function selectCompany(i) {
+    alert("Selected: " + companies[i]);
+}
+
+// ===== RENAME COMPANY =====
+function renameCompany() {
+    let index = prompt("Enter company number (1-10)");
+    let name = prompt("Enter new name");
+
+    if (!index || !name) return;
+
+    companies[index - 1] = name;
+
     saveData();
+    renderCompanies();
 }
 
-// ===== MAIN =====
-function renderAll() {
-    renderMembers();
-    renderTree();
-    renderDashboard();
+// ===== ZOOM =====
+function zoomIn() {
+    zoom += 0.1;
+    document.getElementById("tree").style.transform = `scale(${zoom})`;
 }
 
-// ===== LOAD =====
-window.onload = function () {
-    renderAll();
-};
+function zoomOut() {
+    zoom -= 0.1;
+    document.getElementById("tree").style.transform = `scale(${zoom})`;
+}
+
+// ===== INIT =====
+renderMembers();
+renderTree();
+updateDashboard();
+renderCompanies();
