@@ -1,52 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MLM Panel</title>
-
-<link rel="stylesheet" href="style.css">
-
+    <title>MLM Panel</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<!-- SIDEBAR -->
+<!-- ===== SIDEBAR ===== -->
 <div class="sidebar">
     <h2>MLM Panel</h2>
 
     <button onclick="showPage('dashboard')">Dashboard</button>
-    <button onclick="showPage('tree')">Tree</button>
+    <button onclick="showPage('treePage')">Tree</button>
     <button onclick="showPage('members')">Members</button>
-    <button onclick="updateCompanyName()">Rename Company</button>
+    <button onclick="showPage('addMember')">+ Add Member</button>
 
     <hr>
 
-    <!-- COMPANY LIST -->
+    <button onclick="renameCompany()">Rename Company</button>
+
     <div id="companyList"></div>
 </div>
 
-<!-- MAIN -->
+<!-- ===== MAIN ===== -->
 <div class="main">
 
     <!-- DASHBOARD -->
     <div id="dashboard" class="page active">
         <h2>Dashboard</h2>
-
-        Total Members: <span id="totalMembers">0</span><br>
-        Total Pairs: <span id="totalPairs">0</span><br>
-        Total Income: <span id="totalIncome">₹0</span><br>
-        Company Profit: <span id="companyProfit">₹0</span>
+        <p>Total Members: <span id="totalMembers">0</span></p>
+        <p>Total Pairs: <span id="totalPairs">0</span></p>
+        <p>Total Income: ₹<span id="totalIncome">0</span></p>
+        <p>Company Profit: ₹<span id="companyProfit">0</span></p>
     </div>
 
     <!-- TREE -->
-    <div id="tree" class="page">
+    <div id="treePage" class="page">
         <h2>Binary Tree</h2>
-        <div id="treeContainer"></div>
+
+        <div class="zoom-controls">
+            <button onclick="zoomIn()">➕ Zoom</button>
+            <button onclick="zoomOut()">➖ Zoom</button>
+        </div>
+
+        <div id="treeWrapper">
+            <div id="treeContainer">
+                <div id="tree" class="tree"></div>
+            </div>
+        </div>
     </div>
 
     <!-- MEMBERS -->
     <div id="members" class="page">
         <h2>Members</h2>
+
+        <input type="text" id="search" placeholder="Search name or ID..." onkeyup="searchMember()">
 
         <table>
             <thead>
@@ -55,32 +64,30 @@
                     <th>ID</th>
                     <th>Left</th>
                     <th>Right</th>
-                    <th>Pairs</th>   <!-- ADD -->
-                    <th>Income</th>  <!-- ADD -->
+                    <th>Pairs</th>
+                    <th>Income</th>
                     <th>Action</th>
                 </tr>
             </thead>
-
-            <tbody id="memberTable">
-                <!-- JS will fill -->
-            </tbody>
+            <tbody id="memberTable"></tbody>
         </table>
+    </div>
+
+    <!-- ADD MEMBER -->
+    <div id="addMember" class="page">
+        <h2>Add Member</h2>
+
+        <input type="text" id="name" placeholder="Enter Name"><br><br>
+        <input type="number" id="parentId" placeholder="Parent ID"><br><br>
+
+        <button onclick="addMember('left')">Add Left</button>
+        <button onclick="addMember('right')">Add Right</button>
     </div>
 
 </div>
 
 <!-- SCRIPT -->
 <script src="script.js"></script>
-
-<script>
-// PAGE SWITCH
-function showPage(pageId) {
-    document.querySelectorAll(".page").forEach(p => {
-        p.classList.remove("active");
-    });
-    document.getElementById(pageId).classList.add("active");
-}
-</script>
 
 </body>
 </html>
