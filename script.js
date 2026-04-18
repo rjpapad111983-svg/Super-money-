@@ -1,14 +1,21 @@
-// ===== DATA =====
-let members = JSON.parse(localStorage.getItem("members")) || [
-    { id: 1, name: "Root", left: null, right: null }
-];
+// ===== LOAD DATA SAFE =====
+let members = JSON.parse(localStorage.getItem("members") || "[]");
+if (!Array.isArray(members) || members.length === 0) {
+    members = [{ id: 1, name: "Root", left: null, right: null }];
+}
 
-let companies = JSON.parse(localStorage.getItem("companies")) || [
-    "Company 1","Company 2","Company 3","Company 4","Company 5",
-    "Company 6","Company 7","Company 8","Company 9","Company 10"
-];
+// ===== COMPANY FIX =====
+let companies = JSON.parse(localStorage.getItem("companies") || "[]");
 
-let zoom = 1;
+if (!Array.isArray(companies) || companies.length === 0) {
+    companies = [
+        "Company 1","Company 2","Company 3","Company 4","Company 5",
+        "Company 6","Company 7","Company 8","Company 9","Company 10"
+    ];
+}
+
+// FIX: object → string
+companies = companies.map(c => typeof c === "string" ? c : "Company");
 
 // ===== SAVE =====
 function saveData() {
@@ -17,18 +24,18 @@ function saveData() {
 }
 
 // ===== PAGE SWITCH =====
-function showPage(pageId) {
+function showPage(id) {
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    document.getElementById(pageId).classList.add("active");
+    document.getElementById(id).classList.add("active");
 
-    if (pageId === "members") renderMembers();
-    if (pageId === "treePage") renderTree();
-    if (pageId === "dashboard") updateDashboard();
+    renderMembers();
+    renderTree();
+    updateDashboard();
 }
 
 // ===== ADD MEMBER =====
 function addMember(side) {
-    let name = document.getElementById("name").value;
+    let name = document.getElementById("name").value.trim();
     let parentId = parseInt(document.getElementById("parentId").value);
 
     if (!name || !parentId) return alert("Fill all fields");
@@ -36,15 +43,15 @@ function addMember(side) {
     let parent = members.find(m => m.id === parentId);
     if (!parent) return alert("Parent not found");
 
-    if (parent[side]) return alert(side + " already filled");
+    if (parent[side]) return alert("Already filled");
 
-    let newId = Date.now();
+    let id = Date.now();
 
-    parent[side] = newId;
+    parent[side] = id;
 
     members.push({
-        id: newId,
-        name: name,
+        id,
+        name,
         left: null,
         right: null
     });
@@ -54,19 +61,7 @@ function addMember(side) {
     renderTree();
 }
 
-// ===== EDIT MEMBER =====
-function editMember(id) {
-    let member = members.find(m => m.id === id);
-    let newName = prompt("Enter new name", member.name);
-    if (newName) {
-        member.name = newName;
-        saveData();
-        renderMembers();
-        renderTree();
-    }
-}
-
-// ===== ADD LEFT / RIGHT FROM TABLE =====
+// ===== ADD CHILD =====
 function addChild(parentId, side) {
     let name = prompt("Enter member name");
     if (!name) return;
@@ -75,13 +70,13 @@ function addChild(parentId, side) {
 
     if (parent[side]) return alert("Already filled");
 
-    let newId = Date.now();
+    let id = Date.now();
 
-    parent[side] = newId;
+    parent[side] = id;
 
     members.push({
-        id: newId,
-        name: name,
+        id,
+        name,
         left: null,
         right: null
     });
@@ -91,39 +86,58 @@ function addChild(parentId, side) {
     renderTree();
 }
 
-// ===== CALCULATE =====
-function getCounts(id) {
+// ===== EDIT =====
+function editMember(id) {
+    let m = members.find(x => x.id === id);
+    let n = prompt("Enter new name", m.name);
+    if (n) {
+        m.name = n;
+        saveData();
+        renderMembers();
+        renderTree();
+    }
+}
+
+// ===== TREE CALCULATION =====
+function countNode(id) {
     let node = members.find(m => m.id === id);
-    if (!node) return { left: 0, right: 0 };
+    if (!node) return 0;
 
-    let count = (childId) => {
-        if (!childId) return 0;
-        let child = members.find(m => m.id === childId);
-        return 1 + count(child.left) + count(child.right);
-    };
+    return (
+        (node.left ? 1 + countNode(node.left) : 0) +
+        (node.right ? 1 + countNode(node.right) : 0)
+    );
+}
 
-    return {
-        left: count(node.left),
-        right: count(node.right)
-    };
+function getPair(id) {
+    let node = members.find(m => m.id === id);
+    if (!node) return 0;
+
+    let left = node.left ? countNode(node.left) : 0;
+    let right = node.right ? countNode(node.right) : 0;
+
+    return Math.min(left, right);
 }
 
 // ===== MEMBERS TABLE =====
 function renderMembers() {
     let table = document.getElementById("memberTable");
+    if (!table) return;
+
     table.innerHTML = "";
 
     members.forEach(m => {
-        let c = getCounts(m.id);
-        let pair = Math.min(c.left, c.right);
+        let left = m.left ? countNode(m.left) : 0;
+        let right = m.right ? countNode(m.right) : 0;
+        let pair = Math.min(left, right);
         let income = pair * 3;
 
         table.innerHTML += `
         <tr>
             <td>${m.name}</td>
             <td>${m.id}</td>
-            <td>${c.left}</td>
-            <td>${c.right}</td>
+            <td>${left}</td>
+            <td>${right}</td>
             <td>${pair}</td>
             <td>₹${income}</td>
             <td>
@@ -131,15 +145,14 @@ function renderMembers() {
                 <button onclick="addChild(${m.id},'right')">R</button>
                 <button onclick="editMember(${m.id})">Edit</button>
             </td>
-        </tr>
-        `;
+        </tr>`;
     });
 }
 
-// ===== TREE =====
+// ===== TREE (FIXED PROPER) =====
 function renderTree() {
     let tree = document.getElementById("tree");
-    tree.innerHTML = "";
+    if (!tree) return;
 
     let root = members.find(m => m.id === 1);
     if (!root) return;
@@ -147,26 +160,28 @@ function renderTree() {
     function build(node) {
         if (!node) return "";
 
-        let c = getCounts(node.id);
-        let pair = Math.min(c.left, c.right);
+        let pair = getPair(node.id);
         let income = pair * 3;
 
         return `
-        <div class="node">
-            <div class="box">
-                ${node.name}<br>
-                Pair: ${pair}<br>
-                ₹${income}<br>
-                <button onclick="addChild(${node.id},'left')">L</button>
-                <button onclick="addChild(${node.id},'right')">R</button>
-                <button onclick="editMember(${node.id})">Edit</button>
-            </div>
-            <div class="children">
-                ${node.left ? build(members.find(m => m.id === node.left)) : ""}
-                ${node.right ? build(members.find(m => m.id === node.right)) : ""}
-            </div>
-        </div>
-        `;
+        <ul>
+            <li>
+                <div class="box">
+                    ${node.name}<br>
+                    Pair: ${pair}<br>
+                    ₹${income}<br>
+                    <button onclick="addChild(${node.id},'left')">L</button>
+                    <button onclick="addChild(${node.id},'right')">R</button>
+                    <button onclick="editMember(${node.id})">Edit</button>
+                </div>
+
+                ${(node.left || node.right) ? `
+                <ul>
+                    ${node.left ? `<li>${build(members.find(m=>m.id===node.left))}</li>` : "<li></li>"}
+                    ${node.right ? `<li>${build(members.find(m=>m.id===node.right))}</li>` : "<li></li>"}
+                </ul>` : ""}
+            </li>
+        </ul>`;
     }
 
     tree.innerHTML = build(root);
@@ -175,13 +190,7 @@ function renderTree() {
 // ===== DASHBOARD =====
 function updateDashboard() {
     let totalMembers = members.length;
-
-    let totalPairs = 0;
-
-    members.forEach(m => {
-        let c = getCounts(m.id);
-        totalPairs += Math.min(c.left, c.right);
-    });
+    let totalPairs = members.reduce((sum, m) => sum + getPair(m.id), 0);
 
     let totalIncome = totalPairs * 3;
     let companyProfit = totalMembers * 10 - totalIncome;
@@ -190,6 +199,47 @@ function updateDashboard() {
     document.getElementById("totalPairs").innerText = totalPairs;
     document.getElementById("totalIncome").innerText = totalIncome;
     document.getElementById("companyProfit").innerText = companyProfit;
+}
+
+// ===== COMPANY =====
+function renderCompanies() {
+    let div = document.getElementById("companyList");
+    if (!div) return;
+
+    div.innerHTML = "";
+
+    companies.forEach((c, i) => {
+        div.innerHTML += `<button onclick="selectCompany(${i})">${c}</button>`;
+    });
+}
+
+function selectCompany(i) {
+    alert("Selected: " + companies[i]);
+}
+
+function renameCompany() {
+    let i = prompt("Enter company number (1-10)");
+    let name = prompt("Enter new name");
+
+    if (!i || !name) return;
+
+    companies[i - 1] = name;
+
+    saveData();
+    renderCompanies();
+}
+
+// ===== ZOOM =====
+let zoom = 1;
+
+function zoomIn() {
+    zoom += 0.1;
+    document.getElementById("tree").style.transform = `scale(${zoom})`;
+}
+
+function zoomOut() {
+    zoom -= 0.1;
+    document.getElementById("tree").style.transform = `scale(${zoom})`;
 }
 
 // ===== SEARCH =====
@@ -201,49 +251,8 @@ function searchMember() {
     });
 }
 
-// ===== COMPANY LIST =====
-function renderCompanies() {
-    let list = document.getElementById("companyList");
-    list.innerHTML = "";
-
-    companies.forEach((c, i) => {
-        list.innerHTML += `
-        <button onclick="selectCompany(${i})">${c}</button>
-        `;
-    });
-}
-
-// ===== SELECT COMPANY =====
-function selectCompany(i) {
-    alert("Selected: " + companies[i]);
-}
-
-// ===== RENAME COMPANY =====
-function renameCompany() {
-    let index = prompt("Enter company number (1-10)");
-    let name = prompt("Enter new name");
-
-    if (!index || !name) return;
-
-    companies[index - 1] = name;
-
-    saveData();
-    renderCompanies();
-}
-
-// ===== ZOOM =====
-function zoomIn() {
-    zoom += 0.1;
-    document.getElementById("tree").style.transform = `scale(${zoom})`;
-}
-
-function zoomOut() {
-    zoom -= 0.1;
-    document.getElementById("tree").style.transform = `scale(${zoom})`;
-}
-
 // ===== INIT =====
 renderMembers();
 renderTree();
-updateDashboard();
 renderCompanies();
+updateDashboard();
