@@ -1,80 +1,101 @@
-let members = JSON.parse(localStorage.getItem("members")) || [];
+// ================== STORAGE ==================
+let companies = JSON.parse(localStorage.getItem("companies")) || [];
+let currentCompanyIndex = 0;
 
-// 👉 Save
-function saveData() {
-    localStorage.setItem("members", JSON.stringify(members));
+// ================== INIT ==================
+if (companies.length === 0) {
+    // 10 company create
+    for (let i = 1; i <= 10; i++) {
+        companies.push({
+            name: "Company " + i,
+            members: [
+                { id: 1, name: "Root", left: null, right: null }
+            ]
+        });
+    }
+    saveData();
 }
 
-// 👉 Root ensure
-function ensureRoot() {
-    if (members.length === 0) {
-        members.push({
-            id: 1,
-            name: "Rajesh",
-            left: null,
-            right: null,
-            parentId: null
-        });
+function saveData() {
+    localStorage.setItem("companies", JSON.stringify(companies));
+}
+
+// ================== COMPANY ==================
+function getCurrentCompany() {
+    return companies[currentCompanyIndex];
+}
+
+function switchCompany(index) {
+    currentCompanyIndex = index;
+    renderAll();
+}
+
+function updateCompanyName() {
+    const name = prompt("Enter Company Name:");
+    if (name) {
+        companies[currentCompanyIndex].name = name;
         saveData();
+        renderCompanies();
     }
 }
 
-// 👉 Add Member
-function addMember(name, parentId, side) {
-    let id = members.length + 1;
+function renderCompanies() {
+    const box = document.getElementById("companyList");
+    if (!box) return;
 
-    let newMember = {
-        id,
-        name,
+    box.innerHTML = "";
+
+    companies.forEach((c, i) => {
+        const btn = document.createElement("button");
+        btn.innerText = c.name;
+        btn.onclick = () => switchCompany(i);
+        box.appendChild(btn);
+    });
+}
+
+// ================== MEMBER ==================
+function addMember(parentId, side) {
+    const company = getCurrentCompany();
+
+    const name = prompt("Enter Member Name:");
+    if (!name) return;
+
+    const newId = Date.now();
+
+    const parent = company.members.find(m => m.id === parentId);
+
+    if (side === "left") {
+        if (parent.left) return alert("Left already filled");
+        parent.left = newId;
+    } else {
+        if (parent.right) return alert("Right already filled");
+        parent.right = newId;
+    }
+
+    company.members.push({
+        id: newId,
+        name: name,
         left: null,
-        right: null,
-        parentId
-    };
-
-    members.push(newMember);
-
-    let parent = members.find(m => m.id === parentId);
-    if (side === "left") parent.left = id;
-    if (side === "right") parent.right = id;
+        right: null
+    });
 
     saveData();
     renderAll();
 }
 
-// 👉 Add Left
 function addLeft(id) {
-    let name = prompt("Enter Left Member Name:");
-    if (!name) return;
-
-    let parent = members.find(m => m.id === id);
-
-    if (parent.left) {
-        alert("Left already filled!");
-        return;
-    }
-
-    addMember(name, id, "left");
+    addMember(id, "left");
 }
 
-// 👉 Add Right
 function addRight(id) {
-    let name = prompt("Enter Right Member Name:");
-    if (!name) return;
-
-    let parent = members.find(m => m.id === id);
-
-    if (parent.right) {
-        alert("Right already filled!");
-        return;
-    }
-
-    addMember(name, id, "right");
+    addMember(id, "right");
 }
 
-// 👉 Edit
 function editMember(id) {
-    let m = members.find(x => x.id === id);
-    let name = prompt("Edit Name:", m.name);
+    const company = getCurrentCompany();
+    const m = company.members.find(x => x.id === id);
+
+    const name = prompt("Edit Name:", m.name);
     if (name) {
         m.name = name;
         saveData();
@@ -82,122 +103,104 @@ function editMember(id) {
     }
 }
 
-// 👉 Count Downline
-function countDownline(id, side) {
-    let m = members.find(x => x.id === id);
-    if (!m || !m[side]) return 0;
+// ================== TREE ==================
+function renderTree() {
+    const container = document.getElementById("treeContainer");
+    if (!container) return;
 
-    return 1 +
-        countDownline(m[side], "left") +
-        countDownline(m[side], "right");
+    const company = getCurrentCompany();
+    const members = company.members;
+
+    container.innerHTML = "";
+
+    const map = {};
+    members.forEach(m => map[m.id] = m);
+
+    function createNode(member) {
+        const li = document.createElement("li");
+
+        const box = document.createElement("div");
+        box.className = "tree-box";
+        box.innerHTML = `
+            ${member.name}<br>
+            ID: ${member.id}<br>
+            <button onclick="addLeft(${member.id})">L</button>
+            <button onclick="addRight(${member.id})">R</button>
+            <button onclick="editMember(${member.id})">Edit</button>
+        `;
+
+        li.appendChild(box);
+
+        if (member.left || member.right) {
+            const ul = document.createElement("ul");
+
+            if (member.left && map[member.left]) {
+                ul.appendChild(createNode(map[member.left]));
+            }
+
+            if (member.right && map[member.right]) {
+                ul.appendChild(createNode(map[member.right]));
+            }
+
+            li.appendChild(ul);
+        }
+
+        return li;
+    }
+
+    const rootUL = document.createElement("ul");
+    rootUL.className = "tree";
+
+    rootUL.appendChild(createNode(members[0]));
+    container.appendChild(rootUL);
 }
 
-// 👉 Members Table
+// ================== MEMBERS TABLE ==================
 function renderMembers() {
-    let table = document.getElementById("membersTable");
+    const table = document.getElementById("memberTable");
     if (!table) return;
+
+    const company = getCurrentCompany();
+    const members = company.members;
 
     table.innerHTML = "";
 
     members.forEach(m => {
-        let left = countDownline(m.id, "left");
-        let right = countDownline(m.id, "right");
+        const tr = document.createElement("tr");
 
-        let pair = Math.min(left, right);
-        let income = pair * 3;
-
-        table.innerHTML += `
-        <tr>
+        tr.innerHTML = `
             <td>${m.name}</td>
             <td>${m.id}</td>
-            <td>${left}</td>
-            <td>${right}</td>
-            <td>${pair}</td>
-            <td>₹${income}</td>
+            <td>${m.left || 0}</td>
+            <td>${m.right || 0}</td>
             <td>
                 <button onclick="addLeft(${m.id})">L</button>
                 <button onclick="addRight(${m.id})">R</button>
                 <button onclick="editMember(${m.id})">Edit</button>
             </td>
-        </tr>`;
-    });
-}
-
-// 👉 TREE (FINAL FIX)
-function renderTree() {
-    let container = document.getElementById("treeContainer");
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    if (members.length === 0) return;
-
-    let map = {};
-    members.forEach(m => map[m.id] = m);
-
-    function build(member) {
-        let node = document.createElement("div");
-        node.className = "node";
-
-        node.innerHTML = `
-            <div class="box">
-                ${member.name}<br>
-                ID: ${member.id}<br>
-                <button onclick="addLeft(${member.id})">L</button>
-                <button onclick="addRight(${member.id})">R</button>
-                <button onclick="editMember(${member.id})">Edit</button>
-            </div>
         `;
 
-        let children = document.createElement("div");
-        children.className = "children";
-
-        if (member.left && map[member.left]) {
-            children.appendChild(build(map[member.left]));
-        }
-
-        if (member.right && map[member.right]) {
-            children.appendChild(build(map[member.right]));
-        }
-
-        if (member.left || member.right) {
-            node.appendChild(children);
-        }
-
-        return node;
-    }
-
-    container.appendChild(build(members[0]));
-}
-
-// 👉 Dashboard
-function renderDashboard() {
-    let totalMembers = members.length;
-    let totalPairs = 0;
-    let totalIncome = 0;
-
-    members.forEach(m => {
-        let l = countDownline(m.id, "left");
-        let r = countDownline(m.id, "right");
-
-        let p = Math.min(l, r);
-        totalPairs += p;
-        totalIncome += p * 3;
+        table.appendChild(tr);
     });
-
-    document.getElementById("totalMembers").innerText = totalMembers;
-    document.getElementById("totalPairs").innerText = totalPairs;
-    document.getElementById("totalIncome").innerText = totalIncome;
-    document.getElementById("companyProfit").innerText = totalMembers * 10;
 }
 
-// 👉 All render
+// ================== DASHBOARD ==================
+function renderDashboard() {
+    const total = document.getElementById("totalMembers");
+    if (!total) return;
+
+    const company = getCurrentCompany();
+    total.innerText = company.members.length;
+}
+
+// ================== MAIN ==================
 function renderAll() {
-    renderMembers();
+    renderCompanies();
     renderTree();
+    renderMembers();
     renderDashboard();
 }
 
-// 👉 INIT
-ensureRoot();
-renderAll();
+window.onload = function () {
+    renderAll();
+};
