@@ -27,6 +27,31 @@ function saveData() {
 function addMember(parentId, side) {
     let name = prompt("Enter name");
     if (!name) return;
+    function renderDashboard() {
+    document.getElementById("tree").innerHTML = "";
+    document.getElementById("membersTable").innerHTML = "";
+
+    document.getElementById("totalMembers").innerText = 
+        "Total Members: " + members.length;
+
+    let totalPairs = 0;
+    members.forEach(m => totalPairs += pair(m.id));
+
+    document.getElementById("totalPairs").innerText = 
+        "Total Pairs: " + totalPairs;
+
+    document.getElementById("totalIncome").innerText = 
+        "Total Income: ₹" + (totalPairs * 3);
+
+    document.getElementById("companyProfit").innerText = 
+        "Company Profit: ₹" + (members.length * 10 - totalPairs * 3);
+}
+
+// START
+renderDashboard();
+renderTree();
+renderMembers();
+renderCompanies();
 
     let id = Date.now();
 
