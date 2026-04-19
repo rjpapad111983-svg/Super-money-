@@ -7,60 +7,45 @@
 
 <body>
 
-<div class="container">
+<div class="sidebar">
+    <h2>MLM Panel</h2>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>MLM Panel</h2>
-        <button onclick="showPage('dashboard')">Dashboard</button>
-        <button onclick="showPage('tree')">Tree</button>
-        <button onclick="showPage('members')">Members</button>
-        <button onclick="addMemberPrompt()">+ Add Member</button>
+    <button onclick="renderDashboard()">Dashboard</button>
+    <button onclick="renderTree()">Tree</button>
+    <button onclick="renderMembers()">Members</button>
+    <button onclick="addMember(1,'L')">+ Add Member</button>
+</div>
+
+<div class="main">
+
+    <!-- DASHBOARD -->
+    <div id="dashboard">
+        <h2>Dashboard</h2>
+        <p id="totalMembers"></p>
+        <p id="totalPairs"></p>
+        <p id="totalIncome"></p>
+        <p id="companyProfit"></p>
     </div>
 
-    <!-- Content -->
-    <div class="content">
+    <!-- TREE -->
+    <div id="tree"></div>
 
-        <!-- Dashboard -->
-        <div id="dashboard" class="page">
-            <h2>Dashboard</h2>
-            <p>Total Members: <span id="totalMembers">0</span></p>
-            <p>Total Pairs: <span id="totalPairs">0</span></p>
-            <p>Total Income: ₹<span id="totalIncome">0</span></p>
-            <p>Company Profit: ₹<span id="companyProfit">0</span></p>
-        </div>
+    <!-- MEMBERS -->
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>ID</th>
+                <th>Left</th>
+                <th>Right</th>
+                <th>Pairs</th>
+                <th>Income</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="membersTable"></tbody>
+    </table>
 
-        <!-- Tree -->
-        <div id="tree" class="page" style="display:none;">
-            <h2>Binary Tree</h2>
-            <div id="treeWrapper">
-                <svg id="treeSvg"></svg>
-            </div>
-        </div>
-
-        <!-- Members -->
-        <div id="members" class="page" style="display:none;">
-            <h2>Members</h2>
-
-            <input type="text" id="search" placeholder="Search name or ID..." onkeyup="searchMember()">
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>ID</th>
-                        <th>Left</th>
-                        <th>Right</th>
-                        <th>Pairs</th>
-                        <th>Income</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="memberTable"></tbody>
-            </table>
-        </div>
-
-    </div>
 </div>
 
 <script src="script.js"></script>
