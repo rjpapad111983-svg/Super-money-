@@ -5,14 +5,12 @@ body {
     color: white;
 }
 
-.container {
-    display: flex;
-}
-
 /* Sidebar */
 .sidebar {
     width: 200px;
-    background: #041f22;
+    height: 100vh;
+    position: fixed;
+    background: #042326;
     padding: 10px;
 }
 
@@ -20,16 +18,55 @@ body {
     width: 100%;
     margin: 5px 0;
     padding: 10px;
-    background: #0c3f44;
-    border: none;
+    background: #0a4a50;
     color: white;
-    border-radius: 5px;
+    border: none;
+    border-radius: 6px;
 }
 
-/* Content */
-.content {
-    flex: 1;
+/* Main */
+.main {
+    margin-left: 210px;
     padding: 20px;
+}
+
+/* Tree */
+.treeContainer {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+}
+
+.tree-node {
+    text-align: center;
+}
+
+.children {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 30px;
+}
+
+/* Card */
+.card {
+    background: #0c3f44;
+    padding: 10px;
+    border-radius: 10px;
+    min-width: 120px;
+    box-shadow: 0 0 10px #000;
+}
+
+.card .name {
+    font-weight: bold;
+}
+
+/* Buttons */
+.btns button {
+    margin: 2px;
+    padding: 4px 6px;
+    border: none;
+    border-radius: 4px;
 }
 
 /* Table */
@@ -38,20 +75,7 @@ table {
     border-collapse: collapse;
 }
 
-th, td {
+td, th {
+    border: 1px solid #0a4a50;
     padding: 8px;
-    border: 1px solid #0c3f44;
-}
-
-/* Tree */
-#treeWrapper {
-    width: 100%;
-    height: 80vh;
-    overflow: auto;
-    border: 1px solid #0c3f44;
-}
-
-#treeSvg {
-    width: 3000px;
-    height: 3000px;
 }
