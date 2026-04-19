@@ -1,156 +1,162 @@
-// ===== SAFE INIT =====
-let members = JSON.parse(localStorage.getItem("members")) || [];
+// ====== DATA ======
+let members = JSON.parse(localStorage.getItem("mlm_members")) || [
+  { id: 1, name: "Rajesh", left: null, right: null }
+];
 
-if(members.length === 0){
-  members = [{id:1,name:"Rajesh",left:null,right:null}];
+let lastId = members.length;
+
+// ====== SAVE ======
+function save() {
+  localStorage.setItem("mlm_members", JSON.stringify(members));
 }
 
-// ===== SAVE =====
-function save(){
-  localStorage.setItem("members", JSON.stringify(members));
-}
+// ====== ADD MEMBER ======
+function addLeft(id) {
+  let parent = members.find(m => m.id == id);
+  if (!parent || parent.left) return;
 
-// ===== PAGE SWITCH =====
-function showPage(page){
-  ["dashboardPage","treePage","membersPage"].forEach(id=>{
-    document.getElementById(id).style.display="none";
-  });
+  let name = prompt("Left Member Name");
+  if (!name) return;
 
-  if(page==="dashboard") document.getElementById("dashboardPage").style.display="block";
-  if(page==="tree"){ 
-    document.getElementById("treePage").style.display="block";
-    renderTree();
-  }
-  if(page==="members"){ 
-    document.getElementById("membersPage").style.display="block";
-    renderTable();
-  }
-}
-
-// ===== ADD MEMBER =====
-function addMember(){
-  let name = prompt("Enter Name");
-  if(!name) return;
-
-  let id = Date.now();
-  members.push({id,name,left:null,right:null});
+  let newId = ++lastId;
+  members.push({ id: newId, name, left: null, right: null });
+  parent.left = newId;
 
   save();
-  renderTable();
+  renderAll();
 }
 
-// ===== LEFT RIGHT =====
-function addLeft(pid){
-  let name = prompt("Left Name");
-  if(!name) return;
+function addRight(id) {
+  let parent = members.find(m => m.id == id);
+  if (!parent || parent.right) return;
 
-  let p = members.find(m=>m.id==pid);
-  if(p.left){ alert("Already added"); return; }
+  let name = prompt("Right Member Name");
+  if (!name) return;
 
-  let id = Date.now();
-  members.push({id,name,left:null,right:null});
-  p.left=id;
+  let newId = ++lastId;
+  members.push({ id: newId, name, left: null, right: null });
+  parent.right = newId;
 
   save();
-  renderTree();
+  renderAll();
 }
 
-function addRight(pid){
-  let name = prompt("Right Name");
-  if(!name) return;
+// ====== EDIT ======
+function editMember(id) {
+  let m = members.find(x => x.id == id);
+  if (!m) return;
 
-  let p = members.find(m=>m.id==pid);
-  if(p.right){ alert("Already added"); return; }
+  let newName = prompt("Edit Name", m.name);
+  if (!newName) return;
 
-  let id = Date.now();
-  members.push({id,name,left:null,right:null});
-  p.right=id;
+  m.name = newName;
 
   save();
-  renderTree();
+  renderAll();
 }
 
-// ===== COUNT =====
-function count(id){
-  if(!id) return 0;
-  let m = members.find(x=>x.id==id);
-  if(!m) return 0;
-  return 1 + count(m.left) + count(m.right);
+// ====== COUNT TREE ======
+function countTree(id) {
+  if (!id) return 0;
+
+  let m = members.find(x => x.id == id);
+  if (!m) return 0;
+
+  return (
+    1 +
+    countTree(m.left) +
+    countTree(m.right)
+  );
 }
 
-// ===== CALC =====
-function calc(m){
-  let L = count(m.left);
-  let R = count(m.right);
-  let pair = Math.min(L,R);
-  let income = pair*3;
-  return {L,R,pair,income};
+// ====== PAIR CALC ======
+function getPairData(m) {
+  let leftCount = countTree(m.left);
+  let rightCount = countTree(m.right);
+
+  let pair = Math.min(leftCount, rightCount);
+  let income = pair * 3;
+
+  return { pair, income };
 }
 
-// ===== TREE =====
-function renderTree(){
-  let box = document.getElementById("treeContainer");
-  box.innerHTML="";
+// ====== TREE RENDER ======
+function renderTree() {
+  let root = members[0];
+  let container = document.getElementById("tree");
+  if (!container) return;
 
-  function build(m){
-    let d = calc(m);
-    let l = members.find(x=>x.id==m.left);
-    let r = members.find(x=>x.id==m.right);
+  function build(id) {
+    let m = members.find(x => x.id == id);
+    if (!m) return "";
+
+    let d = getPairData(m);
 
     return `
     <div class="node">
       ${m.name}<br>
       Pair:${d.pair}<br>₹${d.income}<br>
+
       <button onclick="addLeft(${m.id})">L</button>
       <button onclick="addRight(${m.id})">R</button>
-      <div style="display:flex;gap:10px">
-        ${l?build(l):""}
-        ${r?build(r):""}
+      <button onclick="editMember(${m.id})">Edit</button>
+
+      <div class="children">
+        ${m.left ? build(m.left) : ""}
+        ${m.right ? build(m.right) : ""}
       </div>
     </div>`;
   }
 
-  box.innerHTML = build(members[0]);
+  container.innerHTML = build(root.id);
 }
 
-// ===== TABLE =====
-function renderTable(){
-  let tb = document.getElementById("memberTable");
-  tb.innerHTML="";
+// ====== TABLE ======
+function renderTable() {
+  let table = document.getElementById("memberTable");
+  if (!table) return;
 
-  let totalP=0,totalI=0;
+  table.innerHTML = members.map(m => {
+    let d = getPairData(m);
 
-  members.forEach(m=>{
-    let d=calc(m);
-    totalP+=d.pair;
-    totalI+=d.income;
-
-    tb.innerHTML+=`
+    return `
     <tr>
       <td>${m.name}</td>
       <td>${m.id}</td>
-      <td>${d.L}</td>
-      <td>${d.R}</td>
+      <td>${countTree(m.left)}</td>
+      <td>${countTree(m.right)}</td>
       <td>${d.pair}</td>
       <td>₹${d.income}</td>
-      <td>-</td>
     </tr>`;
+  }).join("");
+}
+
+// ====== DASHBOARD ======
+function renderDashboard() {
+  let totalMembers = members.length;
+  let totalPairs = 0;
+  let totalIncome = 0;
+
+  members.forEach(m => {
+    let d = getPairData(m);
+    totalPairs += d.pair;
+    totalIncome += d.income;
   });
 
-  updateDash(totalP,totalI);
+  document.getElementById("totalMembers").innerText = totalMembers;
+  document.getElementById("totalPairs").innerText = totalPairs;
+  document.getElementById("totalIncome").innerText = "₹" + totalIncome;
+  document.getElementById("companyProfit").innerText = "₹" + (totalMembers * 10 - totalIncome);
 }
 
-// ===== DASH =====
-function updateDash(p,i){
-  let t = members.length;
-  document.getElementById("totalMembers").innerText=t;
-  document.getElementById("totalPairs").innerText=p;
-  document.getElementById("totalIncome").innerText=i;
-  document.getElementById("companyProfit").innerText=(t*10)-i;
-}
-
-// ===== START =====
-document.addEventListener("DOMContentLoaded", ()=>{
+// ====== ALL RENDER ======
+function renderAll() {
+  renderTree();
   renderTable();
-  showPage("dashboard");
-});
+  renderDashboard();
+}
+
+// ====== INIT ======
+window.onload = function () {
+  renderAll();
+};
