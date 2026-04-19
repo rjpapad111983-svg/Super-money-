@@ -1,3 +1,4 @@
+/* ===== BODY ===== */
 body {
     margin: 0;
     font-family: Arial;
@@ -5,13 +6,18 @@ body {
     color: white;
 }
 
-/* Sidebar */
+/* ===== SIDEBAR ===== */
 .sidebar {
     width: 200px;
     height: 100vh;
     position: fixed;
     background: #042326;
     padding: 10px;
+    overflow-y: auto;
+}
+
+.sidebar h2 {
+    text-align: center;
 }
 
 .sidebar button {
@@ -24,58 +30,109 @@ body {
     border-radius: 6px;
 }
 
-/* Main */
+/* ===== MAIN ===== */
 .main {
     margin-left: 210px;
-    padding: 20px;
+    padding: 15px;
 }
 
-/* Tree */
-.treeContainer {
-    display: flex;
-    justify-content: center;
+/* ===== TREE WRAP ===== */
+.treeWrap {
+    width: 100%;
     overflow-x: auto;
 }
 
-.tree-node {
-    text-align: center;
+/* ===== TREE STRUCTURE ===== */
+.tree {
+    display: table;
+    margin: auto;
 }
 
-.children {
+.tree ul {
+    padding-top: 20px;
+    position: relative;
     display: flex;
     justify-content: center;
-    gap: 40px;
-    margin-top: 30px;
 }
 
-/* Card */
+.tree li {
+    list-style: none;
+    text-align: center;
+    position: relative;
+    padding: 20px 10px 0 10px;
+}
+
+/* ===== CONNECTING LINES ===== */
+.tree li::before,
+.tree li::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 50%;
+    border-top: 2px solid #0a4a50;
+    width: 50%;
+    height: 20px;
+}
+
+.tree li::after {
+    right: auto;
+    left: 50%;
+    border-left: 2px solid #0a4a50;
+}
+
+/* REMOVE EXTRA LINE */
+.tree li:only-child::before,
+.tree li:only-child::after {
+    display: none;
+}
+
+.tree li:only-child {
+    padding-top: 0;
+}
+
+/* ===== CARD ===== */
 .card {
     background: #0c3f44;
     padding: 10px;
     border-radius: 10px;
     min-width: 120px;
-    box-shadow: 0 0 10px #000;
+    box-shadow: 0 0 10px black;
 }
 
-.card .name {
-    font-weight: bold;
-}
-
-/* Buttons */
-.btns button {
+/* ===== BUTTONS ===== */
+.card button {
     margin: 2px;
     padding: 4px 6px;
     border: none;
     border-radius: 4px;
+    font-size: 12px;
 }
 
-/* Table */
+/* ===== TABLE ===== */
 table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 20px;
 }
 
 td, th {
     border: 1px solid #0a4a50;
     padding: 8px;
+    text-align: center;
+}
+
+/* ===== MOBILE FIX ===== */
+@media (max-width: 600px) {
+    .sidebar {
+        width: 150px;
+    }
+
+    .main {
+        margin-left: 160px;
+    }
+
+    .card {
+        min-width: 100px;
+        font-size: 12px;
+    }
 }
