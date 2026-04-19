@@ -1,54 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>MLM Panel</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLM Panel</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+body{
+  margin:0;
+  font-family: Arial;
+  background:#062f2f;
+  color:#fff;
+}
+
+.container{
+  display:flex;
+}
+
+/* Sidebar */
+.sidebar{
+  width:220px;
+  background:#033;
+  padding:10px;
+  height:100vh;
+  overflow:auto;
+}
+
+.sidebar h2{
+  text-align:center;
+}
+
+.btn{
+  display:block;
+  background:#0a5c5c;
+  padding:10px;
+  margin:6px 0;
+  border-radius:6px;
+  text-align:center;
+  cursor:pointer;
+}
+
+/* Main */
+.main{
+  flex:1;
+  padding:10px;
+}
+
+/* Tree */
+.tree{
+  overflow:auto;
+  white-space:nowrap;
+}
+
+.node{
+  display:inline-block;
+  background:#0a4d4d;
+  padding:10px;
+  border-radius:10px;
+  margin:20px;
+  text-align:center;
+  min-width:120px;
+  box-shadow:0 0 10px rgba(0,0,0,0.4);
+}
+
+.node button{
+  margin:2px;
+}
+
+/* Table */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+}
+
+td,th{
+  border:1px solid #0a5c5c;
+  padding:6px;
+  text-align:center;
+}
+</style>
+
 </head>
 
 <body>
 
-<div class="sidebar">
-    <h2>MLM Panel</h2>
+<div class="container">
 
-    <button onclick="renderDashboard()">Dashboard</button>
-    <button onclick="renderTree()">Tree</button>
-    <button onclick="renderMembers()">Members</button>
-    <button onclick="addMember(1,'L')">+ Add Member</button>
+<!-- Sidebar -->
+<div class="sidebar">
+  <h2>MLM Panel</h2>
+
+  <div class="btn" onclick="showPage('dashboard')">Dashboard</div>
+  <div class="btn" onclick="showPage('tree')">Tree</div>
+  <div class="btn" onclick="showPage('members')">Members</div>
+  <div class="btn" onclick="addMember()">+ Add Member</div>
+
+  <hr>
+
+  <div class="btn">RJ Recharge</div>
+  <div class="btn">Company 2</div>
+  <div class="btn">Company 3</div>
+  <div class="btn">Company 4</div>
+  <div class="btn">Company 5</div>
+  <div class="btn">Company 6</div>
+  <div class="btn">Company 7</div>
+  <div class="btn">Company 8</div>
+  <div class="btn">Company 9</div>
+  <div class="btn">Company 10</div>
 </div>
 
+<!-- Main -->
 <div class="main">
 
-    <!-- DASHBOARD -->
-    <div id="dashboard">
-        <h2>Dashboard</h2>
-        <p id="totalMembers"></p>
-        <p id="totalPairs"></p>
-        <p id="totalIncome"></p>
-        <p id="companyProfit"></p>
-    </div>
+<!-- Dashboard -->
+<div id="dashboardPage">
+  <h2>Dashboard</h2>
 
-    <!-- TREE -->
-    <div id="tree"></div>
-
-    <!-- MEMBERS -->
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>ID</th>
-                <th>Left</th>
-                <th>Right</th>
-                <th>Pairs</th>
-                <th>Income</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="membersTable"></tbody>
-    </table>
-
+  <p>Total Members: <span id="totalMembers">0</span></p>
+  <p>Total Pairs: <span id="totalPairs">0</span></p>
+  <p>Total Income: ₹<span id="totalIncome">0</span></p>
+  <p>Company Profit: ₹<span id="companyProfit">0</span></p>
 </div>
 
-<script src="script.js"></script>
+<!-- Tree -->
+<div id="treePage" style="display:none;">
+  <h2>Binary Tree</h2>
+
+  <div class="tree" id="treeContainer"></div>
+</div>
+
+<!-- Members -->
+<div id="membersPage" style="display:none;">
+  <h2>Members</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>ID</th>
+        <th>Left</th>
+        <th>Right</th>
+        <th>Pairs</th>
+        <th>Income</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody id="memberTable"></tbody>
+  </table>
+</div>
+
+</div>
+</div>
+
+<!-- IMPORTANT -->
+<script src="script.js" defer></script>
 
 </body>
 </html>
