@@ -1,21 +1,53 @@
-// ====== DATA ======
+// ===== DATA =====
 let members = JSON.parse(localStorage.getItem("mlm_members")) || [
   { id: 1, name: "Rajesh", left: null, right: null }
 ];
 
 let lastId = members.length;
 
-// ====== SAVE ======
+// ===== SAVE =====
 function save() {
   localStorage.setItem("mlm_members", JSON.stringify(members));
 }
 
-// ====== ADD MEMBER ======
+// ===== NAVIGATION FIX =====
+function showPage(page) {
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("treePage").style.display = "none";
+  document.getElementById("membersPage").style.display = "none";
+
+  document.getElementById(page).style.display = "block";
+}
+
+// ===== BUTTON FIX (IMPORTANT) =====
+window.addEventListener("DOMContentLoaded", () => {
+
+  document.querySelector(".btn-dashboard")?.addEventListener("click", () => showPage("dashboard"));
+  document.querySelector(".btn-tree")?.addEventListener("click", () => showPage("treePage"));
+  document.querySelector(".btn-members")?.addEventListener("click", () => showPage("membersPage"));
+  document.querySelector(".btn-add")?.addEventListener("click", addRootMember);
+
+  renderAll();
+});
+
+// ===== ADD ROOT MEMBER =====
+function addRootMember() {
+  let name = prompt("Member Name");
+  if (!name) return;
+
+  let newId = ++lastId;
+  members.push({ id: newId, name, left: null, right: null });
+
+  save();
+  renderAll();
+}
+
+// ===== ADD LEFT =====
 function addLeft(id) {
   let parent = members.find(m => m.id == id);
   if (!parent || parent.left) return;
 
-  let name = prompt("Left Member Name");
+  let name = prompt("Left Name");
   if (!name) return;
 
   let newId = ++lastId;
@@ -26,11 +58,12 @@ function addLeft(id) {
   renderAll();
 }
 
+// ===== ADD RIGHT =====
 function addRight(id) {
   let parent = members.find(m => m.id == id);
   if (!parent || parent.right) return;
 
-  let name = prompt("Right Member Name");
+  let name = prompt("Right Name");
   if (!name) return;
 
   let newId = ++lastId;
@@ -41,7 +74,7 @@ function addRight(id) {
   renderAll();
 }
 
-// ====== EDIT ======
+// ===== EDIT =====
 function editMember(id) {
   let m = members.find(x => x.id == id);
   if (!m) return;
@@ -55,36 +88,32 @@ function editMember(id) {
   renderAll();
 }
 
-// ====== COUNT TREE ======
+// ===== COUNT =====
 function countTree(id) {
   if (!id) return 0;
 
   let m = members.find(x => x.id == id);
   if (!m) return 0;
 
-  return (
-    1 +
-    countTree(m.left) +
-    countTree(m.right)
-  );
+  return 1 + countTree(m.left) + countTree(m.right);
 }
 
-// ====== PAIR CALC ======
+// ===== PAIR =====
 function getPairData(m) {
-  let leftCount = countTree(m.left);
-  let rightCount = countTree(m.right);
+  let left = countTree(m.left);
+  let right = countTree(m.right);
 
-  let pair = Math.min(leftCount, rightCount);
+  let pair = Math.min(left, right);
   let income = pair * 3;
 
   return { pair, income };
 }
 
-// ====== TREE RENDER ======
+// ===== TREE =====
 function renderTree() {
   let root = members[0];
-  let container = document.getElementById("tree");
-  if (!container) return;
+  let el = document.getElementById("tree");
+  if (!el) return;
 
   function build(id) {
     let m = members.find(x => x.id == id);
@@ -108,15 +137,15 @@ function renderTree() {
     </div>`;
   }
 
-  container.innerHTML = build(root.id);
+  el.innerHTML = build(root.id);
 }
 
-// ====== TABLE ======
+// ===== TABLE =====
 function renderTable() {
-  let table = document.getElementById("memberTable");
-  if (!table) return;
+  let el = document.getElementById("memberTable");
+  if (!el) return;
 
-  table.innerHTML = members.map(m => {
+  el.innerHTML = members.map(m => {
     let d = getPairData(m);
 
     return `
@@ -131,7 +160,7 @@ function renderTable() {
   }).join("");
 }
 
-// ====== DASHBOARD ======
+// ===== DASHBOARD =====
 function renderDashboard() {
   let totalMembers = members.length;
   let totalPairs = 0;
@@ -146,17 +175,13 @@ function renderDashboard() {
   document.getElementById("totalMembers").innerText = totalMembers;
   document.getElementById("totalPairs").innerText = totalPairs;
   document.getElementById("totalIncome").innerText = "₹" + totalIncome;
-  document.getElementById("companyProfit").innerText = "₹" + (totalMembers * 10 - totalIncome);
+  document.getElementById("companyProfit").innerText =
+    "₹" + (totalMembers * 10 - totalIncome);
 }
 
-// ====== ALL RENDER ======
+// ===== ALL =====
 function renderAll() {
   renderTree();
   renderTable();
   renderDashboard();
 }
-
-// ====== INIT ======
-window.onload = function () {
-  renderAll();
-};
