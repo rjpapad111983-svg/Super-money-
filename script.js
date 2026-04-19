@@ -43,7 +43,7 @@ function editMember(id) {
     renderAll();
 }
 
-// ====== COUNT DOWNLINE ======
+// ====== COUNT ======
 function count(id) {
     if (!id) return 0;
 
@@ -66,11 +66,14 @@ function pair(id) {
 
 // ====== INCOME ======
 function income(id) {
-    return pair(id) * 3; // 1 pair = ₹3
+    return pair(id) * 3;
 }
 
 // ====== TREE ======
 function renderTree() {
+    let treeBox = document.getElementById("tree");
+    if (!treeBox) return;
+
     let root = members.find(m => m.id === 1);
 
     function build(id) {
@@ -105,12 +108,14 @@ function renderTree() {
         </li>`;
     }
 
-    document.getElementById("tree").innerHTML =
-        `<ul class="tree">${build(root.id)}</ul>`;
+    treeBox.innerHTML = `<ul class="tree">${build(root.id)}</ul>`;
 }
 
 // ====== MEMBERS TABLE ======
 function renderMembers() {
+    let table = document.getElementById("membersData");
+    if (!table) return;
+
     let html = "";
 
     members.forEach(m => {
@@ -133,11 +138,18 @@ function renderMembers() {
         </tr>`;
     });
 
-    document.getElementById("membersData").innerHTML = html;
+    table.innerHTML = html;
 }
 
 // ====== DASHBOARD ======
 function renderDashboard() {
+    let totalMembersEl = document.getElementById("totalMembers");
+    let totalPairsEl = document.getElementById("totalPairs");
+    let totalIncomeEl = document.getElementById("totalIncome");
+    let companyProfitEl = document.getElementById("companyProfit");
+
+    if (!totalMembersEl) return;
+
     let totalMembers = members.length;
 
     let totalPairs = 0;
@@ -146,17 +158,10 @@ function renderDashboard() {
     let totalIncome = totalPairs * 3;
     let companyProfit = (members.length * 10) - totalIncome;
 
-    document.getElementById("totalMembers").innerText =
-        "Total Members: " + totalMembers;
-
-    document.getElementById("totalPairs").innerText =
-        "Total Pairs: " + totalPairs;
-
-    document.getElementById("totalIncome").innerText =
-        "Total Income: ₹" + totalIncome;
-
-    document.getElementById("companyProfit").innerText =
-        "Company Profit: ₹" + companyProfit;
+    totalMembersEl.innerText = "Total Members: " + totalMembers;
+    totalPairsEl.innerText = "Total Pairs: " + totalPairs;
+    totalIncomeEl.innerText = "Total Income: ₹" + totalIncome;
+    companyProfitEl.innerText = "Company Profit: ₹" + companyProfit;
 }
 
 // ====== ALL RENDER ======
@@ -166,5 +171,7 @@ function renderAll() {
     renderDashboard();
 }
 
-// ====== START ======
-renderAll();
+// ====== AUTO LOAD FIX ======
+window.onload = function () {
+    renderAll();
+};
