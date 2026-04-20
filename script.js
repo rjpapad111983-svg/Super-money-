@@ -1,187 +1,178 @@
 // ===== DATA =====
-let members = JSON.parse(localStorage.getItem("mlm_members")) || [
-  { id: 1, name: "Rajesh", left: null, right: null }
-];
-
-let lastId = members.length;
+let members = JSON.parse(localStorage.getItem("members")) || [];
 
 // ===== SAVE =====
-function save() {
-  localStorage.setItem("mlm_members", JSON.stringify(members));
+function saveData() {
+  localStorage.setItem("members", JSON.stringify(members));
 }
 
-// ===== NAVIGATION FIX =====
+// ===== ADD MEMBER =====
+function addMember(parentId, side) {
+  const name = prompt("Enter member name");
+  if (!name) return;
+
+  const id = Date.now();
+
+  const newMember = {
+    id,
+    name,
+    left: 0,
+    right: 0,
+    parent: parentId,
+    pairs: 0,
+    income: 0
+  };
+
+  members.push(newMember);
+
+  const parent = members.find(m => m.id === parentId);
+
+  if (side === "left") parent.left = id;
+  if (side === "right") parent.right = id;
+
+  calculateAll();
+  saveData();
+  renderAll();
+}
+
+// ===== EDIT MEMBER =====
+function editMember(id) {
+  const member = members.find(m => m.id === id);
+  const name = prompt("Edit name", member.name);
+  if (!name) return;
+
+  member.name = name;
+  saveData();
+  renderAll();
+}
+
+// ===== CALCULATE PAIR =====
+function countDownline(id) {
+  const member = members.find(m => m.id === id);
+  if (!member) return 0;
+
+  return (
+    1 +
+    countDownline(member.left) +
+    countDownline(member.right)
+  );
+}
+
+function calculateAll() {
+  members.forEach(m => {
+    const leftCount = countDownline(m.left);
+    const rightCount = countDownline(m.right);
+
+    m.pairs = Math.min(leftCount, rightCount);
+    m.income = m.pairs * 3; // ₹3 per pair
+  });
+}
+
+// ===== TREE =====
+function renderTree() {
+  const tree = document.getElementById("tree");
+  if (!tree) return;
+
+  tree.innerHTML = "";
+
+  if (members.length === 0) return;
+
+  const map = {};
+  members.forEach(m => map[m.id] = m);
+
+  function buildNode(member) {
+    if (!member) return "";
+
+    return `
+      <li>
+        <div class="node-card">
+          <b>${member.name}</b><br>
+          Pair: ${member.pairs}<br>
+          ₹${member.income}<br>
+
+          <button onclick="addMember(${member.id}, 'left')">L</button>
+          <button onclick="addMember(${member.id}, 'right')">R</button>
+          <button onclick="editMember(${member.id})">Edit</button>
+        </div>
+
+        <ul>
+          ${buildNode(map[member.left])}
+          ${buildNode(map[member.right])}
+        </ul>
+      </li>
+    `;
+  }
+
+  tree.innerHTML = `
+    <ul class="mlm-tree">
+      ${buildNode(members[0])}
+    </ul>
+  `;
+}
+
+// ===== MEMBERS TABLE =====
+function renderMembers() {
+  const table = document.getElementById("membersTable");
+  if (!table) return;
+
+  table.innerHTML = "";
+
+  members.forEach(m => {
+    table.innerHTML += `
+      <tr>
+        <td>${m.name}</td>
+        <td>${m.id}</td>
+        <td>${m.left || 0}</td>
+        <td>${m.right || 0}</td>
+        <td>${m.pairs}</td>
+        <td>₹${m.income}</td>
+        <td><button onclick="editMember(${m.id})">Edit</button></td>
+      </tr>
+    `;
+  });
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+  document.getElementById("totalMembers").innerText = members.length;
+
+  let totalPairs = members.reduce((a, b) => a + b.pairs, 0);
+  let totalIncome = members.reduce((a, b) => a + b.income, 0);
+
+  document.getElementById("totalPairs").innerText = totalPairs;
+  document.getElementById("totalIncome").innerText = totalIncome;
+  document.getElementById("companyProfit").innerText = totalIncome * 0.7;
+}
+
+// ===== MENU NAV =====
 function showPage(page) {
-  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("treePage").style.display = "none";
   document.getElementById("membersPage").style.display = "none";
 
   document.getElementById(page).style.display = "block";
 }
 
-// ===== BUTTON FIX (IMPORTANT) =====
-window.addEventListener("DOMContentLoaded", () => {
-
-  document.querySelector(".btn-dashboard")?.addEventListener("click", () => showPage("dashboard"));
-  document.querySelector(".btn-tree")?.addEventListener("click", () => showPage("treePage"));
-  document.querySelector(".btn-members")?.addEventListener("click", () => showPage("membersPage"));
-  document.querySelector(".btn-add")?.addEventListener("click", addRootMember);
-
-  renderAll();
-});
-
-// ===== ADD ROOT MEMBER =====
-function addRootMember() {
-  let name = prompt("Member Name");
-  if (!name) return;
-
-  let newId = ++lastId;
-  members.push({ id: newId, name, left: null, right: null });
-
-  save();
-  renderAll();
-}
-
-// ===== ADD LEFT =====
-function addLeft(id) {
-  let parent = members.find(m => m.id == id);
-  if (!parent || parent.left) return;
-
-  let name = prompt("Left Name");
-  if (!name) return;
-
-  let newId = ++lastId;
-  members.push({ id: newId, name, left: null, right: null });
-  parent.left = newId;
-
-  save();
-  renderAll();
-}
-
-// ===== ADD RIGHT =====
-function addRight(id) {
-  let parent = members.find(m => m.id == id);
-  if (!parent || parent.right) return;
-
-  let name = prompt("Right Name");
-  if (!name) return;
-
-  let newId = ++lastId;
-  members.push({ id: newId, name, left: null, right: null });
-  parent.right = newId;
-
-  save();
-  renderAll();
-}
-
-// ===== EDIT =====
-function editMember(id) {
-  let m = members.find(x => x.id == id);
-  if (!m) return;
-
-  let newName = prompt("Edit Name", m.name);
-  if (!newName) return;
-
-  m.name = newName;
-
-  save();
-  renderAll();
-}
-
-// ===== COUNT =====
-function countTree(id) {
-  if (!id) return 0;
-
-  let m = members.find(x => x.id == id);
-  if (!m) return 0;
-
-  return 1 + countTree(m.left) + countTree(m.right);
-}
-
-// ===== PAIR =====
-function getPairData(m) {
-  let left = countTree(m.left);
-  let right = countTree(m.right);
-
-  let pair = Math.min(left, right);
-  let income = pair * 3;
-
-  return { pair, income };
-}
-
-// ===== TREE =====
-function renderTree() {
-  let root = members[0];
-  let el = document.getElementById("tree");
-  if (!el) return;
-
-  function build(id) {
-    let m = members.find(x => x.id == id);
-    if (!m) return "";
-
-    let d = getPairData(m);
-
-    return `
-    <div class="node">
-      ${m.name}<br>
-      Pair:${d.pair}<br>₹${d.income}<br>
-
-      <button onclick="addLeft(${m.id})">L</button>
-      <button onclick="addRight(${m.id})">R</button>
-      <button onclick="editMember(${m.id})">Edit</button>
-
-      <div class="children">
-        ${m.left ? build(m.left) : ""}
-        ${m.right ? build(m.right) : ""}
-      </div>
-    </div>`;
-  }
-
-  el.innerHTML = build(root.id);
-}
-
-// ===== TABLE =====
-function renderTable() {
-  let el = document.getElementById("memberTable");
-  if (!el) return;
-
-  el.innerHTML = members.map(m => {
-    let d = getPairData(m);
-
-    return `
-    <tr>
-      <td>${m.name}</td>
-      <td>${m.id}</td>
-      <td>${countTree(m.left)}</td>
-      <td>${countTree(m.right)}</td>
-      <td>${d.pair}</td>
-      <td>₹${d.income}</td>
-    </tr>`;
-  }).join("");
-}
-
-// ===== DASHBOARD =====
-function renderDashboard() {
-  let totalMembers = members.length;
-  let totalPairs = 0;
-  let totalIncome = 0;
-
-  members.forEach(m => {
-    let d = getPairData(m);
-    totalPairs += d.pair;
-    totalIncome += d.income;
-  });
-
-  document.getElementById("totalMembers").innerText = totalMembers;
-  document.getElementById("totalPairs").innerText = totalPairs;
-  document.getElementById("totalIncome").innerText = "₹" + totalIncome;
-  document.getElementById("companyProfit").innerText =
-    "₹" + (totalMembers * 10 - totalIncome);
-}
-
-// ===== ALL =====
+// ===== RENDER ALL =====
 function renderAll() {
   renderTree();
-  renderTable();
+  renderMembers();
   renderDashboard();
 }
+
+// ===== INIT =====
+if (members.length === 0) {
+  members.push({
+    id: 1,
+    name: "Rajesh",
+    left: 0,
+    right: 0,
+    parent: 0,
+    pairs: 0,
+    income: 0
+  });
+  saveData();
+}
+
+calculateAll();
+renderAll();
