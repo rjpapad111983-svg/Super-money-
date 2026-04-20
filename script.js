@@ -1,9 +1,38 @@
 // ===== DATA =====
 let members = JSON.parse(localStorage.getItem("members")) || [];
 
+// ===== INIT =====
+document.addEventListener("DOMContentLoaded", () => {
+
+  if (members.length === 0) {
+    members.push({
+      id: 1,
+      name: "Rajesh",
+      left: 0,
+      right: 0,
+      parent: 0,
+      pairs: 0,
+      income: 0
+    });
+    saveData();
+  }
+
+  calculateAll();
+  renderAll();
+});
+
 // ===== SAVE =====
 function saveData() {
   localStorage.setItem("members", JSON.stringify(members));
+}
+
+// ===== PAGE SWITCH =====
+function showPage(pageId) {
+  ["dashboardPage", "treePage", "membersPage"].forEach(id => {
+    document.getElementById(id).style.display = "none";
+  });
+
+  document.getElementById(pageId).style.display = "block";
 }
 
 // ===== ADD MEMBER =====
@@ -35,7 +64,7 @@ function addMember(parentId, side) {
   renderAll();
 }
 
-// ===== EDIT MEMBER =====
+// ===== EDIT =====
 function editMember(id) {
   const member = members.find(m => m.id === id);
   const name = prompt("Edit name", member.name);
@@ -46,25 +75,22 @@ function editMember(id) {
   renderAll();
 }
 
-// ===== CALCULATE PAIR =====
+// ===== COUNT =====
 function countDownline(id) {
-  const member = members.find(m => m.id === id);
-  if (!member) return 0;
+  const m = members.find(x => x.id === id);
+  if (!m) return 0;
 
-  return (
-    1 +
-    countDownline(member.left) +
-    countDownline(member.right)
-  );
+  return 1 + countDownline(m.left) + countDownline(m.right);
 }
 
+// ===== CALCULATION =====
 function calculateAll() {
   members.forEach(m => {
-    const leftCount = countDownline(m.left);
-    const rightCount = countDownline(m.right);
+    const left = countDownline(m.left);
+    const right = countDownline(m.right);
 
-    m.pairs = Math.min(leftCount, rightCount);
-    m.income = m.pairs * 3; // ₹3 per pair
+    m.pairs = Math.min(left, right);
+    m.income = m.pairs * 3;
   });
 }
 
@@ -75,42 +101,36 @@ function renderTree() {
 
   tree.innerHTML = "";
 
-  if (members.length === 0) return;
-
   const map = {};
   members.forEach(m => map[m.id] = m);
 
-  function buildNode(member) {
-    if (!member) return "";
+  function build(m) {
+    if (!m) return "";
 
     return `
       <li>
         <div class="node-card">
-          <b>${member.name}</b><br>
-          Pair: ${member.pairs}<br>
-          ₹${member.income}<br>
+          <b>${m.name}</b><br>
+          Pair: ${m.pairs}<br>
+          ₹${m.income}<br>
 
-          <button onclick="addMember(${member.id}, 'left')">L</button>
-          <button onclick="addMember(${member.id}, 'right')">R</button>
-          <button onclick="editMember(${member.id})">Edit</button>
+          <button onclick="addMember(${m.id},'left')">L</button>
+          <button onclick="addMember(${m.id},'right')">R</button>
+          <button onclick="editMember(${m.id})">Edit</button>
         </div>
 
         <ul>
-          ${buildNode(map[member.left])}
-          ${buildNode(map[member.right])}
+          ${build(map[m.left])}
+          ${build(map[m.right])}
         </ul>
       </li>
     `;
   }
 
-  tree.innerHTML = `
-    <ul class="mlm-tree">
-      ${buildNode(members[0])}
-    </ul>
-  `;
+  tree.innerHTML = `<ul class="mlm-tree">${build(members[0])}</ul>`;
 }
 
-// ===== MEMBERS TABLE =====
+// ===== MEMBERS =====
 function renderMembers() {
   const table = document.getElementById("membersTable");
   if (!table) return;
@@ -136,43 +156,17 @@ function renderMembers() {
 function renderDashboard() {
   document.getElementById("totalMembers").innerText = members.length;
 
-  let totalPairs = members.reduce((a, b) => a + b.pairs, 0);
-  let totalIncome = members.reduce((a, b) => a + b.income, 0);
+  const totalPairs = members.reduce((a,b)=>a+b.pairs,0);
+  const totalIncome = members.reduce((a,b)=>a+b.income,0);
 
   document.getElementById("totalPairs").innerText = totalPairs;
   document.getElementById("totalIncome").innerText = totalIncome;
-  document.getElementById("companyProfit").innerText = totalIncome * 0.7;
+  document.getElementById("companyProfit").innerText = (totalIncome * 0.7).toFixed(1);
 }
 
-// ===== MENU NAV =====
-function showPage(page) {
-  document.getElementById("dashboardPage").style.display = "none";
-  document.getElementById("treePage").style.display = "none";
-  document.getElementById("membersPage").style.display = "none";
-
-  document.getElementById(page).style.display = "block";
-}
-
-// ===== RENDER ALL =====
+// ===== RENDER =====
 function renderAll() {
   renderTree();
   renderMembers();
   renderDashboard();
 }
-
-// ===== INIT =====
-if (members.length === 0) {
-  members.push({
-    id: 1,
-    name: "Rajesh",
-    left: 0,
-    right: 0,
-    parent: 0,
-    pairs: 0,
-    income: 0
-  });
-  saveData();
-}
-
-calculateAll();
-renderAll();
