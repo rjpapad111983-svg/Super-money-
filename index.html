@@ -51,13 +51,31 @@
           <th>Action</th>
         </tr>
       </thead>
+
       <tbody id="membersTable"></tbody>
     </table>
+
   </div>
 
 </div>
 
-<!-- IMPORTANT -->
+<!-- FIX SCRIPT -->
+<script>
+function showPage(pageId) {
+  document.getElementById("dashboardPage").style.display = "none";
+  document.getElementById("treePage").style.display = "none";
+  document.getElementById("membersPage").style.display = "none";
+
+  document.getElementById(pageId).style.display = "block";
+}
+
+// dummy function (error avoid)
+function addMember(id, side) {
+  alert("Add Member Clicked");
+}
+</script>
+
+<!-- ORIGINAL SCRIPT -->
 <script src="script.js" defer></script>
 
 </body>
