@@ -29,14 +29,30 @@ function saveData() {
 // ===== PAGE SWITCH =====
 function showPage(pageId) {
   ["dashboardPage", "treePage", "membersPage"].forEach(id => {
-    document.getElementById(id).style.display = "none";
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
   });
 
-  document.getElementById(pageId).style.display = "block";
+  const active = document.getElementById(pageId);
+  if (active) active.style.display = "block";
 }
 
 // ===== ADD MEMBER =====
 function addMember(parentId, side) {
+  const parent = members.find(m => m.id === parentId);
+
+  if (!parent) return;
+
+  // DUPLICATE CHECK
+  if (side === "left" && parent.left) {
+    alert("Left already filled");
+    return;
+  }
+  if (side === "right" && parent.right) {
+    alert("Right already filled");
+    return;
+  }
+
   const name = prompt("Enter member name");
   if (!name) return;
 
@@ -54,8 +70,6 @@ function addMember(parentId, side) {
 
   members.push(newMember);
 
-  const parent = members.find(m => m.id === parentId);
-
   if (side === "left") parent.left = id;
   if (side === "right") parent.right = id;
 
@@ -67,29 +81,50 @@ function addMember(parentId, side) {
 // ===== EDIT =====
 function editMember(id) {
   const member = members.find(m => m.id === id);
+  if (!member) return;
+
   const name = prompt("Edit name", member.name);
   if (!name) return;
 
   member.name = name;
+
   saveData();
   renderAll();
 }
 
-// ===== COUNT =====
-function countDownline(id) {
-  const m = members.find(x => x.id === id);
-  if (!m) return 0;
+// ===== SAFE TEAM COUNT =====
+function countTeam(id) {
+  if (!id || id === 0) return 0;
 
-  return 1 + countDownline(m.left) + countDownline(m.right);
+  const member = members.find(m => m.id === id);
+  if (!member) return 0;
+
+  let total = 1;
+
+  if (member.left && member.left !== id) {
+    total += countTeam(member.left);
+  }
+
+  if (member.right && member.right !== id) {
+    total += countTeam(member.right);
+  }
+
+  return total;
 }
 
-// ===== CALCULATION =====
+// ===== FINAL PAIR CALCULATION =====
 function calculateAll() {
   members.forEach(m => {
-    const left = countDownline(m.left);
-    const right = countDownline(m.right);
 
-    m.pairs = Math.min(left, right);
+    let leftCount = 0;
+    let rightCount = 0;
+
+    if (m.left) leftCount = countTeam(m.left);
+    if (m.right) rightCount = countTeam(m.right);
+
+    m.pairs = Math.min(leftCount, rightCount);
+
+    // ₹3 per pair
     m.income = m.pairs * 3;
   });
 }
@@ -127,7 +162,9 @@ function renderTree() {
     `;
   }
 
-  tree.innerHTML = `<ul class="mlm-tree">${build(members[0])}</ul>`;
+  if (members.length > 0) {
+    tree.innerHTML = `<ul class="mlm-tree">${build(members[0])}</ul>`;
+  }
 }
 
 // ===== MEMBERS =====
@@ -154,17 +191,26 @@ function renderMembers() {
 
 // ===== DASHBOARD =====
 function renderDashboard() {
-  document.getElementById("totalMembers").innerText = members.length;
+  const totalMembers = document.getElementById("totalMembers");
+  const totalPairs = document.getElementById("totalPairs");
+  const totalIncome = document.getElementById("totalIncome");
+  const companyProfit = document.getElementById("companyProfit");
 
-  const totalPairs = members.reduce((a,b)=>a+b.pairs,0);
-  const totalIncome = members.reduce((a,b)=>a+b.income,0);
+  if (!totalMembers) return;
 
-  document.getElementById("totalPairs").innerText = totalPairs;
-  document.getElementById("totalIncome").innerText = totalIncome;
-  document.getElementById("companyProfit").innerText = (totalIncome * 0.7).toFixed(1);
+  totalMembers.innerText = members.length;
+
+  const pairs = members.reduce((a, b) => a + b.pairs, 0);
+  const income = members.reduce((a, b) => a + b.income, 0);
+
+  totalPairs.innerText = pairs;
+  totalIncome.innerText = income;
+
+  // 70% company profit
+  companyProfit.innerText = (income * 0.7).toFixed(1);
 }
 
-// ===== RENDER =====
+// ===== RENDER ALL =====
 function renderAll() {
   renderTree();
   renderMembers();
