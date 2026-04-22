@@ -80,7 +80,6 @@ function addMember(parentId, side) {
 
 // ===== EDIT MEMBER =====
 function editMember(id) {
-
   const member = members.find(m => m.id === id);
   if (!member) return;
 
@@ -93,9 +92,8 @@ function editMember(id) {
   renderAll();
 }
 
-// ===== SAFE TEAM COUNT =====
+// ===== TEAM COUNT (IMPORTANT) =====
 function countTeam(id) {
-
   if (!id) return 0;
 
   const member = members.find(m => m.id === id);
@@ -103,13 +101,13 @@ function countTeam(id) {
 
   let total = 1;
 
-  if (member.left) total += countTeam(member.left);
-  if (member.right) total += countTeam(member.right);
+  total += countTeam(member.left);
+  total += countTeam(member.right);
 
   return total;
 }
 
-// ===== FINAL PAIR CALCULATION (FIXED) =====
+// ===== PAIR CALCULATION (FIXED) =====
 function calculateAll() {
 
   members.forEach(m => {
@@ -117,11 +115,11 @@ function calculateAll() {
     let leftCount = m.left ? countTeam(m.left) : 0;
     let rightCount = m.right ? countTeam(m.right) : 0;
 
-    // ✅ सही MLM logic
     m.pairs = Math.min(leftCount, rightCount);
 
     // ₹3 per pair
     m.income = m.pairs * 3;
+
   });
 }
 
@@ -146,8 +144,8 @@ function renderTree() {
           Pair: ${m.pairs}<br>
           ₹${m.income}<br>
 
-          <button onclick="addMember(${m.id},'left')">L</button>
-          <button onclick="addMember(${m.id},'right')">R</button>
+          <button onclick="addMember(${m.id}, 'left')">L</button>
+          <button onclick="addMember(${m.id}, 'right')">R</button>
           <button onclick="editMember(${m.id})">Edit</button>
         </div>
 
@@ -174,12 +172,15 @@ function renderMembers() {
 
   members.forEach(m => {
 
+    let leftCount = m.left ? countTeam(m.left) : 0;
+    let rightCount = m.right ? countTeam(m.right) : 0;
+
     table.innerHTML += `
       <tr>
         <td>${m.name}</td>
         <td>${m.id}</td>
-        <td>${m.left || 0}</td>
-        <td>${m.right || 0}</td>
+        <td>${leftCount}</td>
+        <td>${rightCount}</td>
         <td>${m.pairs}</td>
         <td>₹${m.income}</td>
         <td><button onclick="editMember(${m.id})">Edit</button></td>
