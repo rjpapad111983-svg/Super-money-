@@ -39,15 +39,15 @@ function showPage(pageId) {
 
 // ===== ADD MEMBER =====
 function addMember(parentId, side) {
-  const parent = members.find(m => m.id === parentId);
 
+  const parent = members.find(m => m.id === parentId);
   if (!parent) return;
 
-  // DUPLICATE CHECK
   if (side === "left" && parent.left) {
     alert("Left already filled");
     return;
   }
+
   if (side === "right" && parent.right) {
     alert("Right already filled");
     return;
@@ -78,8 +78,9 @@ function addMember(parentId, side) {
   renderAll();
 }
 
-// ===== EDIT =====
+// ===== EDIT MEMBER =====
 function editMember(id) {
+
   const member = members.find(m => m.id === id);
   if (!member) return;
 
@@ -94,34 +95,29 @@ function editMember(id) {
 
 // ===== SAFE TEAM COUNT =====
 function countTeam(id) {
-  if (!id || id === 0) return 0;
+
+  if (!id) return 0;
 
   const member = members.find(m => m.id === id);
   if (!member) return 0;
 
   let total = 1;
 
-  if (member.left && member.left !== id) {
-    total += countTeam(member.left);
-  }
-
-  if (member.right && member.right !== id) {
-    total += countTeam(member.right);
-  }
+  if (member.left) total += countTeam(member.left);
+  if (member.right) total += countTeam(member.right);
 
   return total;
 }
 
-// ===== FINAL PAIR CALCULATION =====
+// ===== FINAL PAIR CALCULATION (FIXED) =====
 function calculateAll() {
+
   members.forEach(m => {
 
-    let leftCount = 0;
-    let rightCount = 0;
+    let leftCount = m.left ? countTeam(m.left) : 0;
+    let rightCount = m.right ? countTeam(m.right) : 0;
 
-    if (m.left) leftCount = countTeam(m.left);
-    if (m.right) rightCount = countTeam(m.right);
-
+    // ✅ सही MLM logic
     m.pairs = Math.min(leftCount, rightCount);
 
     // ₹3 per pair
@@ -131,6 +127,7 @@ function calculateAll() {
 
 // ===== TREE =====
 function renderTree() {
+
   const tree = document.getElementById("tree");
   if (!tree) return;
 
@@ -167,14 +164,16 @@ function renderTree() {
   }
 }
 
-// ===== MEMBERS =====
+// ===== MEMBERS TABLE =====
 function renderMembers() {
+
   const table = document.getElementById("membersTable");
   if (!table) return;
 
   table.innerHTML = "";
 
   members.forEach(m => {
+
     table.innerHTML += `
       <tr>
         <td>${m.name}</td>
@@ -191,6 +190,7 @@ function renderMembers() {
 
 // ===== DASHBOARD =====
 function renderDashboard() {
+
   const totalMembers = document.getElementById("totalMembers");
   const totalPairs = document.getElementById("totalPairs");
   const totalIncome = document.getElementById("totalIncome");
