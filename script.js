@@ -189,7 +189,7 @@ function renderMembers() {
   });
 }
 
-// ===== DASHBOARD (FIXED) =====
+// ===== DASHBOARD (FINAL FIX) =====
 function renderDashboard() {
 
   const totalMembers = document.getElementById("totalMembers");
@@ -201,16 +201,20 @@ function renderDashboard() {
 
   totalMembers.innerText = members.length;
 
-  // ✅ ONLY ROOT MEMBER COUNT
-  const root = members.find(m => m.id === 1);
+  // ✅ total income (all members)
+  const totalIncomeValue = members.reduce((a, b) => a + b.income, 0);
 
-  const pairs = root ? root.pairs : 0;
-  const income = root ? root.income : 0;
+  // optional pairs
+  const totalPairsValue = members.reduce((a, b) => a + b.pairs, 0);
 
-  totalPairs.innerText = pairs;
-  totalIncome.innerText = income;
+  totalPairs.innerText = totalPairsValue;
+  totalIncome.innerText = totalIncomeValue;
 
-  companyProfit.innerText = (income * 0.7).toFixed(1);
+  // ✅ REAL COMPANY PROFIT
+  const totalCollection = members.length * 10; // ₹10 per member
+  const profit = totalCollection - totalIncomeValue;
+
+  companyProfit.innerText = profit;
 }
 
 // ===== RENDER ALL =====
