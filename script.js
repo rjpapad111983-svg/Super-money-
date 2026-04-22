@@ -92,7 +92,7 @@ function editMember(id) {
   renderAll();
 }
 
-// ===== TEAM COUNT (IMPORTANT) =====
+// ===== TEAM COUNT =====
 function countTeam(id) {
   if (!id) return 0;
 
@@ -107,7 +107,7 @@ function countTeam(id) {
   return total;
 }
 
-// ===== PAIR CALCULATION (FIXED) =====
+// ===== PAIR CALCULATION =====
 function calculateAll() {
 
   members.forEach(m => {
@@ -189,7 +189,7 @@ function renderMembers() {
   });
 }
 
-// ===== DASHBOARD =====
+// ===== DASHBOARD (FIXED) =====
 function renderDashboard() {
 
   const totalMembers = document.getElementById("totalMembers");
@@ -201,13 +201,15 @@ function renderDashboard() {
 
   totalMembers.innerText = members.length;
 
-  const pairs = members.reduce((a, b) => a + b.pairs, 0);
-  const income = members.reduce((a, b) => a + b.income, 0);
+  // ✅ ONLY ROOT MEMBER COUNT
+  const root = members.find(m => m.id === 1);
+
+  const pairs = root ? root.pairs : 0;
+  const income = root ? root.income : 0;
 
   totalPairs.innerText = pairs;
   totalIncome.innerText = income;
 
-  // 70% company profit
   companyProfit.innerText = (income * 0.7).toFixed(1);
 }
 
