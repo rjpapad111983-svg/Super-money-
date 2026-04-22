@@ -1,49 +1,87 @@
-body {
+/* ===== RESET ===== */
+* {
   margin: 0;
-  font-family: Arial;
-  background: #062f2f;
-  color: white;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* ===== BODY ===== */
+body {
+  display: flex;
+  background: #013a36;
+  color: #fff;
 }
 
 /* ===== SIDEBAR ===== */
 .sidebar {
-  width: 200px;
-  height: 100vh;
-  background: #083f3f;
-  position: fixed;
-  padding: 10px;
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #022f2c, #014d47);
+  padding: 15px;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
 }
 
 .sidebar button {
   width: 100%;
-  margin: 5px 0;
   padding: 10px;
-  background: #0c5c5c;
-  color: white;
+  margin: 6px 0;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
+  background: #0b7d75;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.sidebar button:hover {
+  background: #13a89e;
 }
 
 /* ===== MAIN ===== */
 .main {
-  margin-left: 210px;
-  padding: 10px;
+  flex: 1;
+  padding: 20px;
+}
+
+/* ===== TABLE ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th, td {
+  border: 1px solid #0aa39a;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background: #02635d;
+}
+
+td {
+  background: #014a45;
 }
 
 /* ===== TREE ===== */
 .mlm-tree,
 .mlm-tree ul {
-  display: flex;
-  justify-content: center;
   padding-top: 20px;
   position: relative;
+  display: flex;
+  justify-content: center;
 }
 
 .mlm-tree li {
-  list-style: none;
+  list-style-type: none;
   text-align: center;
-  padding: 20px 10px 0;
   position: relative;
+  padding: 20px 5px 0 5px;
 }
 
 /* lines */
@@ -52,51 +90,80 @@ body {
   content: '';
   position: absolute;
   top: 0;
-  border-top: 2px solid #00c3a5;
+  right: 50%;
+  border-top: 2px solid #0aa39a;
   width: 50%;
-}
-
-.mlm-tree li::before { left: -50%; }
-.mlm-tree li::after { right: -50%; }
-
-.mlm-tree li:only-child::before,
-.mlm-tree li:only-child::after {
-  display: none;
-}
-
-.mlm-tree ul ul::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  border-left: 2px solid #00c3a5;
   height: 20px;
 }
 
-/* card */
+.mlm-tree li::after {
+  right: auto;
+  left: 50%;
+  border-left: 2px solid #0aa39a;
+}
+
+/* remove top line for root */
+.mlm-tree > li::before,
+.mlm-tree > li::after {
+  border: 0;
+}
+
+/* ===== NODE CARD ===== */
 .node-card {
-  background: #0f4f4f;
+  display: inline-block;
   padding: 10px;
   border-radius: 10px;
+  background: #02635d;
+  border: 2px solid #0aa39a;
   min-width: 110px;
-  box-shadow: 0 0 10px black;
+}
+
+.node-card b {
+  font-size: 14px;
 }
 
 .node-card button {
-  margin: 2px;
-  font-size: 10px;
-  padding: 3px 6px;
+  margin: 3px;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 4px;
+  background: #0b7d75;
+  color: #fff;
+  cursor: pointer;
 }
 
-/* ===== TABLE ===== */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
+.node-card button:hover {
+  background: #13a89e;
 }
 
-td, th {
-  border: 1px solid #0c5c5c;
-  padding: 5px;
-  text-align: center;
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+
+  body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .sidebar button {
+    flex: 1 1 48%;
+    margin: 5px;
+  }
+
+  .main {
+    padding: 10px;
+  }
+
+  table {
+    font-size: 12px;
+  }
+
+  .node-card {
+    font-size: 12px;
+    padding: 8px;
+  }
 }
