@@ -58,6 +58,7 @@ function addMember(parentId, side) {
     income: 0
   };
 
+  // 🔥 STEP 1: old child save karo
   let oldChildId = 0;
 
   if (side === "left") {
@@ -68,11 +69,15 @@ function addMember(parentId, side) {
     parent.right = id;
   }
 
+  // 🔥 STEP 2: agar old child tha to usko newMember ke niche lagao
   if (oldChildId) {
     const oldChild = members.find(m => m.id === oldChildId);
+
     if (oldChild) {
       oldChild.parent = id;
-      newMember.left = oldChildId; // नीचे shift
+
+      // 👉 auto adjust (left side pe lagao)
+      newMember.left = oldChildId;
     }
   }
 
