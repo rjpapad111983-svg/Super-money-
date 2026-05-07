@@ -43,16 +43,6 @@ function addMember(parentId, side) {
   const parent = members.find(m => m.id === parentId);
   if (!parent) return;
 
-  if (side === "left" && parent.left) {
-    alert("Left already filled");
-    return;
-  }
-
-  if (side === "right" && parent.right) {
-    alert("Right already filled");
-    return;
-  }
-
   const name = prompt("Enter member name");
   if (!name) return;
 
@@ -68,10 +58,25 @@ function addMember(parentId, side) {
     income: 0
   };
 
-  members.push(newMember);
+  let oldChildId = 0;
 
-  if (side === "left") parent.left = id;
-  if (side === "right") parent.right = id;
+  if (side === "left") {
+    oldChildId = parent.left;
+    parent.left = id;
+  } else {
+    oldChildId = parent.right;
+    parent.right = id;
+  }
+
+  if (oldChildId) {
+    const oldChild = members.find(m => m.id === oldChildId);
+    if (oldChild) {
+      oldChild.parent = id;
+      newMember.left = oldChildId; // नीचे shift
+    }
+  }
+
+  members.push(newMember);
 
   calculateAll();
   saveData();
