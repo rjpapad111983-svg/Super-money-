@@ -156,8 +156,10 @@ function renderTree() {
 
           <button onclick="addMember(${m.id}, 'left')">L</button>
           <button onclick="addMember(${m.id}, 'right')">R</button>
-          <button onclick="editMember(${m.id})">Edit</button>
-          <button onclick="deleteMember(${m.id})">Delete</button>
+          <td>
+  <button onclick="editMember(${m.id})">Edit</button>
+  <button onclick="deleteMember(${m.id})">Delete</button>
+</td>
           <button onclick="focusMember(${m.id})">View</button>
         </div>
 
