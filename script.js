@@ -150,18 +150,17 @@ function renderTree() {
     return `
       <li>
         <div class="node-card">
-          <b>${m.name}</b><br>
-          Pair: ${m.pairs}<br>
-          ₹${m.income}<br>
+<b>${m.name}</b><br>
+Pair: ${m.pairs}<br>
+₹${m.income}<br>
 
-          <button onclick="addMember(${m.id}, 'left')">L</button>
-          <button onclick="addMember(${m.id}, 'right')">R</button>
-          <td>
-  <button onclick="editMember(${m.id})">Edit</button>
-  <button onclick="deleteMember(${m.id})">Delete</button>
-</td>
-          <button onclick="focusMember(${m.id})">View</button>
-        </div>
+<button onclick="addMember(${m.id}, 'left')">L</button>
+<button onclick="addMember(${m.id}, 'right')">R</button>
+
+<button onclick="editMember(${m.id})">Edit</button>
+<button onclick="deleteMember(${m.id})">Delete</button>
+<button onclick="focusMember(${m.id})">View</button>
+</div>
 
         <ul>
           ${build(map[m.left])}
