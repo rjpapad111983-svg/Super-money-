@@ -342,7 +342,33 @@ function showTeamTree() {
   }
 
   tree.innerHTML = `<ul class="mlm-tree">${build(member)}</ul>`;
+function focusMember(id) {
+   const member = members.find(m => m.id === id);
+   if (!member) return;
 
+   const tree = document.getElementById("tree");
+
+   function build(m) {
+      if (!m) return "";
+
+      return `
+      <li>
+        <div class="node-card">
+          <b>${m.name}</b><br>
+          Pair: ${m.pairs}<br>
+          ₹${m.income}
+        </div>
+
+        <ul>
+          ${build(members.find(x => x.id === m.left))}
+          ${build(members.find(x => x.id === m.right))}
+        </ul>
+      </li>
+      `;
+   }
+
+   tree.innerHTML = `<ul class="mlm-tree">${build(member)}</ul>`;
+}
   // 👉 auto tree page open
   showPage("treePage");
 }
