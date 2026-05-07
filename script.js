@@ -304,3 +304,44 @@ function showTeam() {
     `;
   });
 }
+// ===== SHOW TEAM IN TREE =====
+function showTeamTree() {
+  const name = document.getElementById("teamSearch").value.toLowerCase();
+
+  const member = members.find(m => m.name.toLowerCase() === name);
+
+  if (!member) {
+    alert("Member not found");
+    return;
+  }
+
+  const tree = document.getElementById("tree");
+  tree.innerHTML = "";
+
+  const map = {};
+  members.forEach(m => map[m.id] = m);
+
+  function build(m) {
+    if (!m) return "";
+
+    return `
+      <li>
+        <div class="node-card" style="border:2px solid yellow;">
+          <b>${m.name}</b><br>
+          Pair: ${m.pairs}<br>
+          ₹${m.income}
+        </div>
+
+        <ul>
+          ${m.left ? build(map[m.left]) : ""}
+          ${m.right ? build(map[m.right]) : ""}
+        </ul>
+      </li>
+    `;
+  }
+
+  tree.innerHTML = `<ul class="mlm-tree">${build(member)}</ul>`;
+
+  // 👉 auto tree page open
+  showPage("treePage");
+}
