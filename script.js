@@ -247,3 +247,60 @@ function searchMember() {
     }
   });
 }
+function searchMember() {
+  const input = document.getElementById("searchInput").value.toLowerCase();
+  const rows = document.querySelectorAll("#membersTable tr");
+
+  rows.forEach(row => {
+    const text = row.innerText.toLowerCase();
+    if (text.includes(input)) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
+}
+
+// ✅ यहीं नीचे add करना है
+function showTeam() {
+  const name = document.getElementById("teamSearch").value.toLowerCase();
+
+  const member = members.find(m => m.name.toLowerCase() === name);
+
+  if (!member) {
+    alert("Member not found");
+    return;
+  }
+
+  function getTeam(id) {
+    let list = [];
+
+    const m = members.find(x => x.id === id);
+    if (!m) return list;
+
+    list.push(m);
+
+    if (m.left) list = list.concat(getTeam(m.left));
+    if (m.right) list = list.concat(getTeam(m.right));
+
+    return list;
+  }
+
+  const team = getTeam(member.id);
+
+  const table = document.getElementById("membersTable");
+  table.innerHTML = "";
+
+  team.forEach(m => {
+    table.innerHTML += `
+      <tr>
+        <td>${m.name}</td>
+        <td>${m.id}</td>
+        <td>${m.left || 0}</td>
+        <td>${m.right || 0}</td>
+        <td>${m.pairs}</td>
+        <td>₹${m.income}</td>
+      </tr>
+    `;
+  });
+}
