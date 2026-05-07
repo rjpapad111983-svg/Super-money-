@@ -101,7 +101,39 @@ function editMember(id) {
   saveData();
   renderAll();
 }
+function deleteMember(id) {
 
+  if (id === 1) {
+    alert("Root delete nahi kar sakte");
+    return;
+  }
+
+  const member = members.find(m => m.id === id);
+  if (!member) return;
+
+  const parent = members.find(m => m.id === member.parent);
+
+  if (parent) {
+    if (parent.left === id) parent.left = 0;
+    if (parent.right === id) parent.right = 0;
+  }
+
+  function removeTree(mid) {
+    const m = members.find(x => x.id === mid);
+    if (!m) return;
+
+    if (m.left) removeTree(m.left);
+    if (m.right) removeTree(m.right);
+
+    members = members.filter(x => x.id !== mid);
+  }
+
+  removeTree(id);
+
+  saveData();
+  calculateAll();
+  renderAll();
+}
 // ===== TEAM COUNT =====
 function countTeam(id) {
   if (!id) return 0;
