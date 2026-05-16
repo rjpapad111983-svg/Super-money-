@@ -1,26 +1,68 @@
-/* ===== TREE STRUCTURE ===== */
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
 
-.mlm-tree,
+/* ===== BODY ===== */
+body {
+  display: flex;
+  background: #0f2f2f;
+  color: #fff;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #022f2f, #014d4d);
+  padding: 15px;
+}
+
+.sidebar button {
+  width: 100%;
+  margin: 6px 0;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background: #0b7d75;
+  color: #fff;
+  cursor: pointer;
+}
+
+.sidebar button:hover {
+  background: #13a89e;
+}
+
+/* ===== MAIN ===== */
+.main {
+  flex: 1;
+  padding: 20px;
+  overflow-x: auto;
+}
+
+/* ===== TREE ===== */
+.mlm-tree {
+  text-align: center;
+}
+
 .mlm-tree ul {
   padding-top: 20px;
   position: relative;
-  list-style: none;
-}
-
-/* children ko side me lao */
-.mlm-tree ul {
   display: flex;
   justify-content: center;
 }
 
-/* each node */
 .mlm-tree li {
+  list-style: none;
   text-align: center;
   position: relative;
   padding: 20px 10px 0 10px;
 }
 
-/* horizontal line */
+/* ===== CONNECTOR LINES ===== */
 .mlm-tree li::before,
 .mlm-tree li::after {
   content: '';
@@ -31,13 +73,11 @@
   border-top: 2px solid #00e6b8;
 }
 
-/* left line */
 .mlm-tree li::before {
   left: 0;
   border-right: 2px solid #00e6b8;
 }
 
-/* right line */
 .mlm-tree li::after {
   right: 0;
   border-left: 2px solid #00e6b8;
@@ -62,36 +102,33 @@
 }
 
 /* vertical line */
-.mlm-tree ul::before {
+.mlm-tree ul ul::before {
   content: '';
   position: absolute;
   top: 0;
   left: 50%;
-  border-left: 2px solid #00e6b8;
-  width: 0;
   height: 20px;
+  border-left: 2px solid #00e6b8;
 }
 
 /* ===== NODE CARD ===== */
-
 .node-card {
   display: inline-block;
-  padding: 10px;
+  padding: 12px;
   border-radius: 10px;
-  background: #063f3a;
+  background: #063f3f;
   border: 2px solid #00e6b8;
   min-width: 120px;
-  color: #fff;
 }
 
 .node-card b {
   font-size: 14px;
 }
 
-/* buttons */
+/* ===== BUTTONS ===== */
 .node-card button {
   margin: 3px;
-  padding: 5px 7px;
+  padding: 5px 8px;
   border: none;
   border-radius: 5px;
   background: #0b7d75;
@@ -104,9 +141,45 @@
   background: #13a89e;
 }
 
-/* ===== MOBILE FIX ===== */
+/* ===== TABLE ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
 
+th, td {
+  border: 1px solid #00e6b8;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background: #063f3f;
+}
+
+td {
+  background: #014d4d;
+}
+
+/* ===== MOBILE FIX ===== */
 @media (max-width: 768px) {
+
+  body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .sidebar button {
+    flex: 1 1 45%;
+    margin: 5px;
+  }
+
   .mlm-tree ul {
     flex-direction: column;
     align-items: center;
@@ -114,7 +187,7 @@
 
   .mlm-tree li::before,
   .mlm-tree li::after,
-  .mlm-tree ul::before {
+  .mlm-tree ul ul::before {
     display: none;
   }
 }
