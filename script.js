@@ -51,6 +51,7 @@ function addMember(parentId, side) {
     isSub: name.toLowerCase().includes("sub")
   };
 
+  // old child adjust
   let oldChildId = 0;
 
   if (side === "left") {
@@ -76,7 +77,7 @@ function addMember(parentId, side) {
   renderAll();
 }
 
-// ===== TEAM COUNT =====
+// ===== COUNT TEAM =====
 function countTeam(id) {
   if (!id) return 0;
 
@@ -99,24 +100,12 @@ function getCap(level) {
   return 1000;
 }
 
-// ===== PASS TO CHILD =====
-function passToChildren(member, amount) {
-
-  const left = members.find(x => x.id === member.left);
-  const right = members.find(x => x.id === member.right);
-
-  let half = amount / 2;
-
-  if (left && left.income < MAX_CAP) left.income += half;
-  if (right && right.income < MAX_CAP) right.income += half;
-}
-
-// ===== MAIN CALCULATION =====
+// ===== CALCULATION =====
 function calculateAll() {
 
   let companyProfit = 0;
 
-  // 🔥 IMPORTANT RESET
+  // RESET (IMPORTANT FIX)
   members.forEach(m => {
     m.income = 0;
     m.pairs = 0;
@@ -131,7 +120,7 @@ function calculateAll() {
 
     let earning = m.pairs * 3;
 
-    // 🔥 SUB MEMBER
+    // SUB MEMBER
     if (m.isSub) {
       m.income = earning;
       return;
@@ -139,44 +128,51 @@ function calculateAll() {
 
     let cap = getCap(m.level || 1);
 
-    if (m.income >= MAX_CAP) return;
+    let total = earning;
 
-    let total = m.income + earning;
-
-    // 🔴 HARD CAP
+    // HARD CAP
     if (total > MAX_CAP) {
-      let extra = total - MAX_CAP;
+      companyProfit += (total - MAX_CAP);
       m.income = MAX_CAP;
-      companyProfit += extra;
       return;
     }
 
-    // 🟡 LEVEL CAP
-    if (total >= cap) {
-
+    // LEVEL CAP
+    if (total > cap) {
       let extra = total - cap;
       m.income = cap;
 
       const left = members.find(x => x.id === m.left);
       const right = members.find(x => x.id === m.right);
 
-      // level upgrade
       if (left && right && left.income >= cap && right.income >= cap) {
         m.level = (m.level || 1) + 1;
       } else {
         passToChildren(m, extra);
       }
 
-      return;
+    } else {
+      m.income = total;
     }
 
-    m.income = total;
   });
 
   window.companyProfit = companyProfit;
 }
 
-// ===== RENDER TREE =====
+// ===== PASS TO CHILD =====
+function passToChildren(member, amount) {
+
+  const left = members.find(x => x.id === member.left);
+  const right = members.find(x => x.id === member.right);
+
+  let half = amount / 2;
+
+  if (left && left.income < MAX_CAP) left.income += half;
+  if (right && right.income < MAX_CAP) right.income += half;
+}
+
+// ===== TREE =====
 function renderTree() {
 
   const tree = document.getElementById("tree");
@@ -191,29 +187,31 @@ function renderTree() {
     if (!m) return "";
 
     return `
-    <li>
-      <div class="node-card">
-  <b>${m.name}</b><br>
-  Pair: ${m.pairs}<br>
-  ₹${m.income}<br><br>
+      <li>
+        <div class="node-card">
+          <b>${m.name}</b><br>
+          Pair: ${m.pairs}<br>
+          ₹${m.income}<br>
 
-  <button onclick="addMember(${m.id}, 'left')">L+</button>
-  <button onclick="addMember(${m.id}, 'right')">R+</button><br>
+          <button onclick="addMember(${m.id}, 'left')">L+</button>
+          <button onclick="addMember(${m.id}, 'right')">R+</button><br>
 
-  <button onclick="editMember(${m.id})">Edit</button>
-  <button onclick="deleteMember(${m.id})">Delete</button>
-</div>
+          <button onclick="editMember(${m.id})">Edit</button>
+          <button onclick="deleteMember(${m.id})">Delete</button>
+        </div>
 
-      <ul>
-        ${m.left ? build(map[m.left]) : ""}
-        ${m.right ? build(map[m.right]) : ""}
-      </ul>
-    </li>
+        ${(m.left || m.right) ? `
+        <ul>
+          ${m.left ? build(map[m.left]) : "<li></li>"}
+          ${m.right ? build(map[m.right]) : "<li></li>"}
+        </ul>
+        ` : ""}
+      </li>
     `;
   }
 
   if (members.length > 0) {
-    tree.innerHTML = `<ul>${build(members[0])}</ul>`;
+    tree.innerHTML = `<ul class="mlm-tree">${build(members[0])}</ul>`;
   }
 }
 
@@ -231,14 +229,14 @@ function renderMembers() {
     let rightCount = m.right ? countTeam(m.right) : 0;
 
     table.innerHTML += `
-    <tr>
-      <td>${m.name}</td>
-      <td>${m.id}</td>
-      <td>${leftCount}</td>
-      <td>${rightCount}</td>
-      <td>${m.pairs}</td>
-      <td>₹${m.income}</td>
-    </tr>
+      <tr>
+        <td>${m.name}</td>
+        <td>${m.id}</td>
+        <td>${leftCount}</td>
+        <td>${rightCount}</td>
+        <td>${m.pairs}</td>
+        <td>₹${m.income}</td>
+      </tr>
     `;
   });
 }
@@ -263,12 +261,7 @@ function renderDashboard() {
   companyProfit.innerText = window.companyProfit || 0;
 }
 
-// ===== RENDER ALL =====
-function renderAll() {
-  renderTree();
-  renderMembers();
-  renderDashboard();
-}
+// ===== EDIT =====
 function editMember(id) {
   const m = members.find(x => x.id === id);
   if (!m) return;
@@ -277,11 +270,14 @@ function editMember(id) {
   if (!name) return;
 
   m.name = name;
+
   saveData();
   renderAll();
 }
 
+// ===== DELETE =====
 function deleteMember(id) {
+
   if (id === 1) {
     alert("Root delete nahi kar sakte");
     return;
@@ -298,6 +294,15 @@ function deleteMember(id) {
   }
 
   removeTree(id);
+
   saveData();
+  calculateAll();
   renderAll();
 }
+
+// ===== RENDER ALL =====
+function renderAll() {
+  renderTree();
+  renderMembers();
+  renderDashboard();
+               }
