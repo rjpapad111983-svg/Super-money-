@@ -7,41 +7,46 @@
 
 <body>
 
-<!-- SIDEBAR -->
+<!-- ===== SIDEBAR ===== -->
 <div class="sidebar">
   <h2>MLM Panel</h2>
 
   <button onclick="showPage('dashboardPage')">Dashboard</button>
   <button onclick="showPage('treePage')">Tree</button>
   <button onclick="showPage('membersPage')">Members</button>
-  <button onclick="addMember(1,'left')">+ Add Member</button>
+  <button onclick="addMember(1, 'left')">+ Add Member</button>
 </div>
 
-<!-- MAIN -->
+<!-- ===== MAIN ===== -->
 <div class="main">
 
-  <!-- DASHBOARD -->
-  <div id="dashboardPage">
+  <!-- ===== DASHBOARD ===== -->
+  <div id="dashboardPage" style="display:none">
     <h2>Dashboard</h2>
+
     <p>Total Members: <span id="totalMembers">0</span></p>
     <p>Total Pairs: <span id="totalPairs">0</span></p>
     <p>Total Income: ₹<span id="totalIncome">0</span></p>
     <p>Company Profit: ₹<span id="companyProfit">0</span></p>
   </div>
 
-  <!-- TREE -->
-  <div id="treePage" style="display:none">
+  <!-- ===== TREE (DEFAULT OPEN) ===== -->
+  <div id="treePage">
     <h2>Binary Tree</h2>
     <div id="tree"></div>
   </div>
 
-  <!-- MEMBERS -->
+  <!-- ===== MEMBERS ===== -->
   <div id="membersPage" style="display:none">
     <h2>Members</h2>
-<input type="text" id="searchInput" placeholder="Search name / ID..." onkeyup="searchMember()" style="margin-bottom:10px; padding:5px; width:200px;">
-  <input type="text" id="teamSearch" placeholder="Enter name for team" style="margin-left:10px;">
-<button onclick="showTeam()">Show Team</button> 
+
+    <input type="text" id="searchInput" placeholder="Search name / ID..." onkeyup="searchMember()" style="margin-bottom:10px;">
+
+    <input type="text" id="teamSearch" placeholder="Enter name for team" style="margin-left:10px;">
+    <button onclick="showTeam()">Show Team</button>
+
     <div id="teamTree" style="margin-top:20px;"></div>
+
     <table>
       <thead>
         <tr>
@@ -57,12 +62,11 @@
 
       <tbody id="membersTable"></tbody>
     </table>
-
   </div>
 
 </div>
 
-<!-- FIX SCRIPT -->
+<!-- ===== NAVIGATION SCRIPT ===== -->
 <script>
 function showPage(pageId) {
   document.getElementById("dashboardPage").style.display = "none";
@@ -71,12 +75,17 @@ function showPage(pageId) {
 
   document.getElementById(pageId).style.display = "block";
 }
-
-
 </script>
 
-<!-- ORIGINAL SCRIPT -->
-<script src="script.js" defer></script>
+<!-- ===== AUTO LOAD TREE ===== -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  showPage("treePage"); // 👈 default tree open
+});
+</script>
+
+<!-- ===== MAIN SCRIPT ===== -->
+<script src="script.js"></script>
 
 </body>
 </html>
