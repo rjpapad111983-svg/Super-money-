@@ -48,7 +48,7 @@ function addMember(parentId, side) {
     pairs: 0,
     income: 0,
     level: 1,
-    isSub: name.toLowerCase().includes("sub") // 🔥 sub detect
+    isSub: name.toLowerCase().includes("sub")
   };
 
   let oldChildId = 0;
@@ -101,6 +101,7 @@ function getCap(level) {
 
 // ===== PASS TO CHILD =====
 function passToChildren(member, amount) {
+
   const left = members.find(x => x.id === member.left);
   const right = members.find(x => x.id === member.right);
 
@@ -115,17 +116,24 @@ function calculateAll() {
 
   let companyProfit = 0;
 
+  // 🔥 IMPORTANT RESET
+  members.forEach(m => {
+    m.income = 0;
+    m.pairs = 0;
+  });
+
   members.forEach(m => {
 
     let leftCount = m.left ? countTeam(m.left) : 0;
     let rightCount = m.right ? countTeam(m.right) : 0;
 
     m.pairs = Math.min(leftCount, rightCount);
+
     let earning = m.pairs * 3;
 
-    // 🔥 SUB MEMBER → NO RULE
+    // 🔥 SUB MEMBER
     if (m.isSub) {
-      m.income += earning;
+      m.income = earning;
       return;
     }
 
@@ -135,7 +143,7 @@ function calculateAll() {
 
     let total = m.income + earning;
 
-    // 🔥 HARD CAP 1000
+    // 🔴 HARD CAP
     if (total > MAX_CAP) {
       let extra = total - MAX_CAP;
       m.income = MAX_CAP;
@@ -143,7 +151,7 @@ function calculateAll() {
       return;
     }
 
-    // 🔥 LEVEL CAP
+    // 🟡 LEVEL CAP
     if (total >= cap) {
 
       let extra = total - cap;
@@ -152,17 +160,17 @@ function calculateAll() {
       const left = members.find(x => x.id === m.left);
       const right = members.find(x => x.id === m.right);
 
-      // 🔥 level upgrade
+      // level upgrade
       if (left && right && left.income >= cap && right.income >= cap) {
         m.level = (m.level || 1) + 1;
       } else {
         passToChildren(m, extra);
       }
 
-    } else {
-      m.income = total;
+      return;
     }
 
+    m.income = total;
   });
 
   window.companyProfit = companyProfit;
