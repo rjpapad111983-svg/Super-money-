@@ -71,20 +71,76 @@ function countTeam(id) {
   return 1 + countTeam(m.left) + countTeam(m.right);
 }
 
+// ===== LEVEL CAP =====
+function getCap(level) {
+  if (level === 1) return 180;
+  if (level === 2) return 200;
+  if (level === 3) return 250;
+  if (level === 4) return 300;
+  if (level === 5) return 500;
+  if (level === 6) return 1000;
+  return 1000;
+}
+
+// ===== PASS DOWN =====
+function passToChildren(member, amount) {
+
+  const left = members.find(x => x.id === member.left);
+  const right = members.find(x => x.id === member.right);
+
+  let half = amount / 2;
+
+  if (left) left.income += half;
+  if (right) right.income += half;
+}
+
 // ===== CALCULATION =====
 function calculateAll() {
 
+  // RESET
   members.forEach(m => {
+    m.income = 0;
+    m.pairs = 0;
+  });
+
+  members.forEach(m => {
+
     let left = countTeam(m.left);
     let right = countTeam(m.right);
 
     m.pairs = Math.min(left, right);
-    m.income = m.pairs * 3;
+
+    let earning = m.pairs * 3;
+
+    // SUB MEMBER (no cap)
+    if (m.isSub) {
+      m.income += earning;
+      return;
+    }
+
+    let cap = getCap(m.level || 1);
+
+    let total = m.income + earning;
+
+    // CAP HIT
+    if (total > cap) {
+
+      let extra = total - cap;
+
+      m.income = cap;
+
+      // नीचे distribute
+      passToChildren(m, extra);
+
+    } else {
+      m.income = total;
+    }
+
   });
 
 }
 
-// ===== TREE RENDER =====
+// ===== TREE =====
 function renderTree() {
 
   const tree = document.getElementById("tree");
@@ -196,7 +252,17 @@ function deleteMember(id) {
     return;
   }
 
-  members = members.filter(m => m.id !== id);
+  function removeTree(mid) {
+    const m = members.find(x => x.id === mid);
+    if (!m) return;
+
+    if (m.left) removeTree(m.left);
+    if (m.right) removeTree(m.right);
+
+    members = members.filter(x => x.id !== mid);
+  }
+
+  removeTree(id);
 
   members.forEach(m => {
     if (m.left === id) m.left = 0;
@@ -208,7 +274,7 @@ function deleteMember(id) {
   renderAll();
 }
 
-// ===== MAIN RENDER =====
+// ===== RENDER ALL =====
 function renderAll() {
   renderTree();
   renderMembers();
