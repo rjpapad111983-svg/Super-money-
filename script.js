@@ -55,7 +55,8 @@ function addMember(parentId, side) {
     right: 0,
     parent: parentId,
     pairs: 0,
-    income: 0
+    level: 1,
+  
   };
 
   // 🔥 STEP 1: old child save karo
@@ -157,10 +158,77 @@ function calculateAll() {
     let leftCount = m.left ? countTeam(m.left) : 0;
     let rightCount = m.right ? countTeam(m.right) : 0;
 
+  const MAX_CAP = 1000;
+
+function getCap(level) {
+  if (level === 1) return 180;
+  if (level === 2) return 200;
+  if (level === 3) return 250;
+  if (level === 4) return 300;
+  if (level === 5) return 500;
+  if (level === 6) return 1000;
+  return 1000;
+}
+
+function passToChildren(member, amount) {
+  let left = members.find(x => x.id === member.left);
+  let right = members.find(x => x.id === member.right);
+
+  let half = amount / 2;
+
+  if (left && left.income < MAX_CAP) left.income += half;
+  if (right && right.income < MAX_CAP) right.income += half;
+}
+
+function calculateAll() {
+
+  let companyProfit = 0;
+
+  members.forEach(m => {
+
+    let leftCount = m.left ? countTeam(m.left) : 0;
+    let rightCount = m.right ? countTeam(m.right) : 0;
+
     m.pairs = Math.min(leftCount, rightCount);
 
-    // ₹3 per pair
-    m.income = m.pairs * 3;
+    let earning = m.pairs * 3;
+
+    let cap = getCap(m.level || 1);
+
+    if (m.income >= MAX_CAP) return;
+
+    let total = m.income + earning;
+
+    if (total > MAX_CAP) {
+      let extra = total - MAX_CAP;
+      m.income = MAX_CAP;
+      companyProfit += extra;
+      return;
+    }
+
+    if (total >= cap) {
+
+      let extra = total - cap;
+      m.income = cap;
+
+      const left = members.find(x => x.id === m.left);
+      const right = members.find(x => x.id === m.right);
+
+      if (left && right && left.income >= cap && right.income >= cap) {
+        m.level = (m.level || 1) + 1;
+      } else {
+        passToChildren(m, extra);
+        return;
+      }
+
+    } else {
+      m.income = total;
+    }
+
+  });
+
+  window.companyProfit = companyProfit;
+}
 
   });
 }
@@ -259,7 +327,7 @@ function renderDashboard() {
   const totalCollection = members.length * 10; // ₹10 per member
   const profit = totalCollection - totalIncomeValue;
 
-  companyProfit.innerText = profit;
+  companyProfit.innerText = window.companyProfit || 0;
 }
 
 // ===== RENDER ALL =====
