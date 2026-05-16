@@ -193,10 +193,16 @@ function renderTree() {
     return `
     <li>
       <div class="node-card">
-        <b>${m.name}</b><br>
-        Pair: ${m.pairs}<br>
-        ₹${m.income}
-      </div>
+  <b>${m.name}</b><br>
+  Pair: ${m.pairs}<br>
+  ₹${m.income}<br><br>
+
+  <button onclick="addMember(${m.id}, 'left')">L+</button>
+  <button onclick="addMember(${m.id}, 'right')">R+</button><br>
+
+  <button onclick="editMember(${m.id})">Edit</button>
+  <button onclick="deleteMember(${m.id})">Delete</button>
+</div>
 
       <ul>
         ${m.left ? build(map[m.left]) : ""}
@@ -262,4 +268,36 @@ function renderAll() {
   renderTree();
   renderMembers();
   renderDashboard();
+}
+function editMember(id) {
+  const m = members.find(x => x.id === id);
+  if (!m) return;
+
+  const name = prompt("Edit name", m.name);
+  if (!name) return;
+
+  m.name = name;
+  saveData();
+  renderAll();
+}
+
+function deleteMember(id) {
+  if (id === 1) {
+    alert("Root delete nahi kar sakte");
+    return;
+  }
+
+  function removeTree(mid) {
+    const m = members.find(x => x.id === mid);
+    if (!m) return;
+
+    if (m.left) removeTree(m.left);
+    if (m.right) removeTree(m.right);
+
+    members = members.filter(x => x.id !== mid);
+  }
+
+  removeTree(id);
+  saveData();
+  renderAll();
 }
