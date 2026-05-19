@@ -46,7 +46,7 @@ function addMember(parentId, side) {
     parent: parentId,
     pairs: 0,
     income: 0,
-    level: parent.level + 1,
+    level: 1,
     isSub: name.toLowerCase().includes("sub")
   };
 
@@ -65,7 +65,6 @@ function countTeam(id) {
   if (!id) return 0;
   const m = members.find(x => x.id === id);
   if (!m) return 0;
-
   return 1 + countTeam(m.left) + countTeam(m.right);
 }
 
@@ -82,21 +81,38 @@ function getCap(level) {
 
 // ===== PASS DOWN =====
 function passToChildren(member, amount) {
-  if (amount <= 0) return;
 
-  const left = members.find(x => x.id === member.left);
-  const right = members.find(x => x.id === member.right);
+  let left = members.find(x => x.id === member.left);
+  let right = members.find(x => x.id === member.right);
 
-  let half = amount / 2;
+  let distributed = 0;
 
-  if (left) left.income += half;
-  if (right) right.income += half;
+  if (left && right) {
+    let half = amount / 2;
+    left.income += half;
+    right.income += half;
+    distributed = amount;
+  }
+  else if (left) {
+    left.income += amount;
+    distributed = amount;
+  }
+  else if (right) {
+    right.income += amount;
+    distributed = amount;
+  }
+
+  // remaining → company
+  let remaining = amount - distributed;
+  if (remaining > 0) {
+    window.companyProfit += remaining;
+  }
 }
 
-// ===== CALCULATION =====
+// ===== MAIN CALCULATION =====
 function calculateAll() {
 
-  let companyProfit = 0;
+  window.companyProfit = 0;
 
   // RESET
   members.forEach(m => {
@@ -106,40 +122,52 @@ function calculateAll() {
 
   members.forEach(m => {
 
-    let left = countTeam(m.left);
-    let right = countTeam(m.right);
+    let leftCount = countTeam(m.left);
+    let rightCount = countTeam(m.right);
 
-    m.pairs = Math.min(left, right);
+    m.pairs = Math.min(leftCount, rightCount);
 
-    let earning = m.pairs * 3;
+    // 🔥 BUSINESS
+    let totalBusiness = m.pairs * 10;
 
-    // SUB MEMBER → FULL INCOME
+    // 🔥 MEMBER INCOME
+    let memberIncome = m.pairs * 3;
+
+    // 🔥 COMPANY CUT
+    let companyCut = m.pairs * 7;
+
+    // SUB MEMBER
     if (m.isSub) {
-      m.income = earning;
+      m.income = memberIncome;
+      window.companyProfit += companyCut;
       return;
     }
 
     let cap = getCap(m.level);
 
-    // 🔥 HARD CAP
-    if (earning >= cap) {
-      m.income = cap;
-      let extra = earning - cap;
+    if (memberIncome > cap) {
 
-      if (extra > 0) {
-        passToChildren(m, extra);
-      }
+      let extra = memberIncome - cap;
+
+      m.income = cap;
+
+      // overflow नीचे
+      passToChildren(m, extra);
+
     } else {
-      m.income = earning;
+      m.income = memberIncome;
     }
+
+    // company profit
+    window.companyProfit += companyCut;
 
   });
 
-  window.companyProfit = companyProfit;
 }
 
 // ===== TREE =====
 function renderTree() {
+
   const tree = document.getElementById("tree");
   if (!tree) return;
 
@@ -181,6 +209,7 @@ function renderTree() {
 
 // ===== MEMBERS TABLE =====
 function renderMembers() {
+
   const table = document.getElementById("membersTable");
   if (!table) return;
 
@@ -210,6 +239,7 @@ function renderMembers() {
 
 // ===== DASHBOARD =====
 function renderDashboard() {
+
   document.getElementById("totalMembers").innerText = members.length;
 
   let pairs = members.reduce((a, b) => a + b.pairs, 0);
@@ -236,12 +266,23 @@ function editMember(id) {
 
 // ===== DELETE =====
 function deleteMember(id) {
+
   if (id === 1) {
     alert("Root delete nahi kar sakte");
     return;
   }
 
-  members = members.filter(m => m.id !== id);
+  function removeTree(mid) {
+    const m = members.find(x => x.id === mid);
+    if (!m) return;
+
+    if (m.left) removeTree(m.left);
+    if (m.right) removeTree(m.right);
+
+    members = members.filter(x => x.id !== mid);
+  }
+
+  removeTree(id);
 
   members.forEach(m => {
     if (m.left === id) m.left = 0;
@@ -253,9 +294,9 @@ function deleteMember(id) {
   renderAll();
 }
 
-// ===== MAIN RENDER =====
+// ===== RENDER ALL =====
 function renderAll() {
   renderTree();
   renderMembers();
   renderDashboard();
-}
+  }
