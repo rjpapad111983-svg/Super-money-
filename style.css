@@ -40,21 +40,31 @@ body {
 .main {
   flex: 1;
   padding: 20px;
-  overflow-x: auto;
+  overflow-x: auto; /* 🔥 IMPORTANT FIX */
+}
+
+/* ===== TREE CONTAINER ===== */
+#tree {
+  width: max-content;   /* 🔥 full width */
+  min-width: 100%;
 }
 
 /* ===== TREE ===== */
 .mlm-tree {
+  display: flex;
+  justify-content: center;
   text-align: center;
 }
 
+/* children row */
 .mlm-tree ul {
-  padding-top: 20px;
-  position: relative;
   display: flex;
   justify-content: center;
+  padding-top: 20px;
+  position: relative;
 }
 
+/* node */
 .mlm-tree li {
   list-style: none;
   text-align: center;
@@ -89,10 +99,6 @@ body {
   display: none;
 }
 
-.mlm-tree li:only-child {
-  padding-top: 0;
-}
-
 .mlm-tree li:first-child::before {
   border: none;
 }
@@ -102,7 +108,7 @@ body {
 }
 
 /* vertical line */
-.mlm-tree ul ul::before {
+.mlm-tree ul::before {
   content: '';
   position: absolute;
   top: 0;
@@ -119,6 +125,7 @@ body {
   background: #063f3f;
   border: 2px solid #00e6b8;
   min-width: 120px;
+  white-space: nowrap;
 }
 
 .node-card b {
@@ -162,7 +169,7 @@ td {
   background: #014d4d;
 }
 
-/* ===== MOBILE FIX ===== */
+/* ===== MOBILE ===== */
 @media (max-width: 768px) {
 
   body {
@@ -187,7 +194,7 @@ td {
 
   .mlm-tree li::before,
   .mlm-tree li::after,
-  .mlm-tree ul ul::before {
+  .mlm-tree ul::before {
     display: none;
   }
 }
