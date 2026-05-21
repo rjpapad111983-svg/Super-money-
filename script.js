@@ -71,7 +71,7 @@ function countTeam(id) {
     return 1 + countTeam(m.left) + countTeam(m.right);
 }
 
-// ===== LEVEL CAP =====
+// ===== CAP =====
 function getCap(level) {
     if (level === 1) return 180;
     if (level === 2) return 200;
@@ -81,7 +81,7 @@ function getCap(level) {
     return 1000;
 }
 
-// ===== PASS DOWN (FIXED) =====
+// ===== PASS DOWN =====
 function passToChildren(member, amount) {
     let left = members.find(x => x.id === member.left);
     let right = members.find(x => x.id === member.right);
@@ -90,23 +90,18 @@ function passToChildren(member, amount) {
 
     if (left && right) {
         let half = amount / 2;
-
         left.extraIncome += half;
         right.extraIncome += half;
-
         distributed = amount;
-    }
-    else if (left) {
+    } else if (left) {
         left.extraIncome += amount;
         distributed = amount;
-    }
-    else if (right) {
+    } else if (right) {
         right.extraIncome += amount;
         distributed = amount;
     }
 
     let remaining = amount - distributed;
-
     if (remaining > 0) {
         window.companyProfit += remaining;
     }
@@ -126,13 +121,13 @@ function calculateAll() {
 
     members.forEach(m => {
 
-        let leftCount = countTeam(m.left);
-        let rightCount = countTeam(m.right);
+        let left = countTeam(m.left);
+        let right = countTeam(m.right);
 
-        m.pairs = Math.min(leftCount, rightCount);
+        m.pairs = Math.min(left, right);
 
-        let memberIncome = m.pairs * 3;   // user earning
-        let companyCut = m.pairs * 7;     // company earning
+        let memberIncome = m.pairs * 3;
+        let companyCut = m.pairs * 7;
 
         // SUB MEMBER
         if (m.isSub) {
@@ -146,7 +141,6 @@ function calculateAll() {
         if (memberIncome > cap) {
             let extra = memberIncome - cap;
             m.income = cap;
-
             passToChildren(m, extra);
         } else {
             m.income = memberIncome;
@@ -155,15 +149,31 @@ function calculateAll() {
         window.companyProfit += companyCut;
     });
 
-    // FINAL MERGE (overflow add)
+    // 🔥 FINAL FIX (CAP SAFE MERGE)
     members.forEach(m => {
-        if (m.extraIncome) {
-            m.income += m.extraIncome;
+
+        if (m.extraIncome > 0) {
+
+            let cap = getCap(m.level);
+
+            if (m.income + m.extraIncome > cap) {
+
+                let overflow = (m.income + m.extraIncome) - cap;
+
+                m.income = cap;
+
+                // overflow company ko
+                window.companyProfit += overflow;
+
+            } else {
+                m.income += m.extraIncome;
+            }
         }
+
     });
 }
 
-// ===== DELETE FULL TREE =====
+// ===== DELETE =====
 function deleteMember(id) {
 
     if (id === 1) {
@@ -253,9 +263,7 @@ function renderMembers() {
             <td>${right}</td>
             <td>${m.pairs}</td>
             <td>₹${m.income}</td>
-            <td>
-                <button onclick="deleteMember(${m.id})">Delete</button>
-            </td>
+            <td><button onclick="deleteMember(${m.id})">Delete</button></td>
         </tr>
         `;
     });
@@ -274,9 +282,9 @@ function renderDashboard() {
     document.getElementById("companyProfit").innerText = window.companyProfit;
 }
 
-// ===== RENDER ALL =====
+// ===== RENDER =====
 function renderAll() {
     renderTree();
     renderMembers();
     renderDashboard();
-}
+            }
