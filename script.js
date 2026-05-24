@@ -31,7 +31,8 @@ function saveData() {
 
 // ===== ADD MEMBER =====
 function addMember(parentId, side) {
-    const parent = members.find(m => m.id == parentId);
+
+    const parent = members.find(m => m.id === parentId);
     if (!parent) return;
 
     const name = prompt("Enter member name");
@@ -62,15 +63,16 @@ function addMember(parentId, side) {
     renderAll();
 }
 
-// ===== EDIT MEMBER =====
+// ===== EDIT =====
 function editMember(id) {
-    const m = members.find(x => x.id == id);
+    const m = members.find(x => x.id === id);
     if (!m) return;
 
     const name = prompt("Edit name", m.name);
     if (!name) return;
 
     m.name = name;
+    m.isSub = name.toLowerCase().includes("sub");
 
     saveData();
     renderAll();
@@ -80,7 +82,7 @@ function editMember(id) {
 function countTeam(id) {
     if (!id) return 0;
 
-    const m = members.find(x => x.id == id);
+    const m = members.find(x => x.id === id);
     if (!m) return 0;
 
     return 1 + countTeam(m.left) + countTeam(m.right);
@@ -88,19 +90,19 @@ function countTeam(id) {
 
 // ===== CAP =====
 function getCap(level) {
-    if (level == 1) return 180;
-    if (level == 2) return 200;
-    if (level == 3) return 250;
-    if (level == 4) return 300;
-    if (level == 5) return 500;
+    if (level === 1) return 180;
+    if (level === 2) return 200;
+    if (level === 3) return 250;
+    if (level === 4) return 300;
+    if (level === 5) return 500;
     return 1000;
 }
 
 // ===== PASS DOWN =====
 function passToChildren(member, amount) {
 
-    let left = members.find(x => x.id == member.left);
-    let right = members.find(x => x.id == member.right);
+    let left = members.find(x => x.id === member.left);
+    let right = members.find(x => x.id === member.right);
 
     let distributed = 0;
 
@@ -109,12 +111,10 @@ function passToChildren(member, amount) {
         left.extraIncome += half;
         right.extraIncome += half;
         distributed = amount;
-    }
-    else if (left) {
+    } else if (left) {
         left.extraIncome += amount;
         distributed = amount;
-    }
-    else if (right) {
+    } else if (right) {
         right.extraIncome += amount;
         distributed = amount;
     }
@@ -134,14 +134,14 @@ function calculateAll() {
 
     window.companyProfit = 0;
 
-    // reset
+    // RESET
     members.forEach(m => {
         m.income = 0;
         m.pairs = 0;
         m.extraIncome = 0;
     });
 
-    // STEP 1
+    // STEP 1: PAIR INCOME
     members.forEach(m => {
 
         let leftCount = countTeam(m.left);
@@ -150,34 +150,50 @@ function calculateAll() {
         m.pairs = Math.min(leftCount, rightCount);
 
         let income = m.pairs * 3;
+
+        // SUB = NO CAP
+        if (m.isSub) {
+            m.income = income;
+            totalPayout += income;
+            return;
+        }
+
+        // MAIN = CAP
         let cap = getCap(m.level);
 
         if (income > cap) {
             let extra = income - cap;
-            income = cap;
+            m.income = cap;
             passToChildren(m, extra);
+        } else {
+            m.income = income;
         }
 
-        m.income = income;
-        totalPayout += income;
+        totalPayout += m.income;
     });
 
-    // STEP 2 (EXTRA INCOME ADD)
+    // STEP 2: EXTRA ADD
     members.forEach(m => {
-        if (m.extraIncome > 0) {
-            let cap = getCap(m.level);
 
-            if (m.income + m.extraIncome > cap) {
-                let overflow = (m.income + m.extraIncome) - cap;
-                m.income = cap;
-                window.companyProfit += overflow;
-            } else {
-                m.income += m.extraIncome;
-            }
+        let total = m.income + (m.extraIncome || 0);
+
+        if (m.isSub) {
+            m.income = total;
+            return;
+        }
+
+        let cap = getCap(m.level);
+
+        if (total > cap) {
+            let overflow = total - cap;
+            m.income = cap;
+            window.companyProfit += overflow;
+        } else {
+            m.income = total;
         }
     });
 
-    // STEP 3 (FINAL SAFETY)
+    // STEP 3: SAFETY
     if (totalPayout > totalCollection) {
 
         let ratio = totalCollection / totalPayout;
@@ -189,32 +205,32 @@ function calculateAll() {
         totalPayout = members.reduce((a, b) => a + b.income, 0);
     }
 
-    window.companyProfit = totalCollection - totalPayout;
+    window.companyProfit += (totalCollection - totalPayout);
 }
 
 // ===== DELETE =====
 function deleteMember(id) {
 
-    if (id == 1) {
+    if (id === 1) {
         alert("Root delete nahi kar sakte");
         return;
     }
 
     function removeTree(mid) {
-        const m = members.find(x => x.id == mid);
+        const m = members.find(x => x.id === mid);
         if (!m) return;
 
         if (m.left) removeTree(m.left);
         if (m.right) removeTree(m.right);
 
-        members = members.filter(x => x.id != mid);
+        members = members.filter(x => x.id !== mid);
     }
 
     removeTree(id);
 
     members.forEach(m => {
-        if (m.left == id) m.left = 0;
-        if (m.right == id) m.right = 0;
+        if (m.left === id) m.left = 0;
+        if (m.right === id) m.right = 0;
     });
 
     saveData();
@@ -222,7 +238,7 @@ function deleteMember(id) {
     renderAll();
 }
 
-// ===== TREE =====
+// ===== RENDER TREE =====
 function renderTree() {
 
     const tree = document.getElementById("tree");
