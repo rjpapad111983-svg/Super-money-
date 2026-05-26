@@ -3,6 +3,7 @@ let members = JSON.parse(localStorage.getItem("members")) || [];
 
 // ===== INIT =====
 document.addEventListener("DOMContentLoaded", () => {
+
     if (members.length === 0) {
         members.push({
             id: 1,
@@ -139,7 +140,7 @@ function calculateAll() {
         m.extraIncome = 0;
     });
 
-    // ===== STEP 1 (PAIR INCOME + CAP) =====
+    // STEP 1 (PAIR)
     members.forEach(m => {
 
         let leftCount = countTeam(m.left);
@@ -149,7 +150,6 @@ function calculateAll() {
 
         let income = m.pairs * 3;
 
-        // 👉 SUB = NO CAP
         if (m.isSub) {
             m.income = income;
             totalPayout += income;
@@ -168,7 +168,7 @@ function calculateAll() {
         totalPayout += income;
     });
 
-    // ===== STEP 2 (EXTRA ADD + FINAL CAP) =====
+    // STEP 2 (EXTRA)
     members.forEach(m => {
 
         let total = m.income + (m.extraIncome || 0);
@@ -189,7 +189,7 @@ function calculateAll() {
         }
     });
 
-    // ===== STEP 3 (SAFETY) =====
+    // SAFETY
     if (totalPayout > totalCollection) {
 
         let ratio = totalCollection / totalPayout;
@@ -231,4 +231,97 @@ function deleteMember(id) {
     saveData();
     calculateAll();
     renderAll();
+}
+
+// ===== TREE =====
+function renderTree() {
+
+    const tree = document.getElementById("tree");
+    if (!tree) return;
+
+    tree.innerHTML = "";
+
+    const map = {};
+    members.forEach(m => map[m.id] = m);
+
+    function build(m) {
+        if (!m) return "";
+
+        return `
+        <li>
+            <div class="node-card">
+                <b>${m.name}</b><br>
+                Pair: ${m.pairs}<br>
+                ₹${m.income}<br>
+
+                <button onclick="addMember(${m.id}, 'left')">L+</button>
+                <button onclick="addMember(${m.id}, 'right')">R+</button>
+
+                <button onclick="editMember(${m.id})">Edit</button>
+                <button onclick="deleteMember(${m.id})">Delete</button>
+            </div>
+
+            ${(m.left || m.right) ? `
+            <ul>
+                ${m.left ? build(map[m.left]) : "<li></li>"}
+                ${m.right ? build(map[m.right]) : "<li></li>"}
+            </ul>` : ""}
+        </li>`;
+    }
+
+    // 🔥 FIXED ROOT
+    const root = members.find(m => m.parent === 0);
+
+    if (root) {
+        tree.innerHTML = `<ul class="mlm-tree">${build(root)}</ul>`;
+    }
+}
+
+// ===== MEMBERS =====
+function renderMembers() {
+
+    const table = document.getElementById("membersTable");
+    if (!table) return;
+
+    table.innerHTML = "";
+
+    members.forEach(m => {
+
+        let left = countTeam(m.left);
+        let right = countTeam(m.right);
+
+        table.innerHTML += `
+        <tr>
+            <td>${m.name}</td>
+            <td>${m.id}</td>
+            <td>${left}</td>
+            <td>${right}</td>
+            <td>${m.pairs}</td>
+            <td>₹${m.income}</td>
+            <td>
+                <button onclick="editMember(${m.id})">Edit</button>
+                <button onclick="deleteMember(${m.id})">Delete</button>
+            </td>
+        </tr>`;
+    });
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+
+    document.getElementById("totalMembers").innerText = members.length;
+
+    let pairs = members.reduce((a, b) => a + b.pairs, 0);
+    let income = members.reduce((a, b) => a + b.income, 0);
+
+    document.getElementById("totalPairs").innerText = pairs;
+    document.getElementById("totalIncome").innerText = "₹" + income;
+    document.getElementById("companyProfit").innerText = "₹" + window.companyProfit;
+}
+
+// ===== RENDER ALL =====
+function renderAll() {
+    renderTree();
+    renderMembers();
+    renderDashboard();
 }
