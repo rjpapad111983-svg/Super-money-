@@ -3,7 +3,6 @@ let members = JSON.parse(localStorage.getItem("members")) || [];
 
 // ===== INIT =====
 document.addEventListener("DOMContentLoaded", () => {
-
     if (members.length === 0) {
         members.push({
             id: 1,
@@ -31,7 +30,6 @@ function saveData() {
 
 // ===== ADD MEMBER =====
 function addMember(parentId, side) {
-
     const parent = members.find(m => m.id === parentId);
     if (!parent) return;
 
@@ -75,6 +73,7 @@ function editMember(id) {
     m.isSub = name.toLowerCase().includes("sub");
 
     saveData();
+    calculateAll();
     renderAll();
 }
 
@@ -100,7 +99,6 @@ function getCap(level) {
 
 // ===== PASS DOWN =====
 function passToChildren(member, amount) {
-
     let left = members.find(x => x.id === member.left);
     let right = members.find(x => x.id === member.right);
 
@@ -141,7 +139,7 @@ function calculateAll() {
         m.extraIncome = 0;
     });
 
-    // STEP 1: PAIR INCOME
+    // ===== STEP 1 (PAIR INCOME + CAP) =====
     members.forEach(m => {
 
         let leftCount = countTeam(m.left);
@@ -151,28 +149,26 @@ function calculateAll() {
 
         let income = m.pairs * 3;
 
-        // SUB = NO CAP
+        // 👉 SUB = NO CAP
         if (m.isSub) {
             m.income = income;
             totalPayout += income;
             return;
         }
 
-        // MAIN = CAP
         let cap = getCap(m.level);
 
         if (income > cap) {
             let extra = income - cap;
-            m.income = cap;
+            income = cap;
             passToChildren(m, extra);
-        } else {
-            m.income = income;
         }
 
-        totalPayout += m.income;
+        m.income = income;
+        totalPayout += income;
     });
 
-    // STEP 2: EXTRA ADD
+    // ===== STEP 2 (EXTRA ADD + FINAL CAP) =====
     members.forEach(m => {
 
         let total = m.income + (m.extraIncome || 0);
@@ -193,7 +189,7 @@ function calculateAll() {
         }
     });
 
-    // STEP 3: SAFETY
+    // ===== STEP 3 (SAFETY) =====
     if (totalPayout > totalCollection) {
 
         let ratio = totalCollection / totalPayout;
@@ -210,7 +206,6 @@ function calculateAll() {
 
 // ===== DELETE =====
 function deleteMember(id) {
-
     if (id === 1) {
         alert("Root delete nahi kar sakte");
         return;
@@ -236,94 +231,4 @@ function deleteMember(id) {
     saveData();
     calculateAll();
     renderAll();
-}
-
-// ===== RENDER TREE =====
-function renderTree() {
-
-    const tree = document.getElementById("tree");
-    if (!tree) return;
-
-    tree.innerHTML = "";
-
-    const map = {};
-    members.forEach(m => map[m.id] = m);
-
-    function build(m) {
-        if (!m) return "";
-
-        return `
-        <li>
-            <div class="node-card">
-                <b>${m.name}</b><br>
-                Pair: ${m.pairs}<br>
-                ₹${m.income}<br>
-
-                <button onclick="addMember(${m.id}, 'left')">L+</button>
-                <button onclick="addMember(${m.id}, 'right')">R+</button>
-
-                <button onclick="editMember(${m.id})">Edit</button>
-                <button onclick="deleteMember(${m.id})">Delete</button>
-            </div>
-
-            ${(m.left || m.right) ? `
-            <ul>
-                ${m.left ? build(map[m.left]) : ""}
-                ${m.right ? build(map[m.right]) : ""}
-            </ul>` : ""}
-        </li>`;
-    }
-
-    if (members.length > 0) {
-        tree.innerHTML = `<ul class="mlm-tree">${build(members[0])}</ul>`;
-    }
-}
-
-// ===== MEMBERS TABLE =====
-function renderMembers() {
-
-    const table = document.getElementById("membersTable");
-    if (!table) return;
-
-    table.innerHTML = "";
-
-    members.forEach(m => {
-
-        let left = countTeam(m.left);
-        let right = countTeam(m.right);
-
-        table.innerHTML += `
-        <tr>
-            <td>${m.name}</td>
-            <td>${m.id}</td>
-            <td>${left}</td>
-            <td>${right}</td>
-            <td>${m.pairs}</td>
-            <td>₹${m.income}</td>
-            <td>
-                <button onclick="editMember(${m.id})">Edit</button>
-                <button onclick="deleteMember(${m.id})">Delete</button>
-            </td>
-        </tr>`;
-    });
-}
-
-// ===== DASHBOARD =====
-function renderDashboard() {
-
-    document.getElementById("totalMembers").innerText = members.length;
-
-    let pairs = members.reduce((a, b) => a + b.pairs, 0);
-    let income = members.reduce((a, b) => a + b.income, 0);
-
-    document.getElementById("totalPairs").innerText = pairs;
-    document.getElementById("totalIncome").innerText = "₹" + income;
-    document.getElementById("companyProfit").innerText = "₹" + window.companyProfit;
-}
-
-// ===== RENDER ALL =====
-function renderAll() {
-    renderTree();
-    renderMembers();
-    renderDashboard();
 }
