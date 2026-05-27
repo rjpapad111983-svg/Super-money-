@@ -3,7 +3,6 @@ let members = JSON.parse(localStorage.getItem("members")) || [];
 
 // ===== INIT =====
 document.addEventListener("DOMContentLoaded", () => {
-
     if (members.length === 0) {
         members.push({
             id: 1,
@@ -130,7 +129,6 @@ function calculateAll() {
 
     let totalCollection = members.length * 10;
     let totalPayout = 0;
-
     window.companyProfit = 0;
 
     // RESET
@@ -140,7 +138,7 @@ function calculateAll() {
         m.extraIncome = 0;
     });
 
-    // STEP 1 (PAIR)
+    // STEP 1 (PAIR INCOME)
     members.forEach(m => {
 
         let leftCount = countTeam(m.left);
@@ -150,29 +148,33 @@ function calculateAll() {
 
         let income = m.pairs * 3;
 
+        // 👉 SUB = NO CAP
         if (m.isSub) {
             m.income = income;
             totalPayout += income;
             return;
         }
 
+        // 👉 MAIN = CAP
         let cap = getCap(m.level);
 
         if (income > cap) {
             let extra = income - cap;
-            income = cap;
+            m.income = cap;
             passToChildren(m, extra);
+        } else {
+            m.income = income;
         }
 
-        m.income = income;
-        totalPayout += income;
+        totalPayout += m.income;
     });
 
-    // STEP 2 (EXTRA)
+    // STEP 2 (EXTRA INCOME ADD + FINAL CAP)
     members.forEach(m => {
 
         let total = m.income + (m.extraIncome || 0);
 
+        // 👉 SUB = NO CAP
         if (m.isSub) {
             m.income = total;
             return;
@@ -180,6 +182,7 @@ function calculateAll() {
 
         let cap = getCap(m.level);
 
+        // 👉 FINAL CAP FIX (IMPORTANT)
         if (total > cap) {
             let overflow = total - cap;
             m.income = cap;
@@ -191,7 +194,6 @@ function calculateAll() {
 
     // SAFETY
     if (totalPayout > totalCollection) {
-
         let ratio = totalCollection / totalPayout;
 
         members.forEach(m => {
@@ -235,7 +237,6 @@ function deleteMember(id) {
 
 // ===== TREE =====
 function renderTree() {
-
     const tree = document.getElementById("tree");
     if (!tree) return;
 
@@ -256,20 +257,19 @@ function renderTree() {
 
                 <button onclick="addMember(${m.id}, 'left')">L+</button>
                 <button onclick="addMember(${m.id}, 'right')">R+</button>
-
                 <button onclick="editMember(${m.id})">Edit</button>
                 <button onclick="deleteMember(${m.id})">Delete</button>
             </div>
 
             ${(m.left || m.right) ? `
             <ul>
-                ${m.left ? build(map[m.left]) : "<li></li>"}
-                ${m.right ? build(map[m.right]) : "<li></li>"}
+                ${m.left ? build(map[m.left]) : ""}
+                ${m.right ? build(map[m.right]) : ""}
             </ul>` : ""}
-        </li>`;
+        </li>
+        `;
     }
 
-    // 🔥 FIXED ROOT
     const root = members.find(m => m.parent === 0);
 
     if (root) {
@@ -279,7 +279,6 @@ function renderTree() {
 
 // ===== MEMBERS =====
 function renderMembers() {
-
     const table = document.getElementById("membersTable");
     if (!table) return;
 
@@ -297,7 +296,7 @@ function renderMembers() {
             <td>${left}</td>
             <td>${right}</td>
             <td>${m.pairs}</td>
-            <td>₹${m.income}</td>
+            <td>${m.income}</td>
             <td>
                 <button onclick="editMember(${m.id})">Edit</button>
                 <button onclick="deleteMember(${m.id})">Delete</button>
@@ -308,7 +307,6 @@ function renderMembers() {
 
 // ===== DASHBOARD =====
 function renderDashboard() {
-
     document.getElementById("totalMembers").innerText = members.length;
 
     let pairs = members.reduce((a, b) => a + b.pairs, 0);
@@ -324,4 +322,4 @@ function renderAll() {
     renderTree();
     renderMembers();
     renderDashboard();
-}
+                    }
