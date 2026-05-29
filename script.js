@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     calculateAll();
-    renderAll();
+    renderTree();
 });
 
 // ===== SAVE =====
@@ -58,7 +58,7 @@ function addMember(parentId, side) {
 
     saveData();
     calculateAll();
-    renderAll();
+    renderTree();
 }
 
 // ===== COUNT TEAM =====
@@ -81,11 +81,9 @@ function getCap(level) {
 
 // ===== DYNAMIC LEVEL =====
 function getDynamicLevel(m) {
-
     let level = 1;
 
     while (true) {
-
         let cap = getCap(level);
 
         let leftIncome = countTeam(m.left) * 3;
@@ -93,9 +91,7 @@ function getDynamicLevel(m) {
 
         if (leftIncome >= cap && rightIncome >= cap) {
             level++;
-        } else {
-            break;
-        }
+        } else break;
     }
 
     return level;
@@ -114,15 +110,11 @@ function passToChildren(member, amount) {
         left.extraIncome += amount;
     } else if (right) {
         right.extraIncome += amount;
-    } else {
-        window.companyProfit += amount;
     }
 }
 
-// ===== MAIN CALCULATION =====
+// ===== CALCULATION =====
 function calculateAll() {
-
-    window.companyProfit = 0;
 
     members.forEach(m => {
         m.income = 0;
@@ -130,7 +122,6 @@ function calculateAll() {
         m.pairs = 0;
     });
 
-    // STEP 1
     members.forEach(m => {
 
         let level = getDynamicLevel(m);
@@ -143,7 +134,6 @@ function calculateAll() {
         let income = m.pairs * 3;
 
         if (!m.isSub) {
-
             let cap = getCap(level);
 
             if (income > cap) {
@@ -156,27 +146,20 @@ function calculateAll() {
         m.income = income;
     });
 
-    // STEP 2 (FINAL CAP)
+    // FINAL CAP
     members.forEach(m => {
-
-        let total = m.income + (m.extraIncome || 0);
+        let total = m.income + m.extraIncome;
 
         if (!m.isSub) {
-            let level = getDynamicLevel(m);
-            let cap = getCap(level);
-
+            let cap = getCap(getDynamicLevel(m));
             m.income = Math.min(total, cap);
-
-            if (total > cap) {
-                window.companyProfit += (total - cap);
-            }
         } else {
             m.income = total;
         }
     });
 }
 
-// ===== TREE =====
+// ===== TREE RENDER =====
 function renderTree() {
 
     const tree = document.getElementById("tree");
@@ -201,22 +184,16 @@ function renderTree() {
                 <button onclick="addMember(${m.id}, 'right')">R+</button>
             </div>
 
-            ${(m.left || m.right) ? `
             <ul>
-                ${m.left ? build(map[m.left]) : ""}
-                ${m.right ? build(map[m.right]) : ""}
-            </ul>` : ""}
+                ${m.left ? build(map[m.left]) : '<li><div class="empty"></div></li>'}
+                ${m.right ? build(map[m.right]) : '<li><div class="empty"></div></li>'}
+            </ul>
         </li>`;
     }
 
     const root = members.find(m => m.parent === 0);
 
     if (root) {
-        tree.innerHTML = `<ul>${build(root)}</ul>`;
+        tree.innerHTML = `<ul class="mlm-tree">${build(root)}</ul>`;
     }
-}
-
-// ===== RENDER =====
-function renderAll() {
-    renderTree();
 }
