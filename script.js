@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
             parent: 0,
             pairs: 0,
             income: 0,
-            extraIncome: 0,
             isSub: false
         });
         saveData();
@@ -34,7 +33,10 @@ function addMember(parentId, side) {
     const parent = members.find(m => m.id === parentId);
     if (!parent) return;
 
-    const name = prompt("Enter member name");
+    if (side === "left" && parent.left) return alert("Left filled");
+    if (side === "right" && parent.right) return alert("Right filled");
+
+    const name = prompt("Enter name");
     if (!name) return;
 
     const id = Date.now();
@@ -47,7 +49,6 @@ function addMember(parentId, side) {
         parent: parentId,
         pairs: 0,
         income: 0,
-        extraIncome: 0,
         isSub: name.toLowerCase().includes("sub")
     };
 
@@ -55,6 +56,48 @@ function addMember(parentId, side) {
     else parent.right = id;
 
     members.push(newMember);
+
+    saveData();
+    calculateAll();
+    renderTree();
+}
+
+// ===== EDIT =====
+function editMember(id) {
+    const m = members.find(x => x.id === id);
+    if (!m) return;
+
+    const name = prompt("Edit name", m.name);
+    if (!name) return;
+
+    m.name = name;
+    m.isSub = name.toLowerCase().includes("sub");
+
+    saveData();
+    renderTree();
+}
+
+// ===== DELETE =====
+function deleteMember(id) {
+
+    if (id === 1) return alert("Root delete nahi");
+
+    function removeTree(mid) {
+        const m = members.find(x => x.id === mid);
+        if (!m) return;
+
+        if (m.left) removeTree(m.left);
+        if (m.right) removeTree(m.right);
+
+        members = members.filter(x => x.id !== mid);
+    }
+
+    removeTree(id);
+
+    members.forEach(m => {
+        if (m.left === id) m.left = 0;
+        if (m.right === id) m.right = 0;
+    });
 
     saveData();
     calculateAll();
@@ -69,63 +112,10 @@ function countTeam(id) {
     return 1 + countTeam(m.left) + countTeam(m.right);
 }
 
-// ===== CAP =====
-function getCap(level) {
-    if (level === 1) return 180;
-    if (level === 2) return 200;
-    if (level === 3) return 250;
-    if (level === 4) return 300;
-    if (level === 5) return 500;
-    return 1000;
-}
-
-// ===== DYNAMIC LEVEL =====
-function getDynamicLevel(m) {
-    let level = 1;
-
-    while (true) {
-        let cap = getCap(level);
-
-        let leftIncome = countTeam(m.left) * 3;
-        let rightIncome = countTeam(m.right) * 3;
-
-        if (leftIncome >= cap && rightIncome >= cap) {
-            level++;
-        } else break;
-    }
-
-    return level;
-}
-
-// ===== PASS DOWN =====
-function passToChildren(member, amount) {
-
-    let left = members.find(x => x.id === member.left);
-    let right = members.find(x => x.id === member.right);
-
-    if (left && right) {
-        left.extraIncome += amount / 2;
-        right.extraIncome += amount / 2;
-    } else if (left) {
-        left.extraIncome += amount;
-    } else if (right) {
-        right.extraIncome += amount;
-    }
-}
-
 // ===== CALCULATION =====
 function calculateAll() {
 
     members.forEach(m => {
-        m.income = 0;
-        m.extraIncome = 0;
-        m.pairs = 0;
-    });
-
-    members.forEach(m => {
-
-        let level = getDynamicLevel(m);
-
         let left = countTeam(m.left);
         let right = countTeam(m.right);
 
@@ -133,33 +123,16 @@ function calculateAll() {
 
         let income = m.pairs * 3;
 
-        if (!m.isSub) {
-            let cap = getCap(level);
-
-            if (income > cap) {
-                let extra = income - cap;
-                income = cap;
-                passToChildren(m, extra);
-            }
+        // SIMPLE CAP (₹180)
+        if (!m.isSub && income > 180) {
+            income = 180;
         }
 
         m.income = income;
     });
-
-    // FINAL CAP
-    members.forEach(m => {
-        let total = m.income + m.extraIncome;
-
-        if (!m.isSub) {
-            let cap = getCap(getDynamicLevel(m));
-            m.income = Math.min(total, cap);
-        } else {
-            m.income = total;
-        }
-    });
 }
 
-// ===== TREE RENDER =====
+// ===== TREE =====
 function renderTree() {
 
     const tree = document.getElementById("tree");
@@ -181,7 +154,10 @@ function renderTree() {
                 ₹${m.income}<br>
 
                 <button onclick="addMember(${m.id}, 'left')">L+</button>
-                <button onclick="addMember(${m.id}, 'right')">R+</button>
+                <button onclick="addMember(${m.id}, 'right')">R+</button><br>
+
+                <button onclick="editMember(${m.id})">Edit</button>
+                <button onclick="deleteMember(${m.id})">Delete</button>
             </div>
 
             <ul>
