@@ -1,50 +1,129 @@
+/* ===== BODY ===== */
 body {
-    background: #012b2b;
-    font-family: Arial;
+    background: linear-gradient(135deg, #021f1f, #033333);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #fff;
 }
 
-/* TREE */
+/* ===== TREE STRUCTURE ===== */
 .mlm-tree,
 .mlm-tree ul {
     list-style: none;
     padding: 0;
     margin: 0;
     text-align: center;
+    position: relative;
 }
 
+/* children container */
 .mlm-tree ul {
     display: flex;
     justify-content: center;
+    margin-top: 20px;
 }
 
+/* each node */
 .mlm-tree li {
     display: inline-block;
-    margin: 15px;
+    vertical-align: top;
+    margin: 10px 15px;
+    position: relative;
 }
 
-/* NODE */
+/* ===== CONNECTING LINES ===== */
+.mlm-tree li::before,
+.mlm-tree li::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    width: 50%;
+    height: 20px;
+    border-top: 2px solid #00ffc3;
+}
+
+.mlm-tree li::before {
+    left: -50%;
+    border-right: 2px solid #00ffc3;
+}
+
+.mlm-tree li::after {
+    right: -50%;
+    border-left: 2px solid #00ffc3;
+}
+
+/* remove lines for single node */
+.mlm-tree li:only-child::before,
+.mlm-tree li:only-child::after {
+    display: none;
+}
+
+/* ===== NODE CARD ===== */
 .node-card {
+    background: linear-gradient(135deg, #044, #066);
     border: 2px solid #00ffc3;
+    border-radius: 12px;
     padding: 10px;
-    border-radius: 10px;
-    background: #063d3d;
-    color: white;
-    min-width: 90px;
+    min-width: 110px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0,255,195,0.3);
+    transition: 0.3s;
 }
 
-/* BUTTON */
+.node-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #00ffc3;
+}
+
+/* name */
+.node-card b {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* ===== BUTTONS ===== */
 .node-card button {
-    margin: 3px;
-    padding: 3px 6px;
-    background: #00ffc3;
+    margin: 2px;
+    padding: 4px 6px;
+    font-size: 11px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
+    background: #00ffc3;
+    color: #000;
+    font-weight: bold;
+    transition: 0.2s;
 }
 
-/* EMPTY NODE */
+.node-card button:hover {
+    background: #00cfa3;
+}
+
+/* ===== EMPTY NODE ===== */
 .empty {
-    width: 80px;
-    height: 40px;
+    width: 90px;
+    height: 50px;
     border: 1px dashed #555;
+    border-radius: 8px;
+    background: transparent;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+
+    .mlm-tree ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .mlm-tree li {
+        margin: 15px 0;
+    }
+
+    .mlm-tree li::before,
+    .mlm-tree li::after {
+        display: none;
+    }
 }
