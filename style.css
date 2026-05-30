@@ -1,117 +1,150 @@
 /* ===== BODY ===== */
 body {
-    background: linear-gradient(135deg, #021f1f, #033333);
-    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #021f1f, #033);
     color: #fff;
 }
 
-/* ===== TREE STRUCTURE ===== */
-.mlm-tree,
-.mlm-tree ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    text-align: center;
-    position: relative;
+/* ===== CONTAINER ===== */
+.container {
+    padding: 10px;
 }
 
-/* children container */
+/* ===== HEADER ===== */
+h2, h3 {
+    margin: 10px 0;
+}
+
+/* ===== MENU ===== */
+.menu {
+    margin-bottom: 10px;
+}
+
+.menu button {
+    padding: 8px 12px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 5px;
+    background: #00c9a7;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.menu button:hover {
+    background: #00ffcc;
+}
+
+/* ===== TABLE ===== */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 10px;
+}
+
+table th, table td {
+    border: 1px solid #00ffc3;
+    padding: 6px;
+    text-align: center;
+}
+
+table th {
+    background: #044;
+}
+
+/* ===== TREE STRUCTURE ===== */
 .mlm-tree ul {
+    padding-top: 20px;
+    position: relative;
     display: flex;
     justify-content: center;
-    margin-top: 20px;
 }
 
-/* each node */
 .mlm-tree li {
-    display: inline-block;
-    vertical-align: top;
-    margin: 10px 15px;
+    list-style-type: none;
+    text-align: center;
     position: relative;
+    padding: 20px 5px 0 5px;
 }
 
-/* ===== CONNECTING LINES ===== */
+/* ===== LINES ===== */
 .mlm-tree li::before,
 .mlm-tree li::after {
     content: '';
     position: absolute;
-    top: -20px;
+    top: 0;
+    right: 50%;
+    border-top: 2px solid #00ffc3;
     width: 50%;
     height: 20px;
-    border-top: 2px solid #00ffc3;
-}
-
-.mlm-tree li::before {
-    left: -50%;
-    border-right: 2px solid #00ffc3;
 }
 
 .mlm-tree li::after {
-    right: -50%;
+    right: auto;
+    left: 50%;
     border-left: 2px solid #00ffc3;
 }
 
-/* remove lines for single node */
-.mlm-tree li:only-child::before,
-.mlm-tree li:only-child::after {
+.mlm-tree li:only-child::after,
+.mlm-tree li:only-child::before {
     display: none;
+}
+
+.mlm-tree li:only-child {
+    padding-top: 0;
+}
+
+.mlm-tree li:first-child::before,
+.mlm-tree li:last-child::after {
+    border: none;
 }
 
 /* ===== NODE CARD ===== */
 .node-card {
-    background: linear-gradient(135deg, #044, #066);
+    background: #033;
     border: 2px solid #00ffc3;
-    border-radius: 12px;
-    padding: 10px;
-    min-width: 110px;
-    text-align: center;
-    box-shadow: 0 0 10px rgba(0,255,195,0.3);
-    transition: 0.3s;
+    border-radius: 10px;
+    padding: 8px;
+    width: 120px;
+    display: inline-block;
+    box-shadow: 0 0 10px rgba(0,255,200,0.3);
 }
 
-.node-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px #00ffc3;
-}
-
-/* name */
+/* ===== NODE TEXT ===== */
 .node-card b {
     font-size: 14px;
-    display: block;
-    margin-bottom: 5px;
+    color: #00ffc3;
 }
 
 /* ===== BUTTONS ===== */
 .node-card button {
     margin: 2px;
-    padding: 4px 6px;
-    font-size: 11px;
+    padding: 3px 5px;
+    font-size: 10px;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
+    background: #00c9a7;
     cursor: pointer;
-    background: #00ffc3;
-    color: #000;
-    font-weight: bold;
-    transition: 0.2s;
 }
 
 .node-card button:hover {
-    background: #00cfa3;
+    background: #00ffcc;
 }
 
-/* ===== EMPTY NODE ===== */
-.empty {
-    width: 90px;
-    height: 50px;
-    border: 1px dashed #555;
-    border-radius: 8px;
-    background: transparent;
+/* DELETE BUTTON */
+.node-card button:last-child {
+    background: #ff5c5c;
+    color: #fff;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
+.node-card button:last-child:hover {
+    background: red;
+}
+
+/* ===== MOBILE FIX ===== */
+@media (max-width: 600px) {
 
     .mlm-tree ul {
         flex-direction: column;
@@ -119,11 +152,15 @@ body {
     }
 
     .mlm-tree li {
-        margin: 15px 0;
+        padding: 10px 0;
     }
 
     .mlm-tree li::before,
     .mlm-tree li::after {
         display: none;
+    }
+
+    .node-card {
+        width: 90%;
     }
 }
