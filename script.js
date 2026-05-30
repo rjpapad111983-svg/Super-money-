@@ -1,7 +1,6 @@
-// ===== DATA =====
 let members = JSON.parse(localStorage.getItem("members")) || [];
 
-// ===== INIT =====
+// INIT
 document.addEventListener("DOMContentLoaded", () => {
 
     if (members.length === 0) {
@@ -19,16 +18,15 @@ document.addEventListener("DOMContentLoaded", () => {
         saveData();
     }
 
-    calculateAll();
-    renderTree();
+    renderAll();
 });
 
-// ===== SAVE =====
+// SAVE
 function saveData() {
     localStorage.setItem("members", JSON.stringify(members));
 }
 
-// ===== ADD MEMBER =====
+// ADD MEMBER
 function addMember(parentId, side) {
 
     const parent = members.find(m => m.id === parentId);
@@ -60,11 +58,10 @@ function addMember(parentId, side) {
     members.push(newMember);
 
     saveData();
-    calculateAll();
-    renderTree();
+    renderAll();
 }
 
-// ===== COUNT TEAM =====
+// COUNT
 function countTeam(id) {
     if (!id) return 0;
     const m = members.find(x => x.id === id);
@@ -72,17 +69,15 @@ function countTeam(id) {
     return 1 + countTeam(m.left) + countTeam(m.right);
 }
 
-// ===== CAP =====
+// CAP
 function getCap(level) {
     if (level === 1) return 180;
     if (level === 2) return 200;
     if (level === 3) return 250;
-    if (level === 4) return 300;
-    if (level === 5) return 500;
-    return 1000;
+    return 300;
 }
 
-// ===== LEVEL CALCULATION (IMPORTANT) =====
+// LEVEL
 function calculateLevel(m) {
 
     let level = 1;
@@ -91,10 +86,10 @@ function calculateLevel(m) {
 
         let cap = getCap(level);
 
-        let leftIncome = countTeam(m.left) * 3;
-        let rightIncome = countTeam(m.right) * 3;
+        let left = countTeam(m.left) * 3;
+        let right = countTeam(m.right) * 3;
 
-        if (leftIncome >= cap && rightIncome >= cap) {
+        if (left >= cap && right >= cap) {
             level++;
         } else {
             break;
@@ -104,7 +99,7 @@ function calculateLevel(m) {
     return level;
 }
 
-// ===== CALCULATION =====
+// CALC
 function calculateAll() {
 
     members.forEach(m => {
@@ -116,12 +111,10 @@ function calculateAll() {
 
         let income = m.pairs * 3;
 
-        // 👉 LEVEL UPDATE
         m.level = calculateLevel(m);
 
         let cap = getCap(m.level);
 
-        // 👉 MAIN ID CAP
         if (!m.isSub && income > cap) {
             income = cap;
         }
@@ -130,7 +123,7 @@ function calculateAll() {
     });
 }
 
-// ===== DELETE =====
+// DELETE
 function deleteMember(id) {
 
     if (id === 1) return alert("Root delete nahi");
@@ -153,16 +146,13 @@ function deleteMember(id) {
     });
 
     saveData();
-    calculateAll();
-    renderTree();
+    renderAll();
 }
 
-// ===== TREE =====
+// TREE
 function renderTree() {
 
     const tree = document.getElementById("tree");
-    if (!tree) return;
-
     tree.innerHTML = "";
 
     const map = {};
@@ -175,19 +165,18 @@ function renderTree() {
         <li>
             <div class="node-card">
                 <b>${m.name}</b><br>
-                Level: ${m.level}<br>
+                Lvl: ${m.level}<br>
                 Pair: ${m.pairs}<br>
                 ₹${m.income}<br>
 
                 <button onclick="addMember(${m.id}, 'left')">L+</button>
                 <button onclick="addMember(${m.id}, 'right')">R+</button><br>
-
-                <button onclick="deleteMember(${m.id})">Delete</button>
+                <button onclick="deleteMember(${m.id})">Del</button>
             </div>
 
             <ul>
-                ${m.left ? build(map[m.left]) : '<li><div class="empty"></div></li>'}
-                ${m.right ? build(map[m.right]) : '<li><div class="empty"></div></li>'}
+                ${m.left ? build(map[m.left]) : ""}
+                ${m.right ? build(map[m.right]) : ""}
             </ul>
         </li>`;
     }
@@ -197,4 +186,44 @@ function renderTree() {
     if (root) {
         tree.innerHTML = `<ul class="mlm-tree">${build(root)}</ul>`;
     }
+}
+
+// MEMBERS
+function renderMembers() {
+
+    const table = document.getElementById("membersTable");
+    table.innerHTML = "";
+
+    members.forEach(m => {
+
+        let left = countTeam(m.left);
+        let right = countTeam(m.right);
+
+        table.innerHTML += `
+        <tr>
+            <td>${m.name}</td>
+            <td>${m.id}</td>
+            <td>${left}</td>
+            <td>${right}</td>
+            <td>${m.pairs}</td>
+            <td>${m.level}</td>
+            <td>₹${m.income}</td>
+            <td><button onclick="deleteMember(${m.id})">Delete</button></td>
+        </tr>`;
+    });
+}
+
+// PAGE SWITCH
+function showPage(page) {
+    document.getElementById("treePage").style.display = "none";
+    document.getElementById("membersPage").style.display = "none";
+
+    document.getElementById(page).style.display = "block";
+}
+
+// RENDER ALL
+function renderAll() {
+    calculateAll();
+    renderTree();
+    renderMembers();
 }
