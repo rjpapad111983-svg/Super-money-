@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
             parent: 0,
             pairs: 0,
             income: 0,
+            level: 1,
             isSub: false
         });
         saveData();
@@ -33,8 +34,8 @@ function addMember(parentId, side) {
     const parent = members.find(m => m.id === parentId);
     if (!parent) return;
 
-    if (side === "left" && parent.left) return alert("Left filled");
-    if (side === "right" && parent.right) return alert("Right filled");
+    if (side === "left" && parent.left) return alert("Left full");
+    if (side === "right" && parent.right) return alert("Right full");
 
     const name = prompt("Enter name");
     if (!name) return;
@@ -49,6 +50,7 @@ function addMember(parentId, side) {
         parent: parentId,
         pairs: 0,
         income: 0,
+        level: 1,
         isSub: name.toLowerCase().includes("sub")
     };
 
@@ -62,19 +64,70 @@ function addMember(parentId, side) {
     renderTree();
 }
 
-// ===== EDIT =====
-function editMember(id) {
+// ===== COUNT TEAM =====
+function countTeam(id) {
+    if (!id) return 0;
     const m = members.find(x => x.id === id);
-    if (!m) return;
+    if (!m) return 0;
+    return 1 + countTeam(m.left) + countTeam(m.right);
+}
 
-    const name = prompt("Edit name", m.name);
-    if (!name) return;
+// ===== CAP =====
+function getCap(level) {
+    if (level === 1) return 180;
+    if (level === 2) return 200;
+    if (level === 3) return 250;
+    if (level === 4) return 300;
+    if (level === 5) return 500;
+    return 1000;
+}
 
-    m.name = name;
-    m.isSub = name.toLowerCase().includes("sub");
+// ===== LEVEL CALCULATION (IMPORTANT) =====
+function calculateLevel(m) {
 
-    saveData();
-    renderTree();
+    let level = 1;
+
+    while (true) {
+
+        let cap = getCap(level);
+
+        let leftIncome = countTeam(m.left) * 3;
+        let rightIncome = countTeam(m.right) * 3;
+
+        if (leftIncome >= cap && rightIncome >= cap) {
+            level++;
+        } else {
+            break;
+        }
+    }
+
+    return level;
+}
+
+// ===== CALCULATION =====
+function calculateAll() {
+
+    members.forEach(m => {
+
+        let left = countTeam(m.left);
+        let right = countTeam(m.right);
+
+        m.pairs = Math.min(left, right);
+
+        let income = m.pairs * 3;
+
+        // 👉 LEVEL UPDATE
+        m.level = calculateLevel(m);
+
+        let cap = getCap(m.level);
+
+        // 👉 MAIN ID CAP
+        if (!m.isSub && income > cap) {
+            income = cap;
+        }
+
+        m.income = income;
+    });
 }
 
 // ===== DELETE =====
@@ -104,34 +157,6 @@ function deleteMember(id) {
     renderTree();
 }
 
-// ===== COUNT TEAM =====
-function countTeam(id) {
-    if (!id) return 0;
-    const m = members.find(x => x.id === id);
-    if (!m) return 0;
-    return 1 + countTeam(m.left) + countTeam(m.right);
-}
-
-// ===== CALCULATION =====
-function calculateAll() {
-
-    members.forEach(m => {
-        let left = countTeam(m.left);
-        let right = countTeam(m.right);
-
-        m.pairs = Math.min(left, right);
-
-        let income = m.pairs * 3;
-
-        // SIMPLE CAP (₹180)
-        if (!m.isSub && income > 180) {
-            income = 180;
-        }
-
-        m.income = income;
-    });
-}
-
 // ===== TREE =====
 function renderTree() {
 
@@ -150,13 +175,13 @@ function renderTree() {
         <li>
             <div class="node-card">
                 <b>${m.name}</b><br>
+                Level: ${m.level}<br>
                 Pair: ${m.pairs}<br>
                 ₹${m.income}<br>
 
                 <button onclick="addMember(${m.id}, 'left')">L+</button>
                 <button onclick="addMember(${m.id}, 'right')">R+</button><br>
 
-                <button onclick="editMember(${m.id})">Edit</button>
                 <button onclick="deleteMember(${m.id})">Delete</button>
             </div>
 
