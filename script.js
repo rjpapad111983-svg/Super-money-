@@ -158,7 +158,6 @@ function calculateAll() {
     });
 }
 
-// TREE (OLD STYLE SIMPLE)
 function renderTree() {
 
     const tree = document.getElementById("tree");
@@ -171,23 +170,28 @@ function renderTree() {
         if (!m) return "";
 
         return `
-        <li>
+        <div class="tree-node">
             <div class="node">
                 <b>${m.name}</b><br>
                 Pair: ${m.pairs}<br>
                 ₹${m.income}<br>
+
                 <button onclick="addMember(${m.id},'left')">L+</button>
                 <button onclick="addMember(${m.id},'right')">R+</button>
                 <button onclick="deleteMember(${m.id})">Del</button>
             </div>
-            <ul>
+
+            <div class="children">
                 ${m.left ? build(map[m.left]) : ""}
                 ${m.right ? build(map[m.right]) : ""}
-            </ul>
-        </li>
+            </div>
+        </div>
         `;
     }
 
+    const root = members.find(m => m.parent == 0);
+    tree.innerHTML = build(root);
+}
     const root = members.find(m => m.parent == 0);
     tree.innerHTML = `<ul>${build(root)}</ul>`;
 }
