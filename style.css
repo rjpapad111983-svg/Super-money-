@@ -33,22 +33,54 @@ button:hover {
     overflow-x: auto;
 }
 
-/* ===== TREE STRUCTURE ===== */
-ul {
-    list-style: none;
-    padding-left: 20px;
+/* ===== NEW TREE UI FIX ===== */
+
+.tree-node {
+    text-align: center;
+    margin-top: 20px;
 }
 
-/* ===== NODE CARD ===== */
 .node {
     border: 1px solid #00ffc8;
     padding: 10px;
-    margin: 10px 0;
+    border-radius: 10px;
+    background: rgba(0, 255, 200, 0.08);
     display: inline-block;
-    text-align: center;
-    border-radius: 8px;
-    background: rgba(0, 255, 200, 0.05);
     min-width: 120px;
+}
+
+.children {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+/* buttons clean */
+.node button {
+    margin: 2px;
+    padding: 3px 6px;
+    font-size: 10px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+/* colors */
+.node button:nth-child(1) {
+    background: #00c853;
+    color: #fff;
+}
+
+.node button:nth-child(2) {
+    background: #0091ea;
+    color: #fff;
+}
+
+.node button:nth-child(3) {
+    background: #d50000;
+    color: #fff;
 }
 
 /* ===== NODE TEXT ===== */
