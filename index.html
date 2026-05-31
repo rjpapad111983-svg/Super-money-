@@ -7,44 +7,33 @@
 
 <body>
 
-<div class="container">
+<h2>MLM Panel</h2>
 
-    <h2>MLM Panel</h2>
-
-    <div class="menu">
-        <button onclick="showPage('treePage')">Tree</button>
-        <button onclick="showPage('membersPage')">Members</button>
-    </div>
-
-    <!-- TREE -->
-    <div id="treePage">
-        <h3>Binary Tree</h3>
-        <div id="tree"></div>
-    </div>
-
-    <!-- MEMBERS -->
-    <div id="membersPage" style="display:none;">
-        <h3>Members</h3>
-
-        <table border="1" width="100%">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>ID</th>
-                    <th>Left</th>
-                    <th>Right</th>
-                    <th>Pairs</th>
-                    <th>Level</th>
-                    <th>Income</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="membersTable"></tbody>
-        </table>
-    </div>
-
+<div class="menu">
+    <button onclick="showTree()">Tree</button>
+    <button onclick="showMembers()">Members</button>
 </div>
 
+<h3>Binary Tree</h3>
+<div id="tree"></div>
+
+<h3>Members</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>ID</th>
+            <th>Left</th>
+            <th>Right</th>
+            <th>Pairs</th>
+            <th>Income</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="membersTable"></tbody>
+</table>
+
 <script src="script.js"></script>
+
 </body>
 </html>
