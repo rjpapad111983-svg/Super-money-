@@ -1,5 +1,6 @@
 let members = JSON.parse(localStorage.getItem("members")) || [];
 
+// INIT
 document.addEventListener("DOMContentLoaded", () => {
 
     if (members.length === 0) {
@@ -10,22 +11,29 @@ document.addEventListener("DOMContentLoaded", () => {
             right: 0,
             parent: 0,
             pairs: 0,
-            income: 0
+            income: 0,
+            extraIncome: 0,
+            level: 1
         });
         saveData();
     }
 
-    calculate();
+    calculateAll();
     renderAll();
 });
 
+// SAVE
 function saveData() {
     localStorage.setItem("members", JSON.stringify(members));
 }
 
+// ADD MEMBER
 function addMember(parentId, side) {
 
-    let name = prompt("Enter name");
+    const parent = members.find(m => m.id == parentId);
+    if (!parent) return;
+
+    const name = prompt("Enter member name");
     if (!name) return;
 
     const id = Date.now();
@@ -37,10 +45,10 @@ function addMember(parentId, side) {
         right: 0,
         parent: parentId,
         pairs: 0,
-        income: 0
+        income: 0,
+        extraIncome: 0,
+        level: 1
     };
-
-    const parent = members.find(x => x.id === parentId);
 
     if (side === "left") parent.left = id;
     else parent.right = id;
@@ -48,51 +56,109 @@ function addMember(parentId, side) {
     members.push(newMember);
 
     saveData();
-    calculate();
+    calculateAll();
     renderAll();
 }
 
+// DELETE
 function deleteMember(id) {
 
-    if (id === 1) return alert("Root delete nahi");
+    if (id == 1) {
+        alert("Root delete nahi kar sakte");
+        return;
+    }
 
-    members = members.filter(x => x.id !== id);
+    function removeTree(mid) {
+        let m = members.find(x => x.id == mid);
+        if (!m) return;
+
+        if (m.left) removeTree(m.left);
+        if (m.right) removeTree(m.right);
+
+        members = members.filter(x => x.id != mid);
+    }
+
+    removeTree(id);
 
     members.forEach(m => {
-        if (m.left === id) m.left = 0;
-        if (m.right === id) m.right = 0;
+        if (m.left == id) m.left = 0;
+        if (m.right == id) m.right = 0;
     });
 
     saveData();
-    calculate();
+    calculateAll();
     renderAll();
 }
 
-function count(id) {
+// COUNT TEAM
+function countTeam(id) {
     if (!id) return 0;
-    const m = members.find(x => x.id === id);
+
+    let m = members.find(x => x.id == id);
     if (!m) return 0;
-    return 1 + count(m.left) + count(m.right);
+
+    return 1 + countTeam(m.left) + countTeam(m.right);
 }
 
-function calculate() {
+// CAP
+function getCap(level) {
+    if (level == 1) return 180;
+    if (level == 2) return 200;
+    if (level == 3) return 250;
+    if (level == 4) return 300;
+    return 500;
+}
+
+// PASS DOWN
+function passToChildren(member, amount) {
+
+    let left = members.find(x => x.id == member.left);
+    let right = members.find(x => x.id == member.right);
+
+    if (left) left.extraIncome += amount / 2;
+    if (right) right.extraIncome += amount / 2;
+}
+
+// 🔥 FINAL CALCULATION FIX
+function calculateAll() {
 
     members.forEach(m => {
+        m.pairs = 0;
+        m.income = 0;
+        m.extraIncome = 0;
+    });
 
-        let left = count(m.left);
-        let right = count(m.right);
+    // STEP 1
+    members.forEach(m => {
+
+        let left = countTeam(m.left);
+        let right = countTeam(m.right);
 
         m.pairs = Math.min(left, right);
 
         let income = m.pairs * 3;
 
-        // 🔥 HARD CAP 180
-        if (income > 180) income = 180;
+        let cap = getCap(m.level);
 
-        m.income = income;
+        if (income > cap) {
+            let extra = income - cap;
+            m.income = cap;
+            passToChildren(m, extra);
+        } else {
+            m.income = income;
+        }
+    });
+
+    // STEP 2 FINAL CAP
+    members.forEach(m => {
+        let total = m.income + m.extraIncome;
+        let cap = getCap(m.level);
+
+        m.income = Math.min(total, cap);
     });
 }
 
+// TREE (OLD STYLE SIMPLE)
 function renderTree() {
 
     const tree = document.getElementById("tree");
@@ -106,29 +172,27 @@ function renderTree() {
 
         return `
         <li>
-            <div class="node-card">
+            <div class="node">
                 <b>${m.name}</b><br>
                 Pair: ${m.pairs}<br>
                 ₹${m.income}<br>
-
-                <button onclick="addMember(${m.id},'left')">L</button>
-                <button onclick="addMember(${m.id},'right')">R</button>
+                <button onclick="addMember(${m.id},'left')">L+</button>
+                <button onclick="addMember(${m.id},'right')">R+</button>
                 <button onclick="deleteMember(${m.id})">Del</button>
             </div>
-
-            ${(m.left || m.right) ? `
             <ul>
                 ${m.left ? build(map[m.left]) : ""}
                 ${m.right ? build(map[m.right]) : ""}
-            </ul>` : ""}
-        </li>`;
+            </ul>
+        </li>
+        `;
     }
 
-    const root = members.find(m => m.parent === 0);
-
-    tree.innerHTML = `<ul class="mlm-tree">${build(root)}</ul>`;
+    const root = members.find(m => m.parent == 0);
+    tree.innerHTML = `<ul>${build(root)}</ul>`;
 }
 
+// MEMBERS TABLE
 function renderMembers() {
 
     const table = document.getElementById("membersTable");
@@ -136,8 +200,8 @@ function renderMembers() {
 
     members.forEach(m => {
 
-        let left = count(m.left);
-        let right = count(m.right);
+        let left = countTeam(m.left);
+        let right = countTeam(m.right);
 
         table.innerHTML += `
         <tr>
@@ -147,13 +211,13 @@ function renderMembers() {
             <td>${right}</td>
             <td>${m.pairs}</td>
             <td>₹${m.income}</td>
-            <td>
-                <button onclick="deleteMember(${m.id})">Delete</button>
-            </td>
-        </tr>`;
+            <td><button onclick="deleteMember(${m.id})">Delete</button></td>
+        </tr>
+        `;
     });
 }
 
+// RENDER ALL
 function renderAll() {
     renderTree();
     renderMembers();
