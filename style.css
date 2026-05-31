@@ -1,73 +1,113 @@
+/* ===== BODY ===== */
 body {
     margin: 0;
-    font-family: Arial;
-    background: #033;
+    padding: 0;
+    background: #022f2f;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+}
+
+/* ===== HEADER ===== */
+h1 {
+    padding: 10px;
+    font-size: 20px;
+}
+
+/* ===== BUTTON ===== */
+button {
+    margin: 2px;
+    padding: 4px 8px;
+    font-size: 11px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+/* ===== TREE CONTAINER ===== */
+#tree {
+    padding: 10px;
+    overflow-x: auto;
+}
+
+/* ===== TREE STRUCTURE ===== */
+ul {
+    list-style: none;
+    padding-left: 20px;
+}
+
+/* ===== NODE CARD ===== */
+.node {
+    border: 1px solid #00ffc8;
+    padding: 10px;
+    margin: 10px 0;
+    display: inline-block;
+    text-align: center;
+    border-radius: 8px;
+    background: rgba(0, 255, 200, 0.05);
+    min-width: 120px;
+}
+
+/* ===== NODE TEXT ===== */
+.node b {
+    font-size: 14px;
+}
+
+.node small {
+    font-size: 11px;
+    color: #aaa;
+}
+
+/* ===== BUTTON COLORS ===== */
+.node button {
+    font-size: 10px;
+}
+
+.node button:nth-child(1) {
+    background: #00c853;
     color: #fff;
 }
 
-.menu {
-    padding: 10px;
+.node button:nth-child(2) {
+    background: #0091ea;
+    color: #fff;
 }
 
-.menu button {
-    padding: 6px;
-    margin-right: 5px;
-    background: #00c9a7;
-    border: none;
+.node button:nth-child(3) {
+    background: #d50000;
+    color: #fff;
 }
 
-/* TREE */
-#tree {
-    padding: 20px;
-    text-align: center;
-}
-
-.mlm-tree {
-    display: flex;
-    justify-content: center;
-}
-
-.mlm-tree ul {
-    display: flex;
-    justify-content: center;
-    padding-top: 20px;
-}
-
-.mlm-tree li {
-    list-style: none;
-    padding: 20px 10px 0 10px;
-}
-
-/* BOX */
-.node-card {
-    display: inline-block;
-    padding: 6px;
-    border: 1px solid #00ffc3;
-    background: #022;
-    border-radius: 6px;
-    width: 100px;
-}
-
-/* BUTTON */
-.node-card button {
-    margin: 2px;
-    font-size: 10px;
-    background: #00c9a7;
-    border: none;
-}
-
-.node-card button:last-child {
-    background: red;
-    color: white;
-}
-
-/* TABLE */
+/* ===== MEMBERS TABLE ===== */
 table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 20px;
 }
 
-table td, table th {
-    border: 1px solid #00ffc3;
+table th, table td {
+    border: 1px solid #00ffc8;
+    padding: 6px;
     text-align: center;
+    font-size: 12px;
+}
+
+table th {
+    background: #014d4d;
+}
+
+/* ===== MOBILE FIX ===== */
+@media (max-width: 600px) {
+    .node {
+        min-width: 100px;
+        font-size: 12px;
+    }
+
+    table th, table td {
+        font-size: 10px;
+        padding: 4px;
+    }
 }
