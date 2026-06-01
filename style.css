@@ -8,18 +8,20 @@ body {
 }
 
 /* ===== HEADER ===== */
-h1 {
+h2 {
     padding: 10px;
-    font-size: 20px;
 }
 
-/* ===== BUTTON ===== */
+/* ===== MENU ===== */
+.menu {
+    padding: 10px;
+}
+
 button {
-    margin: 2px;
-    padding: 4px 8px;
-    font-size: 11px;
+    margin: 3px;
+    padding: 5px 10px;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
 }
 
@@ -27,37 +29,48 @@ button:hover {
     opacity: 0.8;
 }
 
+/* ===== DASHBOARD ===== */
+.card {
+    border: 1px solid #00ffcc;
+    padding: 10px;
+    margin: 8px;
+    border-radius: 8px;
+    display: inline-block;
+    min-width: 150px;
+    background: rgba(0,255,200,0.05);
+}
+
 /* ===== TREE CONTAINER ===== */
 #tree {
-    padding: 10px;
+    padding: 20px;
     overflow-x: auto;
 }
 
-/* ===== NEW TREE UI FIX ===== */
-
+/* ===== TREE STRUCTURE ===== */
 .tree-node {
     text-align: center;
     margin-top: 20px;
 }
 
+/* NODE BOX */
 .node {
-    border: 1px solid #00ffc8;
+    border: 2px solid #00ffcc;
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 12px;
     background: rgba(0, 255, 200, 0.08);
     display: inline-block;
     min-width: 120px;
 }
 
+/* CHILDREN ALIGNMENT */
 .children {
     display: flex;
     justify-content: center;
     gap: 40px;
-    margin-top: 15px;
-    flex-wrap: wrap;
+    margin-top: 20px;
 }
 
-/* buttons clean */
+/* ===== NODE BUTTONS ===== */
 .node button {
     margin: 2px;
     padding: 3px 6px;
@@ -67,55 +80,26 @@ button:hover {
     cursor: pointer;
 }
 
-/* colors */
+/* L+ */
 .node button:nth-child(1) {
     background: #00c853;
     color: #fff;
 }
 
+/* R+ */
 .node button:nth-child(2) {
     background: #0091ea;
     color: #fff;
 }
 
+/* Edit */
 .node button:nth-child(3) {
-    background: #d50000;
-    color: #fff;
+    background: #ffab00;
+    color: #000;
 }
 
-/* ===== NODE TEXT ===== */
-.node b {
-    font-size: 14px;
-}
-
-.node small {
-    font-size: 11px;
-    color: #aaa;
-}
-
-.node button {
-    margin: 2px;
-    padding: 4px 6px;
-    font-size: 11px;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-}
-
-/* L button */
-.node button:nth-child(1) {
-    background: #00c853;
-    color: #fff;
-}
-
-/* R button */
-.node button:nth-child(2) {
-    background: #0091ea;
-    color: #fff;
-}
-
-/* Delete button */
-.node button:nth-child(3) {
+/* Delete */
+.node button:nth-child(4) {
     background: #d50000;
     color: #fff;
 }
@@ -128,7 +112,7 @@ table {
 }
 
 table th, table td {
-    border: 1px solid #00ffc8;
+    border: 1px solid #00ffcc;
     padding: 6px;
     text-align: center;
     font-size: 12px;
@@ -140,9 +124,15 @@ table th {
 
 /* ===== MOBILE FIX ===== */
 @media (max-width: 600px) {
+
     .node {
         min-width: 100px;
         font-size: 12px;
+    }
+
+    .children {
+        gap: 20px;
+        flex-wrap: wrap;
     }
 
     table th, table td {
