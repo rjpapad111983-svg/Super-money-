@@ -180,13 +180,12 @@ function renderTree() {
                 <button onclick="addMember(${m.id},'right')">R+</button>
                 <button onclick="deleteMember(${m.id})">Del</button>
             </div>
-
-            ${(m.left || m.right) ? `
+${(m.left || m.right) ? `
 <div class="children">
     ${m.left ? build(map[m.left]) : ""}
     ${m.right ? build(map[m.right]) : ""}
-</div>` : ""}
-        </div>
+</div>
+` : ""}
         `;
     }
 
