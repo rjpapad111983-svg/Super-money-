@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     calculateAll();
     renderAll();
-    showDashboard(); // default screen
+    showDashboard();
 });
 
 // SAVE
@@ -30,6 +30,7 @@ function saveData() {
 
 // ADD MEMBER
 function addMember(parentId, side) {
+
     const parent = members.find(m => m.id == parentId);
     if (!parent) return;
 
@@ -47,7 +48,7 @@ function addMember(parentId, side) {
         pairs: 0,
         income: 0,
         extraIncome: 0,
-        level: parent.level + 1
+        level: 1   // ✅ always start from level 1
     };
 
     if (side === "left") parent.left = id;
@@ -109,8 +110,9 @@ function getCap(level) {
     return 500;
 }
 
-// PASS DOWN
+// PASS EXTRA
 function passToChildren(member, amount) {
+
     let left = members.find(x => x.id == member.left);
     let right = members.find(x => x.id == member.right);
 
@@ -121,6 +123,7 @@ function passToChildren(member, amount) {
 // CALCULATION
 function calculateAll() {
 
+    // reset
     members.forEach(m => {
         m.pairs = 0;
         m.income = 0;
@@ -151,8 +154,25 @@ function calculateAll() {
     members.forEach(m => {
         let total = m.income + m.extraIncome;
         let cap = getCap(m.level);
-
         m.income = Math.min(total, cap);
+    });
+
+    // 🔥 LEVEL UPGRADE (ALL MEMBERS)
+    members.forEach(m => {
+
+        let left = members.find(x => x.id == m.left);
+        let right = members.find(x => x.id == m.right);
+
+        let leftIncome = left ? left.income : 0;
+        let rightIncome = right ? right.income : 0;
+
+        let cap = getCap(m.level);
+
+        if (m.income >= cap) {
+            if (leftIncome >= cap && rightIncome >= cap) {
+                m.level += 1;
+            }
+        }
     });
 }
 
@@ -171,11 +191,12 @@ function renderTree() {
         <div class="tree-node">
             <div class="node">
                 <b>${m.name}</b><br>
+                Level: ${m.level}<br>
                 Pair: ${m.pairs}<br>
                 ₹${m.income}<br>
 
-                <button onclick="addMember(${m.id}, 'left')">L</button>
-                <button onclick="addMember(${m.id}, 'right')">R</button>
+                <button onclick="addMember(${m.id}, 'left')">L+</button>
+                <button onclick="addMember(${m.id}, 'right')">R+</button>
                 <button onclick="deleteMember(${m.id})">Del</button>
             </div>
 
@@ -183,19 +204,12 @@ function renderTree() {
             <div class="children">
                 ${m.left ? build(m.left) : ""}
                 ${m.right ? build(m.right) : ""}
-            </div>
-            ` : ""}
+            </div>` : ""}
         </div>
         `;
     }
 
-    let root = members.find(m => m.id == 1);
-
-    if (root) {
-        tree.innerHTML = build(root.id);
-    } else {
-        tree.innerHTML = "<p>No root found</p>";
-    }
+    tree.innerHTML = build(1);
 }
 
 // MEMBERS TABLE
@@ -217,9 +231,9 @@ function renderMembers() {
             <td>${right}</td>
             <td>${m.pairs}</td>
             <td>${m.income}</td>
+            <td>${m.level}</td>
             <td><button onclick="deleteMember(${m.id})">Delete</button></td>
-        </tr>
-        `;
+        </tr>`;
     });
 }
 
@@ -238,7 +252,7 @@ function renderDashboard() {
     document.getElementById("companyProfit").innerText = companyProfit;
 }
 
-// BUTTON FIX
+// BUTTON SWITCH
 function showDashboard() {
     document.getElementById("dashboardSection").style.display = "block";
     document.getElementById("treeSection").style.display = "none";
@@ -264,4 +278,4 @@ function renderAll() {
     renderTree();
     renderMembers();
     renderDashboard();
-                    }
+            }
