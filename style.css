@@ -3,13 +3,8 @@ body {
     margin: 0;
     padding: 0;
     background: #022f2f;
-    color: #ffffff;
+    color: #fff;
     font-family: Arial, sans-serif;
-}
-
-/* ===== HEADER ===== */
-h2 {
-    padding: 10px;
 }
 
 /* ===== MENU ===== */
@@ -36,24 +31,29 @@ button:hover {
     margin: 8px;
     border-radius: 8px;
     display: inline-block;
-    min-width: 150px;
     background: rgba(0,255,200,0.05);
 }
 
-/* ===== TREE CONTAINER ===== */
-#tree {
-    padding: 20px;
-    overflow-x: auto;
+/* ===== TREE WRAPPER (ZOOM) ===== */
+#treeWrapper {
+    overflow: auto;
     width: 100%;
-    display: block;
 }
 
-/* ===== TREE STRUCTURE ===== */
+/* ===== TREE ===== */
+#tree {
+    padding: 20px;
+    transform-origin: top center;
+    display: inline-block;
+}
+
+/* ===== TREE NODE ===== */
 .tree-node {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 40px;
+    position: relative;
     display: inline-block;
-    min-width: max-content; /* 🔥 FIX */
+    min-width: max-content;
 }
 
 /* ===== NODE BOX ===== */
@@ -61,79 +61,75 @@ button:hover {
     border: 2px solid #00ffcc;
     padding: 10px;
     border-radius: 12px;
-    background: rgba(0, 255, 200, 0.08);
+    background: rgba(0,255,200,0.08);
     display: inline-block;
     min-width: 120px;
 }
 
-/* ===== CHILDREN ALIGNMENT ===== */
+/* ===== CHILDREN ===== */
 .children {
     display: flex;
     justify-content: center;
     gap: 40px;
     margin-top: 20px;
-    flex-wrap: nowrap; /* 🔥 FIX (wrap हटाया) */
+    flex-wrap: nowrap;
+    position: relative;
 }
 
-/* ===== NODE BUTTONS ===== */
+/* ===== TREE LINES ===== */
+
+/* vertical line */
+.tree-node::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    width: 2px;
+    height: 20px;
+    background: #00ffcc;
+}
+
+/* horizontal line */
+.children::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 10%;
+    width: 80%;
+    height: 2px;
+    background: #00ffcc;
+}
+
+/* ===== BUTTON COLORS ===== */
 .node button {
     margin: 2px;
     padding: 3px 6px;
     font-size: 10px;
     border-radius: 4px;
-    border: none;
-    cursor: pointer;
 }
 
-/* L+ */
 .node button:nth-child(1) {
     background: #00c853;
     color: #fff;
 }
 
-/* R+ */
 .node button:nth-child(2) {
     background: #0091ea;
     color: #fff;
 }
 
-/* Edit */
 .node button:nth-child(3) {
     background: #ffab00;
     color: #000;
 }
 
-/* Delete */
 .node button:nth-child(4) {
     background: #d50000;
     color: #fff;
 }
 
-/* ===== MEMBERS TABLE ===== */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-table th, table td {
-    border: 1px solid #00ffcc;
-    padding: 6px;
-    text-align: center;
-    font-size: 12px;
-}
-
-table th {
-    background: #014d4d;
-}
-
-/* ===== MOBILE FIX ===== */
+/* ===== MOBILE ===== */
 @media (max-width: 600px) {
-
-    #tree {
-        overflow-x: auto;
-    }
-
     .node {
         min-width: 100px;
         font-size: 12px;
@@ -141,10 +137,5 @@ table th {
 
     .children {
         gap: 20px;
-    }
-
-    table th, table td {
-        font-size: 10px;
-        padding: 4px;
     }
 }
