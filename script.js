@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     calculateAll();
     renderAll();
+    showDashboard(); // default screen
 });
 
 // SAVE
@@ -29,7 +30,6 @@ function saveData() {
 
 // ADD MEMBER
 function addMember(parentId, side) {
-
     const parent = members.find(m => m.id == parentId);
     if (!parent) return;
 
@@ -111,7 +111,6 @@ function getCap(level) {
 
 // PASS DOWN
 function passToChildren(member, amount) {
-
     let left = members.find(x => x.id == member.left);
     let right = members.find(x => x.id == member.right);
 
@@ -119,7 +118,7 @@ function passToChildren(member, amount) {
     if (right) right.extraIncome += amount / 2;
 }
 
-// FINAL CALCULATION
+// CALCULATION
 function calculateAll() {
 
     members.forEach(m => {
@@ -152,11 +151,12 @@ function calculateAll() {
     members.forEach(m => {
         let total = m.income + m.extraIncome;
         let cap = getCap(m.level);
+
         m.income = Math.min(total, cap);
     });
 }
 
-// 🌳 TREE RENDER (FIXED)
+// TREE
 function renderTree() {
 
     const tree = document.getElementById("tree");
@@ -174,8 +174,8 @@ function renderTree() {
                 Pair: ${m.pairs}<br>
                 ₹${m.income}<br>
 
-                <button onclick="addMember(${m.id}, 'left')">L+</button>
-                <button onclick="addMember(${m.id}, 'right')">R+</button>
+                <button onclick="addMember(${m.id}, 'left')">L</button>
+                <button onclick="addMember(${m.id}, 'right')">R</button>
                 <button onclick="deleteMember(${m.id})">Del</button>
             </div>
 
@@ -216,20 +216,45 @@ function renderMembers() {
             <td>${left}</td>
             <td>${right}</td>
             <td>${m.pairs}</td>
-            <td>₹${m.income}</td>
+            <td>${m.income}</td>
             <td><button onclick="deleteMember(${m.id})">Delete</button></td>
         </tr>
         `;
     });
 }
 
-// SHOW BUTTON FIX
+// DASHBOARD
+function renderDashboard() {
+
+    document.getElementById("totalMembers").innerText = members.length;
+
+    let totalPairs = members.reduce((sum, m) => sum + m.pairs, 0);
+    let totalIncome = members.reduce((sum, m) => sum + m.income, 0);
+
+    let companyProfit = totalPairs * 10 - totalIncome;
+
+    document.getElementById("totalPairs").innerText = totalPairs;
+    document.getElementById("totalIncome").innerText = totalIncome;
+    document.getElementById("companyProfit").innerText = companyProfit;
+}
+
+// BUTTON FIX
+function showDashboard() {
+    document.getElementById("dashboardSection").style.display = "block";
+    document.getElementById("treeSection").style.display = "none";
+    document.getElementById("membersSection").style.display = "none";
+
+    renderDashboard();
+}
+
 function showTree() {
+    document.getElementById("dashboardSection").style.display = "none";
     document.getElementById("treeSection").style.display = "block";
     document.getElementById("membersSection").style.display = "none";
 }
 
 function showMembers() {
+    document.getElementById("dashboardSection").style.display = "none";
     document.getElementById("treeSection").style.display = "none";
     document.getElementById("membersSection").style.display = "block";
 }
@@ -238,4 +263,5 @@ function showMembers() {
 function renderAll() {
     renderTree();
     renderMembers();
-}
+    renderDashboard();
+                    }
