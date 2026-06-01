@@ -167,29 +167,31 @@ function renderTree() {
     members.forEach(m => map[m.id] = m);
 
     function build(m) {
-        if (!m) return "";
+    if (!m) return "";
 
-        return `
-        <div class="tree-node">
-            <div class="node">
-                <b>${m.name}</b><br>
-                Pair: ${m.pairs}<br>
-                ₹${m.income}<br>
+    return `
+    <div class="tree-node">
+        <div class="node">
+            <b>${m.name}</b><br>
+            Pair: ${m.pairs}<br>
+            ₹${m.income}<br>
 
-                <button onclick="addMember(${m.id},'left')">L+</button>
-                <button onclick="addMember(${m.id},'right')">R+</button>
-                <button onclick="deleteMember(${m.id})">Del</button>
-            </div>
-${(m.left || m.right) ? `
-<div class="children">
-    ${m.left ? build(map[m.left]) : ""}
-    ${m.right ? build(map[m.right]) : ""}
-</div>
-` : ""}
-        `;
+            <button onclick="addMember(${m.id}, 'left')">L+</button>
+            <button onclick="addMember(${m.id}, 'right')">R+</button>
+            <button onclick="deleteMember(${m.id})">Del</button>
+        </div>
+
+        ${(m.left || m.right) ? `
+        <div class="children">
+            ${m.left ? build(members.find(x => x.id == m.left)) : ""}
+            ${m.right ? build(members.find(x => x.id == m.right)) : ""}
+        </div>
+        ` : ""}
+    </div>
+    `;
     }
 
-    const root = members.find(m => m.parent === 0);
+    const root = members.find(m => m.id === 1);
 
 if (root) {
     tree.innerHTML = build(root);
