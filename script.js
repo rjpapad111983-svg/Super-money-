@@ -181,10 +181,11 @@ function renderTree() {
                 <button onclick="deleteMember(${m.id})">Del</button>
             </div>
 
-            <div class="children">
-                ${m.left ? build(map[m.left]) : ""}
-                ${m.right ? build(map[m.right]) : ""}
-            </div>
+            ${(m.left || m.right) ? `
+<div class="children">
+    ${m.left ? build(map[m.left]) : ""}
+    ${m.right ? build(map[m.right]) : ""}
+</div>` : ""}
         </div>
         `;
     }
