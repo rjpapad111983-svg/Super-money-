@@ -192,7 +192,7 @@ function renderTree() {
     const root = members.find(m => m.parent === 0);
 
 if (root) {
-    tree.innerHTML = build(root.id);
+    tree.innerHTML = build(root);
 } else {
     tree.innerHTML = "<p>No root found</p>";
 }
