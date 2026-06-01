@@ -189,11 +189,12 @@ function renderTree() {
         `;
     }
 
-    const root = members.find(m => m.parent == 0);
-    tree.innerHTML = build(root);
-}
-    const root = members.find(m => m.parent == 0);
-    tree.innerHTML = `<ul>${build(root)}</ul>`;
+    const root = members.find(m => m.parent === 0);
+
+if (root) {
+    tree.innerHTML = build(root.id);
+} else {
+    tree.innerHTML = "<p>No root found</p>";
 }
 
 // MEMBERS TABLE
