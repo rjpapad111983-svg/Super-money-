@@ -48,7 +48,7 @@ function addMember(parentId, side) {
         pairs: 0,
         income: 0,
         extraIncome: 0,
-        level: 1   // ✅ always start from level 1
+        level: 1
     };
 
     if (side === "left") parent.left = id;
@@ -58,6 +58,22 @@ function addMember(parentId, side) {
 
     saveData();
     calculateAll();
+    renderAll();
+}
+
+// EDIT MEMBER
+function editMember(id) {
+
+    let m = members.find(x => x.id == id);
+    if (!m) return;
+
+    let newName = prompt("Enter new name", m.name);
+
+    if (newName && newName.trim() !== "") {
+        m.name = newName;
+    }
+
+    saveData();
     renderAll();
 }
 
@@ -197,6 +213,7 @@ function renderTree() {
 
                 <button onclick="addMember(${m.id}, 'left')">L+</button>
                 <button onclick="addMember(${m.id}, 'right')">R+</button>
+                <button onclick="editMember(${m.id})">Edit</button>
                 <button onclick="deleteMember(${m.id})">Del</button>
             </div>
 
@@ -278,4 +295,4 @@ function renderAll() {
     renderTree();
     renderMembers();
     renderDashboard();
-            }
+}
