@@ -9,14 +9,19 @@
 
 <h2>MLM Panel</h2>
 
-<!-- 🔹 MENU -->
+<!-- ===== MENU ===== -->
 <div class="menu">
     <button onclick="showDashboard()">Dashboard</button>
     <button onclick="showTree()">Tree</button>
     <button onclick="showMembers()">Members</button>
+
+    <!-- 🔥 ZOOM BUTTONS -->
+    <button onclick="zoomIn()">Zoom +</button>
+    <button onclick="zoomOut()">Zoom -</button>
+    <button onclick="resetZoom()">Reset</button>
 </div>
 
-<!-- 🔹 DASHBOARD -->
+<!-- ===== DASHBOARD ===== -->
 <div id="dashboardSection">
     <h3>Dashboard</h3>
 
@@ -37,13 +42,17 @@
     </div>
 </div>
 
-<!-- 🔹 TREE -->
+<!-- ===== TREE ===== -->
 <div id="treeSection" style="display:none;">
     <h3>Binary Tree</h3>
-    <div id="tree"></div>
+
+    <!-- 🔥 WRAPPER FOR SCROLL + ZOOM -->
+    <div id="treeWrapper">
+        <div id="tree"></div>
+    </div>
 </div>
 
-<!-- 🔹 MEMBERS -->
+<!-- ===== MEMBERS ===== -->
 <div id="membersSection" style="display:none;">
     <h3>Members</h3>
 
