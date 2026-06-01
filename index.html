@@ -9,30 +9,41 @@
 
 <h2>MLM Panel</h2>
 
-<!-- MENU -->
+<!-- 🔹 MENU -->
 <div class="menu">
     <button onclick="showDashboard()">Dashboard</button>
     <button onclick="showTree()">Tree</button>
     <button onclick="showMembers()">Members</button>
 </div>
 
-<!-- ✅ DASHBOARD -->
+<!-- 🔹 DASHBOARD -->
 <div id="dashboardSection">
     <h3>Dashboard</h3>
 
-    <div class="card">Total Members: <span id="totalMembers">0</span></div>
-    <div class="card">Total Pairs: <span id="totalPairs">0</span></div>
-    <div class="card">Total Income: ₹<span id="totalIncome">0</span></div>
-    <div class="card">Company Profit: ₹<span id="companyProfit">0</span></div>
+    <div class="card">
+        Total Members: <span id="totalMembers">0</span>
+    </div>
+
+    <div class="card">
+        Total Pairs: <span id="totalPairs">0</span>
+    </div>
+
+    <div class="card">
+        Total Income: ₹<span id="totalIncome">0</span>
+    </div>
+
+    <div class="card">
+        Company Profit: ₹<span id="companyProfit">0</span>
+    </div>
 </div>
 
-<!-- ✅ TREE -->
+<!-- 🔹 TREE -->
 <div id="treeSection" style="display:none;">
     <h3>Binary Tree</h3>
     <div id="tree"></div>
 </div>
 
-<!-- ✅ MEMBERS -->
+<!-- 🔹 MEMBERS -->
 <div id="membersSection" style="display:none;">
     <h3>Members</h3>
 
@@ -45,6 +56,7 @@
                 <th>Right</th>
                 <th>Pairs</th>
                 <th>Income</th>
+                <th>Level</th>
                 <th>Action</th>
             </tr>
         </thead>
