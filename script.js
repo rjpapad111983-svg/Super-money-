@@ -47,7 +47,7 @@ function addMember(parentId, side) {
         pairs: 0,
         income: 0,
         extraIncome: 0,
-        level: 1
+        level: parent.level + 1
     };
 
     if (side === "left") parent.left = id;
@@ -119,7 +119,7 @@ function passToChildren(member, amount) {
     if (right) right.extraIncome += amount / 2;
 }
 
-// 🔥 FINAL CALCULATION FIX
+// FINAL CALCULATION
 function calculateAll() {
 
     members.forEach(m => {
@@ -137,7 +137,6 @@ function calculateAll() {
         m.pairs = Math.min(left, right);
 
         let income = m.pairs * 3;
-
         let cap = getCap(m.level);
 
         if (income > cap) {
@@ -149,54 +148,54 @@ function calculateAll() {
         }
     });
 
-    // STEP 2 FINAL CAP
+    // STEP 2 FINAL
     members.forEach(m => {
         let total = m.income + m.extraIncome;
         let cap = getCap(m.level);
-
         m.income = Math.min(total, cap);
     });
 }
 
+// 🌳 TREE RENDER (FIXED)
 function renderTree() {
 
     const tree = document.getElementById("tree");
     tree.innerHTML = "";
 
-    const map = {};
-    members.forEach(m => map[m.id] = m);
+    function build(id) {
 
-    function build(m) {
-    if (!m) return "";
+        let m = members.find(x => x.id == id);
+        if (!m) return "";
 
-    return `
-    <div class="tree-node">
-        <div class="node">
-            <b>${m.name}</b><br>
-            Pair: ${m.pairs}<br>
-            ₹${m.income}<br>
+        return `
+        <div class="tree-node">
+            <div class="node">
+                <b>${m.name}</b><br>
+                Pair: ${m.pairs}<br>
+                ₹${m.income}<br>
 
-            <button onclick="addMember(${m.id}, 'left')">L+</button>
-            <button onclick="addMember(${m.id}, 'right')">R+</button>
-            <button onclick="deleteMember(${m.id})">Del</button>
+                <button onclick="addMember(${m.id}, 'left')">L+</button>
+                <button onclick="addMember(${m.id}, 'right')">R+</button>
+                <button onclick="deleteMember(${m.id})">Del</button>
+            </div>
+
+            ${(m.left || m.right) ? `
+            <div class="children">
+                ${m.left ? build(m.left) : ""}
+                ${m.right ? build(m.right) : ""}
+            </div>
+            ` : ""}
         </div>
-
-        ${(m.left || m.right) ? `
-        <div class="children">
-            ${m.left ? build(members.find(x => x.id == m.left)) : ""}
-            ${m.right ? build(members.find(x => x.id == m.right)) : ""}
-        </div>
-        ` : ""}
-    </div>
-    `;
+        `;
     }
 
-    const root = members.find(m => m.id === 1);
+    let root = members.find(m => m.id == 1);
 
-if (root) {
-    tree.innerHTML = build(root);
-} else {
-    tree.innerHTML = "<p>No root found</p>";
+    if (root) {
+        tree.innerHTML = build(root.id);
+    } else {
+        tree.innerHTML = "<p>No root found</p>";
+    }
 }
 
 // MEMBERS TABLE
@@ -222,6 +221,17 @@ function renderMembers() {
         </tr>
         `;
     });
+}
+
+// SHOW BUTTON FIX
+function showTree() {
+    document.getElementById("treeSection").style.display = "block";
+    document.getElementById("membersSection").style.display = "none";
+}
+
+function showMembers() {
+    document.getElementById("treeSection").style.display = "none";
+    document.getElementById("membersSection").style.display = "block";
 }
 
 // RENDER ALL
