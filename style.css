@@ -44,15 +44,19 @@ button:hover {
 #tree {
     padding: 20px;
     overflow-x: auto;
+    width: 100%;
+    display: block;
 }
 
 /* ===== TREE STRUCTURE ===== */
 .tree-node {
     text-align: center;
     margin-top: 20px;
+    display: inline-block;
+    min-width: max-content; /* 🔥 FIX */
 }
 
-/* NODE BOX */
+/* ===== NODE BOX ===== */
 .node {
     border: 2px solid #00ffcc;
     padding: 10px;
@@ -62,12 +66,13 @@ button:hover {
     min-width: 120px;
 }
 
-/* CHILDREN ALIGNMENT */
+/* ===== CHILDREN ALIGNMENT ===== */
 .children {
     display: flex;
     justify-content: center;
     gap: 40px;
     margin-top: 20px;
+    flex-wrap: nowrap; /* 🔥 FIX (wrap हटाया) */
 }
 
 /* ===== NODE BUTTONS ===== */
@@ -125,6 +130,10 @@ table th {
 /* ===== MOBILE FIX ===== */
 @media (max-width: 600px) {
 
+    #tree {
+        overflow-x: auto;
+    }
+
     .node {
         min-width: 100px;
         font-size: 12px;
@@ -132,7 +141,6 @@ table th {
 
     .children {
         gap: 20px;
-        flex-wrap: wrap;
     }
 
     table th, table td {
