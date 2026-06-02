@@ -1,6 +1,6 @@
 let members = JSON.parse(localStorage.getItem("members")) || [];
 
-// ===== INIT =====
+// INIT
 document.addEventListener("DOMContentLoaded", () => {
 
     if (members.length === 0) {
@@ -13,7 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
             pairs: 0,
             income: 0,
             extraIncome: 0,
-            level: 1
+            level: 1,
+            leftCarry: 0,
+            rightCarry: 0
         });
         saveData();
     }
@@ -23,17 +25,18 @@ document.addEventListener("DOMContentLoaded", () => {
     showDashboard();
 });
 
-// ===== SAVE =====
+// SAVE
 function saveData() {
     localStorage.setItem("members", JSON.stringify(members));
 }
 
-// ===== ADD MEMBER =====
+// ADD MEMBER
 function addMember(parentId, side) {
-    const parent = members.find(m => m.id === parentId);
+
+    const parent = members.find(m => m.id == parentId);
     if (!parent) return;
 
-    if (parent[side] !== 0) {
+    if (parent[side] != 0) {
         alert("Already filled!");
         return;
     }
@@ -52,7 +55,9 @@ function addMember(parentId, side) {
         pairs: 0,
         income: 0,
         extraIncome: 0,
-        level: 1
+        level: 1,
+        leftCarry: 0,
+        rightCarry: 0
     };
 
     parent[side] = id;
@@ -63,9 +68,9 @@ function addMember(parentId, side) {
     renderAll();
 }
 
-// ===== EDIT MEMBER =====
+// EDIT MEMBER
 function editMember(id) {
-    let m = members.find(x => x.id === id);
+    let m = members.find(x => x.id == id);
     if (!m) return;
 
     let newName = prompt("Enter new name", m.name);
@@ -78,29 +83,29 @@ function editMember(id) {
     renderAll();
 }
 
-// ===== DELETE MEMBER =====
+// DELETE
 function deleteMember(id) {
 
-    if (id === 1) {
+    if (id == 1) {
         alert("Root delete nahi kar sakte");
         return;
     }
 
     function removeTree(mid) {
-        let m = members.find(x => x.id === mid);
+        let m = members.find(x => x.id == mid);
         if (!m) return;
 
         if (m.left) removeTree(m.left);
         if (m.right) removeTree(m.right);
 
-        members = members.filter(x => x.id !== mid);
+        members = members.filter(x => x.id != mid);
     }
 
     removeTree(id);
 
     members.forEach(m => {
-        if (m.left === id) m.left = 0;
-        if (m.right === id) m.right = 0;
+        if (m.left == id) m.left = 0;
+        if (m.right == id) m.right = 0;
     });
 
     saveData();
@@ -108,52 +113,50 @@ function deleteMember(id) {
     renderAll();
 }
 
-// ===== COUNT TEAM =====
+// COUNT TEAM
 function countTeam(id) {
     if (!id) return 0;
 
-    let m = members.find(x => x.id === id);
+    let m = members.find(x => x.id == id);
     if (!m) return 0;
 
     return 1 + countTeam(m.left) + countTeam(m.right);
 }
 
-// ===== CAP =====
+// CAP
 function getCap(level) {
-    if (level === 1) return 180;
-    if (level === 2) return 200;
-    if (level === 3) return 250;
-    if (level === 4) return 300;
+    if (level == 1) return 180;
+    if (level == 2) return 200;
+    if (level == 3) return 250;
+    if (level == 4) return 300;
     return 500;
 }
 
-// ===== PASS EXTRA =====
+// PASS EXTRA
 function passToChildren(member, amount) {
-    let left = members.find(x => x.id === member.left);
-    let right = members.find(x => x.id === member.right);
+    let left = members.find(x => x.id == member.left);
+    let right = members.find(x => x.id == member.right);
 
     if (left) left.extraIncome += amount / 2;
     if (right) right.extraIncome += amount / 2;
 }
 
-// ===== CALCULATION =====
+// 🔥 MAIN CALCULATION (REAL BINARY)
 function calculateAll() {
 
     members.forEach(m => {
-        m.pairs = 0;
-        m.income = 0;
-        m.extraIncome = 0;
-    });
 
-    // STEP 1
-    members.forEach(m => {
+        let leftNew = countTeam(m.left);
+        let rightNew = countTeam(m.right);
 
-        let left = countTeam(m.left);
-        let right = countTeam(m.right);
+        let left = (m.leftCarry || 0) + leftNew;
+        let right = (m.rightCarry || 0) + rightNew;
 
-        m.pairs = Math.min(left, right);
+        let pair = Math.min(left, right);
 
-        let income = m.pairs * 3;
+        m.pairs = pair;
+
+        let income = pair * 3;
         let cap = getCap(m.level);
 
         if (income > cap) {
@@ -163,20 +166,24 @@ function calculateAll() {
         } else {
             m.income = income;
         }
+
+        // carry forward
+        m.leftCarry = left - pair;
+        m.rightCarry = right - pair;
     });
 
-    // STEP 2
+    // FINAL CAP
     members.forEach(m => {
-        let total = m.income + m.extraIncome;
+        let total = m.income + (m.extraIncome || 0);
         let cap = getCap(m.level);
-
         m.income = Math.min(total, cap);
     });
 
     // LEVEL UPGRADE
     members.forEach(m => {
-        let left = members.find(x => x.id === m.left);
-        let right = members.find(x => x.id === m.right);
+
+        let left = members.find(x => x.id == m.left);
+        let right = members.find(x => x.id == m.right);
 
         let leftIncome = left ? left.income : 0;
         let rightIncome = right ? right.income : 0;
@@ -191,15 +198,14 @@ function calculateAll() {
     });
 }
 
-// ===== TREE =====
+// TREE
 function renderTree() {
 
     const tree = document.getElementById("tree");
     tree.innerHTML = "";
 
     function build(id) {
-
-        let m = members.find(x => x.id === id);
+        let m = members.find(x => x.id == id);
         if (!m) return "";
 
         return `
@@ -220,16 +226,14 @@ function renderTree() {
             <div class="children">
                 ${m.left ? build(m.left) : ""}
                 ${m.right ? build(m.right) : ""}
-            </div>
-            ` : ""}
-        </div>
-        `;
+            </div>` : ""}
+        </div>`;
     }
 
     tree.innerHTML = build(1);
 }
 
-// ===== MEMBERS TABLE =====
+// MEMBERS TABLE
 function renderMembers() {
 
     const table = document.getElementById("membersTable");
@@ -253,12 +257,11 @@ function renderMembers() {
                 <button onclick="editMember(${m.id})">Edit</button>
                 <button onclick="deleteMember(${m.id})">Delete</button>
             </td>
-        </tr>
-        `;
+        </tr>`;
     });
 }
 
-// ===== DASHBOARD =====
+// DASHBOARD
 function renderDashboard() {
 
     document.getElementById("totalMembers").innerText = members.length;
@@ -266,14 +269,17 @@ function renderDashboard() {
     let totalPairs = members.reduce((sum, m) => sum + m.pairs, 0);
     let totalIncome = members.reduce((sum, m) => sum + m.income, 0);
 
-    let companyProfit = totalPairs * 10 - totalIncome;
+    // 🔥 Company earning (₹10 per join)
+    let companyIncome = members.length * 10;
+
+    let companyProfit = companyIncome - totalIncome;
 
     document.getElementById("totalPairs").innerText = totalPairs;
     document.getElementById("totalIncome").innerText = totalIncome;
     document.getElementById("companyProfit").innerText = companyProfit;
 }
 
-// ===== SWITCH =====
+// SWITCH
 function showDashboard() {
     document.getElementById("dashboardSection").style.display = "block";
     document.getElementById("treeSection").style.display = "none";
@@ -293,7 +299,7 @@ function showMembers() {
     document.getElementById("membersSection").style.display = "block";
 }
 
-// ===== RENDER ALL =====
+// RENDER ALL
 function renderAll() {
     renderTree();
     renderMembers();
