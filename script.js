@@ -68,7 +68,7 @@ function addMember(parentId, side) {
     renderAll();
 }
 
-// EDIT MEMBER
+// EDIT
 function editMember(id) {
     let m = members.find(x => x.id == id);
     if (!m) return;
@@ -132,18 +132,37 @@ function getCap(level) {
     return 500;
 }
 
-// PASS EXTRA
-function passToChildren(member, amount) {
-    let left = members.find(x => x.id == member.left);
-    let right = members.find(x => x.id == member.right);
+// PASS DOWN
+function passDown(id, amount) {
 
-    if (left) left.extraIncome += amount / 2;
-    if (right) right.extraIncome += amount / 2;
+    let m = members.find(x => x.id == id);
+    if (!m) return;
+
+    let left = members.find(x => x.id == m.left);
+    let right = members.find(x => x.id == m.right);
+
+    let share = amount / 2;
+
+    if (left) {
+        left.extraIncome = (left.extraIncome || 0) + share;
+    }
+
+    if (right) {
+        right.extraIncome = (right.extraIncome || 0) + share;
+    }
 }
 
-// 🔥 MAIN CALCULATION (REAL BINARY)
+// MAIN CALCULATION (REAL BINARY)
 function calculateAll() {
 
+    // RESET
+    members.forEach(m => {
+        m.pairs = 0;
+        m.income = 0;
+        m.extraIncome = 0;
+    });
+
+    // STEP 1
     members.forEach(m => {
 
         let leftNew = countTeam(m.left);
@@ -156,27 +175,35 @@ function calculateAll() {
 
         m.pairs = pair;
 
+        // carry forward
+        m.leftCarry = left - pair;
+        m.rightCarry = right - pair;
+
         let income = pair * 3;
         let cap = getCap(m.level);
 
         if (income > cap) {
             let extra = income - cap;
             m.income = cap;
-            passToChildren(m, extra);
+            passDown(m.id, extra);
         } else {
             m.income = income;
         }
-
-        // carry forward
-        m.leftCarry = left - pair;
-        m.rightCarry = right - pair;
     });
 
-    // FINAL CAP
+    // STEP 2 (extra re-check)
     members.forEach(m => {
+
         let total = m.income + (m.extraIncome || 0);
         let cap = getCap(m.level);
-        m.income = Math.min(total, cap);
+
+        if (total > cap) {
+            let extra = total - cap;
+            m.income = cap;
+            passDown(m.id, extra);
+        } else {
+            m.income = total;
+        }
     });
 
     // LEVEL UPGRADE
@@ -205,6 +232,7 @@ function renderTree() {
     tree.innerHTML = "";
 
     function build(id) {
+
         let m = members.find(x => x.id == id);
         if (!m) return "";
 
@@ -227,7 +255,8 @@ function renderTree() {
                 ${m.left ? build(m.left) : ""}
                 ${m.right ? build(m.right) : ""}
             </div>` : ""}
-        </div>`;
+        </div>
+        `;
     }
 
     tree.innerHTML = build(1);
@@ -269,9 +298,7 @@ function renderDashboard() {
     let totalPairs = members.reduce((sum, m) => sum + m.pairs, 0);
     let totalIncome = members.reduce((sum, m) => sum + m.income, 0);
 
-    // 🔥 Company earning (₹10 per join)
     let companyIncome = members.length * 10;
-
     let companyProfit = companyIncome - totalIncome;
 
     document.getElementById("totalPairs").innerText = totalPairs;
@@ -291,12 +318,14 @@ function showTree() {
     document.getElementById("dashboardSection").style.display = "none";
     document.getElementById("treeSection").style.display = "block";
     document.getElementById("membersSection").style.display = "none";
+    renderTree();
 }
 
 function showMembers() {
     document.getElementById("dashboardSection").style.display = "none";
     document.getElementById("treeSection").style.display = "none";
     document.getElementById("membersSection").style.display = "block";
+    renderMembers();
 }
 
 // RENDER ALL
@@ -304,4 +333,4 @@ function renderAll() {
     renderTree();
     renderMembers();
     renderDashboard();
-}
+                    }
