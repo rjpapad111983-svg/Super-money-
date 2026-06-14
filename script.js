@@ -66,6 +66,21 @@ function addMember(parentId, side) {
     renderAll();
 }
 
+// EDIT MEMBER ✅
+function editMember(id) {
+    let m = members.find(x => x.id == id);
+    if (!m) return;
+
+    let newName = prompt("Enter new name", m.name);
+
+    if (newName && newName.trim() !== "") {
+        m.name = newName.trim();
+    }
+
+    saveData();
+    renderAll();
+}
+
 // DELETE
 function deleteMember(id) {
     if (id == 1) {
@@ -108,7 +123,6 @@ function countTeam(id) {
 //////////////////////////////////////////////////////
 // 🔥 DISTRIBUTE DOWN (MAIN LOGIC)
 //////////////////////////////////////////////////////
-
 function distributeDown(member, amount) {
     if (amount <= 0) return;
 
@@ -124,7 +138,7 @@ function distributeDown(member, amount) {
         if (total < 165) {
             left.extraIncome = (left.extraIncome || 0) + share;
         } else {
-            distributeDown(left, share); // 🔥 recursion
+            distributeDown(left, share);
         }
     } else {
         window.companyExtra += share;
@@ -137,7 +151,7 @@ function distributeDown(member, amount) {
         if (total < 165) {
             right.extraIncome = (right.extraIncome || 0) + share;
         } else {
-            distributeDown(right, share); // 🔥 recursion
+            distributeDown(right, share);
         }
     } else {
         window.companyExtra += share;
@@ -147,7 +161,6 @@ function distributeDown(member, amount) {
 //////////////////////////////////////////////////////
 // 🔥 MAIN CALCULATION
 //////////////////////////////////////////////////////
-
 function calculateAll() {
 
     // RESET
@@ -181,7 +194,6 @@ function calculateAll() {
             m.income = income;
         }
 
-        // carry
         m.leftCarry = left - pair;
         m.rightCarry = right - pair;
     });
@@ -225,6 +237,7 @@ function renderMembers() {
             <td>
                 <button onclick="addMember(${m.id}, 'left')">L+</button>
                 <button onclick="addMember(${m.id}, 'right')">R+</button>
+                <button onclick="editMember(${m.id})">Edit</button>
                 <button onclick="deleteMember(${m.id})">Delete</button>
             </td>
         </tr>
@@ -245,10 +258,8 @@ function renderDashboard() {
     document.getElementById("totalPairs").innerText = totalPairs;
     document.getElementById("totalIncome").innerText = totalIncome;
     document.getElementById("companyProfit").innerText = companyProfit;
-    document.getElementById("companyExtra").innerText = window.companyExtra;
 }
 
-// SWITCH
 function showDashboard() {
     document.getElementById("dashboardSection").style.display = "block";
     document.getElementById("treeSection").style.display = "none";
@@ -276,14 +287,15 @@ function renderAll() {
 }
 
 //////////////////////////////////////////////////////
-// TREE VIEW
+// TREE VIEW (EDIT BUTTON ADDED)
 //////////////////////////////////////////////////////
-
 function renderTree() {
+
     const tree = document.getElementById("tree");
     tree.innerHTML = "";
 
     function build(id) {
+
         let m = members.find(x => x.id == id);
         if (!m) return "";
 
@@ -292,13 +304,14 @@ function renderTree() {
             <div class="node">
                 <b>${m.name}</b><br>
                 Pair: ${m.pairs}<br>
-                ₹${m.income}
-                <br>
+                ₹${m.income}<br>
+
                 <button onclick="addMember(${m.id}, 'left')">L+</button>
                 <button onclick="addMember(${m.id}, 'right')">R+</button>
+                <button onclick="editMember(${m.id})">Edit</button>
             </div>
 
-            ${(m.left || m.right) ? `
+            ${m.left || m.right ? `
             <div class="children">
                 ${m.left ? build(m.left) : ""}
                 ${m.right ? build(m.right) : ""}
